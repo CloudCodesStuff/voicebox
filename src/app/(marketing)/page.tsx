@@ -362,6 +362,16 @@ export default function LandingPage() {
           }),
         }}
       />
+
+      {/* Dogfooding: the widget on our own landing page. `site.url` resolves
+          to the right domain on its own (production, a preview, or
+          localhost), the same auto-detection every other absolute link on
+          this page already goes through, see src/env.ts. */}
+      <Script
+        src={`${site.url}/widget.js`}
+        data-project="pk_rvP7OxYq0W7sc2Uj0POIDwlh"
+        strategy="lazyOnload"
+      />
     </>
   );
 }
