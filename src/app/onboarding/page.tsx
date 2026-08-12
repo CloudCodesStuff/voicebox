@@ -12,15 +12,31 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function OnboardingPage() {
+export default async function OnboardingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ new?: string }>;
+}) {
   const session = await auth();
   if (!session?.user) redirect("/signin");
 
-  const existing = await db.membership.findFirst({
-    where: { userId: session.user.id },
-    select: { id: true },
-  });
-  if (existing) redirect("/app");
+  // `?new=1` is someone deliberately adding a second workspace from the
+  // switcher, so the "you already have one, go to the dashboard" redirect
+  // would be exactly wrong for them.
+  const wantsAnother = (await searchParams).new === "1";
 
-  return <OnboardingFlow defaultName={session.user.name ?? ""} />;
+  if (!wantsAnother) {
+    const existing = await db.membership.findFirst({
+      where: { userId: session.user.id },
+      select: { id: true },
+    });
+    if (existing) redirect("/app");
+  }
+
+  return (
+    <OnboardingFlow
+      defaultName={session.user.name ?? ""}
+      additional={wantsAnother}
+    />
+  );
 }

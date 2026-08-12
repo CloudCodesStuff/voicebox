@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -14,16 +13,16 @@ export function AcceptInvite({
   token: string;
   orgName: string;
 }) {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
   const accept = api.org.acceptInvite.useMutation({
     onSuccess(result) {
       toast.success(`You're in. Welcome to ${result.orgName}.`);
-      // replace, not push: the token is spent, so the back button should not
-      // return to a page that will now fail.
-      router.replace("/app");
-      router.refresh();
+      // A full document load rather than router.replace: accepting switches
+      // the active workspace, and a soft navigation would carry the previous
+      // one's cached queries into it. It also spends the token, so the back
+      // button must not return to a page that will now fail.
+      window.location.replace("/app");
     },
     onError(e) {
       setError(e.message);
