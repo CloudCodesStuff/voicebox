@@ -11,6 +11,7 @@ import {
   Layers,
   LogOut,
   Menu,
+  Plus,
   Settings,
   Sparkles,
   X,
@@ -41,14 +42,20 @@ const nav = [
   { href: "/app/settings", label: "Settings", icon: Settings, tour: undefined },
 ];
 
+type Workspace = { id: string; name: string };
+
 export function AppShell({
   orgName,
+  orgId,
+  workspaces,
   userName,
   userEmail,
   userImage,
   children,
 }: {
   orgName: string;
+  orgId: string;
+  workspaces: Workspace[];
   userName: string;
   userEmail: string;
   userImage: string | null;
@@ -90,6 +97,8 @@ export function AppShell({
             userEmail={userEmail}
             userImage={userImage}
             orgName={orgName}
+            orgId={orgId}
+            workspaces={workspaces}
           />
         </div>
       </aside>
@@ -132,6 +141,8 @@ export function AppShell({
                 userEmail={userEmail}
                 userImage={userImage}
                 orgName={orgName}
+                orgId={orgId}
+                workspaces={workspaces}
               />
             </div>
           </div>
@@ -273,11 +284,15 @@ function AccountMenu({
   userEmail,
   userImage,
   orgName,
+  orgId,
+  workspaces,
 }: {
   userName: string;
   userEmail: string;
   userImage: string | null;
   orgName: string;
+  orgId: string;
+  workspaces: Workspace[];
 }) {
   return (
     <DropdownMenu>
@@ -304,6 +319,48 @@ function AccountMenu({
           </div>
           <div className="truncate text-[0.78rem] text-steel">{userEmail}</div>
         </div>
+        <DropdownMenuSeparator />
+
+        {/* Workspaces. Shown even when there's only one, so the concept and
+            the way to add another are discoverable before you need them, and
+            so the menu doesn't restructure itself the day you join a team. */}
+        <div className="px-2 pt-1.5 pb-1">
+          <div className="label">Workspace</div>
+        </div>
+        {workspaces.map((w) => (
+          <DropdownMenuItem key={w.id} asChild>
+            {/* Native POST, not a Server Function: switching tenants has to
+                throw away the client cache, and only a real document load
+                does that. See the route handler for the full reasoning. */}
+            <form
+              method="POST"
+              action="/api/workspace/switch"
+              className="w-full"
+            >
+              <input type="hidden" name="orgId" value={w.id} />
+              <button
+                type="submit"
+                disabled={w.id === orgId}
+                className="flex w-full cursor-pointer items-center gap-2 disabled:cursor-default"
+              >
+                <span className="flex-1 truncate text-left">{w.name}</span>
+                {w.id === orgId && (
+                  <Check className="size-3.5 shrink-0 text-mint-deep" />
+                )}
+              </button>
+            </form>
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuItem asChild>
+          <Link
+            href="/onboarding?new=1"
+            className="cursor-pointer text-steel"
+          >
+            <Plus className="mr-2 size-4" />
+            New workspace
+          </Link>
+        </DropdownMenuItem>
+
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/app/settings/general" className="cursor-pointer">

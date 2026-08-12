@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { ArrowRight, Check, Copy, Loader2, Radio, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -11,8 +10,14 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/client";
 
-export function OnboardingFlow({ defaultName }: { defaultName: string }) {
-  const router = useRouter();
+export function OnboardingFlow({
+  defaultName,
+  additional = false,
+}: {
+  defaultName: string;
+  /** True when this is a second workspace, not a first run. */
+  additional?: boolean;
+}) {
   const utils = api.useUtils();
 
   const [step, setStep] = useState<1 | 2>(1);
@@ -125,11 +130,12 @@ export function OnboardingFlow({ defaultName }: { defaultName: string }) {
         {step === 1 ? (
           <>
             <h1 className="text-[2rem] font-bold leading-tight tracking-[-0.02em] text-ink">
-              Let&apos;s set you up.
+              {additional ? "New workspace." : "Let's set you up."}
             </h1>
             <p className="mt-3 text-[0.97rem] leading-relaxed text-steel">
-              One organization, one project to start. You can add more projects
-              any time, each gets its own widget and its own themes.
+              {additional
+                ? "Separate from the workspaces you're already in: its own projects, its own team, its own plan. Switch between them from the account menu."
+                : "One workspace, one project to start. You can add more projects any time, each gets its own widget and its own themes."}
             </p>
 
             <div className="mt-10 space-y-7">
@@ -290,8 +296,10 @@ export function OnboardingFlow({ defaultName }: { defaultName: string }) {
               <button
                 type="button"
                 onClick={() => {
-                  router.replace("/app");
-                  router.refresh();
+                  // Hard load: creating a workspace made it the active one,
+                  // and anything cached here belongs to whichever workspace
+                  // was active before.
+                  window.location.replace("/app");
                 }}
                 className={cn(
                   "inline-flex min-h-12 items-center gap-2 rounded-lg px-6 text-[0.94rem] font-semibold transition-opacity",

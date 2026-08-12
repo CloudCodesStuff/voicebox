@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
+import { resolveActiveMembership } from "@/server/lib/active-org";
 
 /* ---------------------------------------------------------------------------
    tRPC context
@@ -63,13 +64,14 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
  * into context. Procedures scope every query with `ctx.orgId` and must never
  * accept an organization identifier as input, a client-supplied tenant id is
  * the entire class of bug this procedure exists to make impossible.
+ *
+ * Which org, when the user belongs to several, comes from the active-org
+ * cookie, but only after `resolveActiveMembership` confirms a membership row
+ * backs it. The cookie chooses between orgs the user already has; it can never
+ * grant one.
  */
 export const orgProcedure = protectedProcedure.use(async ({ ctx, next }) => {
-  const membership = await ctx.db.membership.findFirst({
-    where: { userId: ctx.session.user.id },
-    orderBy: { createdAt: "asc" },
-    include: { org: true },
-  });
+  const membership = await resolveActiveMembership(ctx.db, ctx.session.user.id);
 
   if (!membership) {
     // Distinct from UNAUTHORIZED: signed in, but hasn't finished onboarding.
@@ -82,6 +84,8 @@ export const orgProcedure = protectedProcedure.use(async ({ ctx, next }) => {
       orgId: membership.orgId,
       org: membership.org,
       role: membership.role,
+      /** The caller's own row here, so the UI can tell "me" from "them". */
+      membershipId: membership.id,
     },
   });
 });

@@ -11,6 +11,10 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "@/server/trpc/init";
+import {
+  clearActiveOrgCookie,
+  setActiveOrgCookie,
+} from "@/server/lib/active-org";
 import { projectKey, slugify, withSuffix } from "@/server/lib/ids";
 import {
   assertFeature,
@@ -32,7 +36,42 @@ export const orgRouter = createTRPCRouter({
     return membership?.org ?? null;
   }),
 
-  /** Creates the org, the first project, and the free subscription in one go. */
+  /**
+   * Every workspace this person belongs to, with their role in each.
+   *
+   * `protectedProcedure`, not `orgProcedure`: this is the list you choose an
+   * active org *from*, so it can't require one to already be chosen.
+   */
+  list: protectedProcedure.query(async ({ ctx }) => {
+    const memberships = await ctx.db.membership.findMany({
+      where: { userId: ctx.session.user.id },
+      orderBy: { createdAt: "asc" },
+      select: {
+        id: true,
+        role: true,
+        org: { select: { id: true, name: true, slug: true } },
+      },
+    });
+
+    return memberships.map((m) => ({
+      membershipId: m.id,
+      role: m.role,
+      id: m.org.id,
+      name: m.org.name,
+      slug: m.org.slug,
+    }));
+  }),
+
+  /**
+   * Creates the org, the first project, and the free subscription in one go,
+   * then makes it the active one.
+   *
+   * Deliberately allowed even when the caller already belongs to somewhere.
+   * Joining a team used to be a one-way door: accept an invite before you'd
+   * made your own workspace and you could never make one, because this
+   * refused anyone with an existing membership. Your account belonged to
+   * whoever invited you first.
+   */
   create: protectedProcedure
     .input(
       z.object({
@@ -42,13 +81,19 @@ export const orgRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const existing = await ctx.db.membership.findFirst({
-        where: { userId: ctx.session.user.id },
+      // Each workspace carries its own free plan and its own monthly quota,
+      // so unlimited creation is unlimited free tier. A person juggling more
+      // than a handful of workspaces is not the case this product serves.
+      assertRate(`createOrg:${ctx.session.user.id}`, 5, 60_000);
+
+      const owned = await ctx.db.membership.count({
+        where: { userId: ctx.session.user.id, role: "OWNER" },
       });
-      if (existing) {
+      if (owned >= 10) {
         throw new TRPCError({
-          code: "CONFLICT",
-          message: "You already belong to an organization.",
+          code: "FORBIDDEN",
+          message:
+            "You've reached the limit of 10 workspaces. Delete one you no longer use, or get in touch.",
         });
       }
 
@@ -78,6 +123,11 @@ export const orgRouter = createTRPCRouter({
         include: { projects: true },
       });
 
+      // Land in the thing you just made. Without this the dashboard would keep
+      // showing whichever workspace was already active and creating one would
+      // look like it silently failed.
+      await setActiveOrgCookie(org.id);
+
       return org;
     }),
 
@@ -95,6 +145,13 @@ export const orgRouter = createTRPCRouter({
     return {
       org: ctx.org,
       role: ctx.role,
+      // Identifies the caller inside the member list, so the team screen can
+      // grey out your own row instead of offering to demote or remove you.
+      me: {
+        membershipId: ctx.membershipId,
+        userId: ctx.session.user.id,
+        role: ctx.role,
+      },
       projects,
       subscription,
       usage: describeUsage(subscription),
@@ -395,6 +452,12 @@ export const orgRouter = createTRPCRouter({
 
       await ctx.db.invite.delete({ where: { id: invite.id } });
 
+      // Switch to the workspace they just joined. Accepting used to be
+      // invisible for anyone who already had one: the membership was created,
+      // but the dashboard resolved to their oldest org and the team they'd
+      // just joined was nowhere in the interface.
+      await setActiveOrgCookie(invite.orgId);
+
       return { orgName: invite.org.name };
     }),
 
@@ -412,21 +475,153 @@ export const orgRouter = createTRPCRouter({
       });
       if (!target) throw new TRPCError({ code: "NOT_FOUND" });
 
-      // An org without an owner is unrecoverable, so the last one can't leave.
+      // An org without an owner is unrecoverable, and there is exactly one at
+      // a time, so the owner is never removable from here. Handing the
+      // workspace over is `transferOwnership`; getting rid of it is `delete`.
       if (target.role === "OWNER") {
-        const owners = await ctx.db.membership.count({
-          where: { orgId: ctx.orgId, role: "OWNER" },
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "The owner can't be removed. Transfer ownership first, or delete the workspace.",
         });
-        if (owners <= 1) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "An organization must keep at least one owner.",
-          });
-        }
+      }
+
+      // Removing yourself through the member list would work, but it reads as
+      // an admin action taken on someone else. `leave` is the honest verb and
+      // it says what happens next.
+      if (target.userId === ctx.session.user.id) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Use Leave workspace to remove yourself.",
+        });
       }
 
       return ctx.db.membership.delete({ where: { id: target.id } });
     }),
+
+  /**
+   * Changes what someone can do here. Admins can promote and demote; the
+   * owner's role is only ever moved by `transferOwnership`.
+   */
+  updateMemberRole: adminProcedure
+    .input(
+      z.object({
+        membershipId: z.string(),
+        role: z.enum(["ADMIN", "MEMBER"]),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const target = await ctx.db.membership.findFirst({
+        where: { id: input.membershipId, orgId: ctx.orgId },
+      });
+      if (!target) throw new TRPCError({ code: "NOT_FOUND" });
+
+      if (target.role === "OWNER") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "The owner's role can only change by transferring ownership.",
+        });
+      }
+
+      // An admin demoting themselves is a one-way trip out of this screen,
+      // usually by misclick. Ask an owner.
+      if (target.userId === ctx.session.user.id) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You can't change your own role.",
+        });
+      }
+
+      return ctx.db.membership.update({
+        where: { id: target.id },
+        data: { role: input.role },
+      });
+    }),
+
+  /**
+   * Hands the workspace to someone else and steps down to admin.
+   *
+   * The only way an owner can ever leave. Without it the person who created
+   * the workspace is stuck with it forever: they can't be removed, they can't
+   * leave, and their only exit is destroying everyone's data.
+   *
+   * A swap rather than a second promotion, so there is always exactly one
+   * owner and "who is responsible for billing here" has one answer.
+   */
+  transferOwnership: ownerProcedure
+    .input(z.object({ membershipId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const target = await ctx.db.membership.findFirst({
+        where: { id: input.membershipId, orgId: ctx.orgId },
+        include: { user: { select: { name: true, email: true } } },
+      });
+      if (!target) throw new TRPCError({ code: "NOT_FOUND" });
+
+      if (target.userId === ctx.session.user.id) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You already own this workspace.",
+        });
+      }
+
+      // One transaction: a half-applied swap leaves the org with two owners or
+      // none, and the none case locks everybody out permanently.
+      await ctx.db.$transaction([
+        ctx.db.membership.updateMany({
+          where: { orgId: ctx.orgId, userId: ctx.session.user.id },
+          data: { role: "ADMIN" },
+        }),
+        ctx.db.membership.update({
+          where: { id: target.id },
+          data: { role: "OWNER" },
+        }),
+      ]);
+
+      return { newOwner: target.user.name || target.user.email || "them" };
+    }),
+
+  /**
+   * Leaves a workspace you were invited to.
+   *
+   * The counterpart to accepting an invite, and the thing that makes joining
+   * a team safe: nobody can add you to something you can't walk away from.
+   * Admins can remove members, but a member who wants out should never have
+   * to ask the person they want out from.
+   *
+   * The owner is the one exception, and it isn't a lock so much as an order of
+   * operations: hand the workspace over first, then leave.
+   */
+  leave: orgProcedure.mutation(async ({ ctx }) => {
+    const membership = await ctx.db.membership.findUnique({
+      where: { userId_orgId: { userId: ctx.session.user.id, orgId: ctx.orgId } },
+    });
+    if (!membership) throw new TRPCError({ code: "NOT_FOUND" });
+
+    if (membership.role === "OWNER") {
+      const others = await ctx.db.membership.count({
+        where: { orgId: ctx.orgId, userId: { not: ctx.session.user.id } },
+      });
+
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: others
+          ? "You own this workspace. Transfer it to someone else first, then you can leave."
+          : "You're the only person here, so leaving would strand the data. Delete the workspace instead.",
+      });
+    }
+
+    await ctx.db.membership.delete({ where: { id: membership.id } });
+
+    // Drop the pointer rather than picking their next workspace for them; the
+    // next request resolves to the oldest one they still have.
+    await clearActiveOrgCookie();
+
+    const remaining = await ctx.db.membership.count({
+      where: { userId: ctx.session.user.id },
+    });
+
+    return { orgName: ctx.org.name, remaining };
+  }),
 
   /* ------------------------------------------------------- data subject rights
 
@@ -553,10 +748,17 @@ export const orgRouter = createTRPCRouter({
    * every project, every piece of end-user feedback, and every theme goes.
    * The schema cascades from Organization, so one delete removes all of it.
    *
-   * The caller's own User row goes too when this was their only organization.
+   * The caller's own User row goes too when this was their only workspace.
    * Leaving it would keep their name, email, and Google refresh token on file
    * after they asked to be forgotten, which is exactly what the erasure right
-   * is about. Members who belong to other orgs keep their accounts.
+   * is about.
+   *
+   * Teammates keep their accounts either way. An earlier version deleted the
+   * account of every member who had no other workspace, which meant one
+   * person's decision about their own org silently destroyed other people's
+   * logins. Erasure is a right you exercise over your own data, not one an
+   * owner exercises on your behalf; they land on onboarding and make or join
+   * something else.
    */
   deleteOrganization: ownerProcedure
     .input(z.object({ confirmName: z.string() }))
@@ -568,25 +770,21 @@ export const orgRouter = createTRPCRouter({
         });
       }
 
-      const memberIds = (
-        await ctx.db.membership.findMany({
-          where: { orgId: ctx.orgId },
-          select: { userId: true },
-        })
-      ).map((m) => m.userId);
-
       await ctx.db.organization.delete({ where: { id: ctx.orgId } });
+      await clearActiveOrgCookie();
 
-      // Anyone whose membership rows are now all gone has no way back into the
-      // product, so their account is deleted with it (Account and Session
-      // cascade from User).
-      for (const userId of memberIds) {
-        const remaining = await ctx.db.membership.count({ where: { userId } });
-        if (remaining === 0) {
-          await ctx.db.user.delete({ where: { id: userId } }).catch(() => undefined);
-        }
+      const remaining = await ctx.db.membership.count({
+        where: { userId: ctx.session.user.id },
+      });
+
+      // Nothing left to sign in to, so the account itself goes (Account and
+      // Session cascade from User).
+      if (remaining === 0) {
+        await ctx.db.user
+          .delete({ where: { id: ctx.session.user.id } })
+          .catch(() => undefined);
       }
 
-      return { ok: true as const };
+      return { ok: true as const, remaining };
     }),
 });

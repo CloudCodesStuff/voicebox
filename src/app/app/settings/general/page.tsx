@@ -321,10 +321,13 @@ function PrivacySection({
   });
 
   const destroy = api.org.deleteOrganization.useMutation({
-    onSuccess() {
-      toast.success("Organization deleted.");
-      // Nothing left to render against, so leave the app entirely.
-      window.location.href = "/";
+    onSuccess({ remaining }) {
+      toast.success("Workspace deleted.");
+      // A full page load either way: the active workspace is resolved on the
+      // server and every cached query belongs to the org that just went away.
+      // Someone with other workspaces stays in the app and lands in the next
+      // one; someone who deleted their last one no longer has an account.
+      window.location.href = remaining > 0 ? "/app" : "/";
     },
     onError: (e) => toast.error(e.message),
   });
@@ -356,12 +359,13 @@ function PrivacySection({
       {isOwner && (
         <section className="rounded-xl border border-negative/40 bg-paper-2 p-6">
           <h2 className="text-[1rem] font-semibold text-ink">
-            Delete this organization
+            Delete this workspace
           </h2>
           <p className="mt-1 max-w-[62ch] text-[0.85rem] leading-relaxed text-steel">
-            Removes every project, every piece of feedback your users sent, every
-            theme, and the accounts of anyone who is only a member here. It
-            happens immediately and cannot be undone. Export first.
+            Removes every project, every piece of feedback your users sent, and
+            every theme. It happens immediately and cannot be undone. Export
+            first. Everyone here loses access; their accounts and any other
+            workspaces they belong to are untouched.
           </p>
 
           {confirming ? (
@@ -411,7 +415,7 @@ function PrivacySection({
               className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-lg border border-negative/50 px-3.5 text-[0.84rem] font-medium text-negative transition-colors hover:bg-negative-wash"
             >
               <Trash2 className="size-4" />
-              Delete organization
+              Delete workspace
             </button>
           )}
         </section>
