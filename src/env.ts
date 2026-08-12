@@ -81,7 +81,11 @@ const clientSchema = z.object({
     .string()
     .url()
     .default("http://localhost:3000")
-    .describe("Public origin, no trailing slash. Used in emails and QR codes."),
+    .describe(
+      "Public origin, no trailing slash. Used in emails and QR codes. " +
+        "On Vercel this is auto-detected from the platform's own env vars " +
+        "and does not need to be set by hand, see detectAppUrl() below.",
+    ),
 });
 
 export type ServerEnv = z.infer<typeof serverSchema>;
@@ -145,6 +149,40 @@ export const env = new Proxy({} as ServerEnv, {
 });
 
 /**
+ * Vercel already knows the exact URL this app is running at, there's no
+ * reason to make a human retype it into a dashboard field, where a stray
+ * paste (a markdown link, a trailing slash, the wrong domain) becomes a
+ * build-crashing typo instead of a compile error. Vercel injects these
+ * automatically on every build and request, no configuration needed:
+ *
+ *   VERCEL_PROJECT_PRODUCTION_URL   the project's assigned production
+ *                                   domain, stable across deploys, and the
+ *                                   custom domain if one is configured as
+ *                                   primary, not just the *.vercel.app one.
+ *   VERCEL_URL                      this specific deployment's own URL,
+ *                                   different every deploy, so it's the
+ *                                   right choice for previews: each one gets
+ *                                   correct absolute links and OG images
+ *                                   pointing at itself rather than at prod.
+ *
+ * An explicit NEXT_PUBLIC_APP_URL always wins over both, so local dev, a
+ * non-Vercel host, or an intentional override (a canonical domain that
+ * differs from what Vercel assigned) still work exactly as before.
+ */
+function detectAppUrl(): string | undefined {
+  const explicit = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (explicit) return explicit;
+
+  if (process.env.VERCEL_ENV === "production" && process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return undefined; // zod's own default(), "http://localhost:3000", takes over.
+}
+
+/**
  * Client env is inlined at build time by Next, so it must be read statically.
  *
  * Parsed eagerly (not through the lazy `env` proxy above) so a malformed value
@@ -156,7 +194,7 @@ export const env = new Proxy({} as ServerEnv, {
  */
 function loadClientEnv(): ClientEnv {
   const parsed = clientSchema.safeParse({
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_APP_URL: detectAppUrl(),
   });
   if (!parsed.success) {
     throw new Error(formatIssues(parsed.error, clientSchema));
