@@ -135,7 +135,7 @@ export function ThemesView() {
             body={
               aiReady.data?.ok
                 ? "Themes form once there are enough analyzed pieces to see a pattern, usually around twenty. Hit Regroup now to try anyway."
-                : "Add a DEEPSEEK_API_KEY to enable theme clustering."
+                : "Theme grouping is paused right now. Your feedback is still arriving and nothing is lost, it gets grouped as soon as analysis is back."
             }
           />
         ) : (

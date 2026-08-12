@@ -25,6 +25,31 @@ export const dynamic = "force-dynamic";
    of the product is volume of honest feedback.
 --------------------------------------------------------------------------- */
 
+const MAX_METADATA_KEYS = 30;
+const MAX_METADATA_BYTES = 4_000;
+
+/**
+ * Fits metadata inside the storage cap, keeping as much as will fit.
+ *
+ * Keys are taken in insertion order, which for an `identify()` call is the
+ * order the developer wrote them, so the traits they thought of first survive.
+ * Returns null rather than an empty object when nothing fits, since a `{}` on
+ * the record would suggest the visitor was identified when they weren't.
+ */
+function trimMetadata(
+  raw: Record<string, unknown>,
+): Record<string, unknown> | null {
+  const kept: Record<string, unknown> = {};
+
+  for (const key of Object.keys(raw).slice(0, MAX_METADATA_KEYS)) {
+    const candidate = { ...kept, [key]: raw[key] };
+    if (JSON.stringify(candidate).length > MAX_METADATA_BYTES) break;
+    kept[key] = raw[key];
+  }
+
+  return Object.keys(kept).length > 0 ? kept : null;
+}
+
 const ingestSchema = z.object({
   key: z.string().min(8).max(64),
   body: z.string().trim().min(1).max(5_000),
@@ -57,11 +82,15 @@ const ingestSchema = z.object({
     // Traits are a convenience, not a document store. Cap the shape so a
     // single submission can't write a multi-megabyte blob into the JSON column
     // (body/pageUrl/referrer are already capped; this was the one hole).
-    .refine((m) => Object.keys(m).length <= 30, "Too many metadata keys")
-    .refine(
-      (m) => JSON.stringify(m).length <= 4_000,
-      "Metadata payload is too large",
-    )
+    //
+    // Trimmed rather than rejected, deliberately. These caps used to be
+    // `refine`, which failed the whole request: one `identify()` call with too
+    // many traits meant every piece of feedback that visitor ever wrote was
+    // thrown away, and the only signal was "Couldn't send that" in the widget.
+    // The person typing has no idea a developer over-filled a metadata object,
+    // and their words are the part worth keeping. Enforce the storage limit by
+    // dropping traits, never by discarding the message.
+    .transform(trimMetadata)
     .nullish(),
   /** Hidden field. Any value means a bot filled the form. */
   _hp: z.string().max(200).nullish(),

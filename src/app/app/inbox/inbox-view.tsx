@@ -1,6 +1,15 @@
 "use client";
 
-import { Archive, Check, Loader2, Search, Trash2, X } from "lucide-react";
+import Link from "next/link";
+import {
+  Archive,
+  ArrowRight,
+  Check,
+  Loader2,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -209,7 +218,21 @@ export function InboxView({ initialId }: { initialId?: string }) {
             body={
               search || activeFilters
                 ? "Try a different filter or search term."
-                : "Feedback from your widget lands here the moment it's submitted."
+                : "Feedback from your widget lands here the moment it's submitted. If you haven't installed it yet, that's the next step."
+            }
+            // Only on a genuinely empty inbox. Offering "set up the widget" to
+            // someone who has simply filtered their existing feedback down to
+            // nothing would be answering a question they didn't ask.
+            action={
+              search || activeFilters ? undefined : (
+                <Link
+                  href="/app/widget"
+                  className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-[0.85rem] font-semibold text-paper"
+                >
+                  Set up the widget
+                  <ArrowRight className="size-3.5" />
+                </Link>
+              )
             }
           />
         ) : (

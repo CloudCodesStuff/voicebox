@@ -168,11 +168,15 @@ export function Overview() {
             {!aiReady.data?.ok && (
               <div className="mt-4 flex items-start gap-3 rounded-xl border border-line bg-mint-wash px-4 py-3.5">
                 <Sparkles className="mt-0.5 size-4 shrink-0 text-mint-deep" />
+                {/* Deliberately says nothing about environment variables.
+                    This renders for every member of every workspace, and a
+                    customer cannot set a key on a server they don't run. The
+                    operator finds the cause in `npm run env:check`. */}
                 <p className="text-[0.85rem] leading-relaxed text-ink">
                   <strong className="font-semibold">Analysis is paused.</strong>{" "}
-                  Add a <code className="font-mono text-[0.8rem]">DEEPSEEK_API_KEY</code>{" "}
-                  to enable sentiment and themes. Feedback is still being
-                  collected and nothing is lost.
+                  Sentiment scoring and themes are unavailable right now.
+                  Feedback is still being collected and stored, and everything
+                  is scored automatically once analysis is back.
                 </p>
               </div>
             )}
@@ -231,7 +235,7 @@ export function Overview() {
                 body={
                   aiReady.data?.ok
                     ? "Themes appear once there are enough analyzed pieces to find a pattern, usually around twenty. Hit Regroup now to try anyway."
-                    : "Themes need an AI key configured."
+                    : "Theme grouping is paused right now. Nothing is lost."
                 }
               />
             )}
