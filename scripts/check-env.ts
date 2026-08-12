@@ -127,8 +127,6 @@ const groups: Group[] = [
     checks: [
       check("STRIPE_SECRET_KEY", startsWith("sk_")),
       check("STRIPE_WEBHOOK_SECRET", startsWith("whsec_")),
-      check("STRIPE_PRICE_STARTER_MONTHLY", startsWith("price_")),
-      check("STRIPE_PRICE_STARTER_ANNUAL", startsWith("price_")),
       check("STRIPE_PRICE_PRO_MONTHLY", startsWith("price_")),
       check("STRIPE_PRICE_PRO_ANNUAL", startsWith("price_")),
       check("STRIPE_PRICE_SCALE_MONTHLY", startsWith("price_")),

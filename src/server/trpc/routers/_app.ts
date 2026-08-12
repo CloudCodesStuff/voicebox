@@ -1,5 +1,6 @@
 import { createTRPCRouter, publicProcedure } from "@/server/trpc/init";
 import { analyticsRouter } from "@/server/trpc/routers/analytics";
+import { billingRouter } from "@/server/trpc/routers/billing";
 import { developerRouter } from "@/server/trpc/routers/developer";
 import { feedbackRouter } from "@/server/trpc/routers/feedback";
 import { orgRouter } from "@/server/trpc/routers/org";
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   theme: themeRouter,
   analytics: analyticsRouter,
   developer: developerRouter,
+  billing: billingRouter,
 });
 
 export type AppRouter = typeof appRouter;

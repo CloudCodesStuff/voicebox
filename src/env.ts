@@ -61,8 +61,6 @@ const serverSchema = z.object({
   STRIPE_SECRET_KEY: z.string().startsWith("sk_").optional(),
   STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),
 
-  STRIPE_PRICE_STARTER_MONTHLY: z.string().optional(),
-  STRIPE_PRICE_STARTER_ANNUAL: z.string().optional(),
   STRIPE_PRICE_PRO_MONTHLY: z.string().optional(),
   STRIPE_PRICE_PRO_ANNUAL: z.string().optional(),
   STRIPE_PRICE_SCALE_MONTHLY: z.string().optional(),

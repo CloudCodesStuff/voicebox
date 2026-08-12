@@ -1,6 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import { features } from "@/env";
+
 import {
   adminProcedure,
   createTRPCRouter,
@@ -97,6 +99,12 @@ export const orgRouter = createTRPCRouter({
       subscription,
       usage: describeUsage(subscription),
       limits: planRules[subscription.plan],
+      // A plain boolean, not the underlying env check: `features.billing`
+      // reads process.env directly, which is undefined in a client bundle
+      // for anything not NEXT_PUBLIC_-prefixed, so the client can't compute
+      // this itself. The server can, and there's nothing secret in the
+      // answer to "is billing turned on".
+      billingConfigured: features.billing,
     };
   }),
 

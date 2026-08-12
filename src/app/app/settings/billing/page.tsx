@@ -1,11 +1,15 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check, ExternalLink, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { plans } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/client";
+
+type BillingInterval = "monthly" | "annual";
 
 export default function BillingSettings() {
   const org = api.org.current.useQuery();
@@ -14,8 +18,7 @@ export default function BillingSettings() {
     return <Skeleton className="h-64 rounded-xl" />;
   }
 
-  const { usage, subscription } = org.data;
-  const billingConfigured = false; // Stripe keys aren't wired yet.
+  const { usage, subscription, billingConfigured } = org.data;
 
   return (
     <div className="space-y-6">
@@ -33,17 +36,35 @@ export default function BillingSettings() {
               })}
             </p>
           </div>
-          <span
-            className={cn(
-              "rounded-full px-3 py-1 text-[0.78rem] font-medium capitalize",
-              subscription.status === "ACTIVE"
-                ? "bg-positive-wash text-positive"
-                : "bg-mixed-wash text-mixed",
+          <div className="flex items-center gap-3">
+            {billingConfigured && subscription.stripeCustomerId && (
+              <ManageBillingLink />
             )}
-          >
-            {subscription.status.toLowerCase()}
-          </span>
+            <span
+              className={cn(
+                "rounded-full px-3 py-1 text-[0.78rem] font-medium capitalize",
+                subscription.status === "ACTIVE"
+                  ? "bg-positive-wash text-positive"
+                  : "bg-mixed-wash text-mixed",
+              )}
+            >
+              {subscription.status.toLowerCase()}
+            </span>
+          </div>
         </div>
+
+        {subscription.cancelAtPeriodEnd && (
+          <p className="mt-4 rounded-lg bg-mixed-wash px-3.5 py-2.5 text-[0.82rem] leading-relaxed text-mixed">
+            Cancels on{" "}
+            {subscription.currentPeriodEnd
+              ? new Date(subscription.currentPeriodEnd).toLocaleDateString(undefined, {
+                  month: "long",
+                  day: "numeric",
+                })
+              : "the end of this period"}
+            . You&apos;ll keep {usage.plan.toLowerCase()} access until then.
+          </p>
+        )}
 
         <div className="mt-6">
           <div className="flex items-baseline justify-between">
@@ -74,67 +95,10 @@ export default function BillingSettings() {
 
       <section>
         <h2 className="text-[1rem] font-semibold text-ink">Plans</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          {plans.map((p) => {
-            const current = p.id === usage.plan;
-            return (
-              <div
-                key={p.id}
-                className={cn(
-                  "rounded-xl border bg-paper-2 p-5",
-                  current ? "border-ink" : "border-line",
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-[0.92rem] font-semibold text-ink">
-                    {p.name}
-                  </h3>
-                  {current && (
-                    <span className="rounded-full bg-ink px-2 py-0.5 text-[0.72rem] font-medium text-paper">
-                      Current
-                    </span>
-                  )}
-                </div>
-                <div className="mt-3 text-[1.6rem] font-bold text-ink">
-                  ${p.priceMonthly}
-                  <span className="text-[0.78rem] font-normal text-steel">/mo</span>
-                </div>
-                <div className="mt-1 text-[0.78rem] text-steel">
-                  {p.feedbackPerMonth.toLocaleString()} a month
-                </div>
-
-                <ul className="mt-4 space-y-1.5 border-t border-line pt-4">
-                  <li className="text-[0.78rem] text-steel">{p.scope}</li>
-                  {[...p.included, ...p.adds].map((f) => (
-                    <li
-                      key={f}
-                      className="flex gap-2 text-[0.78rem] leading-snug text-steel"
-                    >
-                      <Check className="mt-0.5 size-3 shrink-0 text-mint-deep" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                <button
-                  type="button"
-                  disabled={current || !billingConfigured}
-                  title={
-                    billingConfigured ? undefined : "Stripe isn't configured yet"
-                  }
-                  className={cn(
-                    "mt-5 min-h-9 w-full rounded-lg text-[0.82rem] font-semibold transition-colors",
-                    current
-                      ? "border border-line text-steel"
-                      : "bg-ink text-paper disabled:opacity-40",
-                  )}
-                >
-                  {current ? "Current plan" : `Choose ${p.name}`}
-                </button>
-              </div>
-            );
-          })}
-        </div>
+        <PlanGrid
+          currentPlan={usage.plan}
+          billingConfigured={billingConfigured}
+        />
 
         {!billingConfigured && (
           <p className="mt-4 rounded-lg border border-line bg-muted px-4 py-3 text-[0.82rem] leading-relaxed text-steel">
@@ -145,5 +109,171 @@ export default function BillingSettings() {
         )}
       </section>
     </div>
+  );
+}
+
+/**
+ * Monthly/annual interval lives here as shared state, since switching it
+ * should reflect on every plan's price at once, the way it does on the
+ * public pricing page, not per-card.
+ */
+function PlanGrid({
+  currentPlan,
+  billingConfigured,
+}: {
+  currentPlan: string;
+  billingConfigured: boolean;
+}) {
+  const [interval, setInterval] = useState<BillingInterval>("monthly");
+
+  return (
+    <>
+      {billingConfigured && (
+        <div className="mt-4 inline-flex rounded-lg border border-line p-0.5 text-[0.78rem] font-medium">
+          {(["monthly", "annual"] as const).map((i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setInterval(i)}
+              className={cn(
+                "rounded-md px-3 py-1.5 transition-colors",
+                interval === i ? "bg-ink text-paper" : "text-steel hover:text-ink",
+              )}
+            >
+              {i === "monthly" ? "Monthly" : "Annual, 2 months free"}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        {plans.map((p) => (
+          <PlanCard
+            key={p.id}
+            plan={p}
+            current={p.id === currentPlan}
+            interval={interval}
+            billingConfigured={billingConfigured}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
+
+function PlanCard({
+  plan: p,
+  current,
+  interval,
+  billingConfigured,
+}: {
+  plan: (typeof plans)[number];
+  current: boolean;
+  interval: BillingInterval;
+  billingConfigured: boolean;
+}) {
+  const utils = api.useUtils();
+  const isFree = p.id === "FREE";
+  const price = interval === "monthly" ? p.priceMonthly : Math.round(p.priceAnnual / 12);
+
+  const changePlan = api.billing.changePlan.useMutation({
+    onSuccess(result) {
+      if (result.mode === "checkout") {
+        window.location.href = result.url;
+        return;
+      }
+      toast.success(`Switched to ${p.name}.`);
+      void utils.org.invalidate();
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const canChoose = billingConfigured && !current && !isFree;
+
+  return (
+    <div
+      className={cn(
+        "rounded-xl border bg-paper-2 p-5",
+        current ? "border-ink" : "border-line",
+      )}
+    >
+      <div className="flex items-center justify-between">
+        <h3 className="text-[0.92rem] font-semibold text-ink">{p.name}</h3>
+        {current && (
+          <span className="rounded-full bg-ink px-2 py-0.5 text-[0.72rem] font-medium text-paper">
+            Current
+          </span>
+        )}
+      </div>
+      <div className="mt-3 text-[1.6rem] font-bold text-ink">
+        ${price}
+        <span className="text-[0.78rem] font-normal text-steel">/mo</span>
+      </div>
+      {!isFree && interval === "annual" && (
+        <div className="mt-0.5 text-[0.74rem] text-steel">
+          ${p.priceAnnual} billed yearly
+        </div>
+      )}
+      <div className="mt-1 text-[0.78rem] text-steel">
+        {p.feedbackPerMonth.toLocaleString()} a month
+      </div>
+
+      <ul className="mt-4 space-y-1.5 border-t border-line pt-4">
+        <li className="text-[0.78rem] text-steel">{p.scope}</li>
+        {[...p.included, ...p.adds].map((f) => (
+          <li
+            key={f}
+            className="flex gap-2 text-[0.78rem] leading-snug text-steel"
+          >
+            <Check className="mt-0.5 size-3 shrink-0 text-mint-deep" />
+            {f}
+          </li>
+        ))}
+      </ul>
+
+      {!isFree && (
+        <button
+          type="button"
+          disabled={!canChoose || changePlan.isPending}
+          title={billingConfigured ? undefined : "Stripe isn't configured yet"}
+          onClick={() => changePlan.mutate({ plan: p.id, interval })}
+          className={cn(
+            "mt-5 inline-flex min-h-9 w-full items-center justify-center gap-2 rounded-lg text-[0.82rem] font-semibold transition-colors",
+            current
+              ? "border border-line text-steel"
+              : "bg-ink text-paper disabled:opacity-40",
+          )}
+        >
+          {changePlan.isPending && <Loader2 className="size-3.5 animate-spin" />}
+          {current ? "Current plan" : `Choose ${p.name}`}
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** Opens Stripe's own hosted page for updating a card, past invoices, or cancelling. */
+function ManageBillingLink() {
+  const portal = api.billing.createPortalSession.useMutation({
+    onSuccess: (result) => {
+      window.location.href = result.url;
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  return (
+    <button
+      type="button"
+      disabled={portal.isPending}
+      onClick={() => portal.mutate()}
+      className="inline-flex items-center gap-1.5 text-[0.82rem] font-medium text-steel transition-colors hover:text-ink disabled:opacity-50"
+    >
+      {portal.isPending ? (
+        <Loader2 className="size-3.5 animate-spin" />
+      ) : (
+        <ExternalLink className="size-3.5" />
+      )}
+      Manage billing
+    </button>
   );
 }
