@@ -1,0 +1,472 @@
+// Sift, feedback intelligence
+//
+// Tenancy rule: every domain row carries `orgId`, and every query is scoped by
+// an orgId derived from the session, never from client input. The redundant
+// orgId on child tables is deliberate: it lets every read filter on the tenant
+// without a join, so a forgotten `where` fails closed instead of leaking.
+//
+// AI fields are additive and nullable. Feedback is fully usable before it is
+// analyzed; analysis enriches it. The product must never appear broken because
+// a model call was slow or a key is missing.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Auth.js (NextAuth v5)
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+
+  accounts    Account[]
+  sessions    Session[]
+  memberships Membership[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ---------------------------------------------------------------------------
+// Tenancy
+// ---------------------------------------------------------------------------
+
+model Organization {
+  id       String @id @default(cuid())
+  slug     String @unique
+  name     String
+  timezone String @default("America/New_York")
+
+  /// Weekly insight digest. On by default because the whole point of the
+  /// product is telling you what changed without you having to come and look.
+  digestEnabled    Boolean   @default(true)
+  digestLastSentAt DateTime?
+
+  /// AI analysis opt-out. The privacy policy tells customers they can decline
+  /// the model entirely (feedback text is processed outside the EU/US), so
+  /// that has to be a real switch, not a sentence. Off means submissions are
+  /// still collected, stored, and shown, just never sent to the provider.
+  analysisEnabled Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships  Membership[]
+  projects     Project[]
+  feedback     Feedback[]
+  themes       Theme[]
+  analysisRuns AnalysisRun[]
+  apiKeys      ApiKey[]
+  webhooks     Webhook[]
+  invites      Invite[]
+  jobs         ScheduledJob[]
+  subscription Subscription?
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model Membership {
+  id     String @id @default(cuid())
+  userId String
+  orgId  String
+  role   Role   @default(OWNER)
+
+  /// Per-person digest opt-out. The org-wide switch is an admin setting; this
+  /// is the individual's own unsubscribe, which is what CAN-SPAM and the
+  /// one-click List-Unsubscribe header actually require. A member must be able
+  /// to stop their own mail without asking an admin.
+  digestOptOut Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, orgId])
+  @@index([orgId])
+}
+
+model Invite {
+  id    String @id @default(cuid())
+  orgId String
+  email String
+  role  Role   @default(MEMBER)
+
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, email])
+  @@index([orgId])
+}
+
+// ---------------------------------------------------------------------------
+// Projects, one per site/app the customer collects feedback from
+// ---------------------------------------------------------------------------
+
+model Project {
+  id    String @id @default(cuid())
+  orgId String
+
+  name String
+  url  String?
+
+  /// The only public identifier. Unguessable, rate-limited, and the sole thing
+  /// the widget sends. Rotatable without touching stored feedback.
+  key String @unique
+
+  /// Widget appearance + behaviour. Shape lives in src/lib/widget-config.ts so
+  /// the studio, the preview, and the runtime all read one definition.
+  widgetConfig Json
+
+  /// Origin allowlist. Empty array means "any origin" (dev convenience);
+  /// production projects should always list their domains.
+  allowedDomains String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  org          Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  feedback     Feedback[]
+  themes       Theme[]
+  analysisRuns AnalysisRun[]
+
+  @@index([orgId])
+}
+
+// ---------------------------------------------------------------------------
+// Feedback
+// ---------------------------------------------------------------------------
+
+/// Chosen by the end user in the widget. Drives placeholder copy and filtering.
+enum FeedbackType {
+  IDEA
+  ISSUE
+  PRAISE
+  QUESTION
+  OTHER
+}
+
+enum Sentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+  MIXED
+}
+
+enum FeedbackStatus {
+  NEW
+  REVIEWED
+  ARCHIVED
+}
+
+model Feedback {
+  id        String @id @default(cuid())
+  orgId     String
+  projectId String
+
+  body   String       @db.Text
+  type   FeedbackType @default(OTHER)
+  rating Int?
+
+  /// Optional contact the submitter typed. Never sent to the model.
+  email String?
+
+  // Context the widget captures silently.
+  pageUrl   String?
+  userAgent String? @db.Text
+  locale    String?
+  referrer  String?
+
+  /// Traits passed by the host via Sift('identify', {...}). Never sent to the model.
+  metadata Json?
+
+  // --- AI-derived (null until analyzed) ------------------------------------
+  sentiment      Sentiment?
+  sentimentScore Float?
+  aiCategory     String?
+  summary        String?  @db.Text
+  themeId        String?
+  analyzedAt     DateTime?
+
+  /// Set when a model call failed, so the batch sweep can retry only what needs it.
+  analysisAttempts Int @default(0)
+
+  status    FeedbackStatus @default(NEW)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  org     Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  project Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  theme   Theme?       @relation(fields: [themeId], references: [id], onDelete: SetNull)
+
+  @@index([orgId, createdAt])
+  @@index([projectId, createdAt])
+  @@index([projectId, status])
+  @@index([themeId])
+  @@index([projectId, analyzedAt])
+}
+
+// ---------------------------------------------------------------------------
+// Themes, the differentiator. Clusters of feedback, ranked by what to fix.
+// ---------------------------------------------------------------------------
+
+enum ThemeStatus {
+  ACTIVE
+  RESOLVED
+  IGNORED
+}
+
+model Theme {
+  id        String @id @default(cuid())
+  orgId     String
+  projectId String
+
+  title       String
+  description String @db.Text
+
+  sentiment     Sentiment @default(NEUTRAL)
+  itemCount     Int       @default(0)
+  negativeShare Float     @default(0)
+
+  /// volume x negativeShare x recencyDecay. Drives the "what to work on" order.
+  priorityScore Float @default(0)
+
+  /// Weekly bucket counts for the sparkline: [{ week: "2026-08-04", count: 12 }]
+  trend Json?
+
+  status ThemeStatus @default(ACTIVE)
+
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  org      Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  project  Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  feedback Feedback[]
+
+  @@index([projectId, status, priorityScore])
+  @@index([orgId])
+}
+
+// ---------------------------------------------------------------------------
+// Analysis audit, cost visibility and idempotency
+// ---------------------------------------------------------------------------
+
+enum AnalysisKind {
+  INGEST
+  CLUSTER
+  DIGEST
+}
+
+enum RunStatus {
+  RUNNING
+  DONE
+  FAILED
+}
+
+model AnalysisRun {
+  id        String  @id @default(cuid())
+  orgId     String
+  projectId String?
+
+  kind           AnalysisKind
+  status         RunStatus    @default(RUNNING)
+  itemsProcessed Int          @default(0)
+  tokensUsed     Int          @default(0)
+  model          String?
+  error          String?      @db.Text
+
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+
+  org     Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  project Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, startedAt])
+  @@index([projectId, kind])
+}
+
+// ---------------------------------------------------------------------------
+// API access
+// ---------------------------------------------------------------------------
+
+model ApiKey {
+  id    String @id @default(cuid())
+  orgId String
+
+  name String
+
+  /// Only the hash is stored. The plaintext is shown exactly once at creation.
+  hashedKey String  @unique
+  prefix    String
+  lastUsedAt DateTime?
+
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+}
+
+model Webhook {
+  id    String @id @default(cuid())
+  orgId String
+
+  url    String
+  secret String
+  events String[] @default([])
+  active Boolean  @default(true)
+
+  lastFiredAt  DateTime?
+  lastStatus   Int?
+  failureCount Int       @default(0)
+
+  createdAt DateTime @default(now())
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+}
+
+// ---------------------------------------------------------------------------
+// Scheduled work (Postgres-backed queue drained by Vercel Cron)
+// ---------------------------------------------------------------------------
+
+enum JobType {
+  ANALYZE_FEEDBACK
+  CLUSTER_PROJECT
+  WEEKLY_DIGEST
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  DONE
+  FAILED
+  CANCELLED
+}
+
+model ScheduledJob {
+  id    String  @id @default(cuid())
+  orgId String?
+
+  type    JobType
+  payload Json
+  runAt   DateTime
+
+  status   JobStatus @default(PENDING)
+  attempts Int       @default(0)
+  lastError String?   @db.Text
+  lockedAt DateTime?
+
+  /// Makes enqueueing idempotent, the same clustering run can't be queued twice.
+  dedupeKey String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  org Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([status, runAt])
+}
+
+// ---------------------------------------------------------------------------
+// Billing
+// ---------------------------------------------------------------------------
+
+enum Plan {
+  FREE
+  STARTER
+  PRO
+  SCALE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+}
+
+model Subscription {
+  id    String @id @default(cuid())
+  orgId String @unique
+
+  plan   Plan               @default(FREE)
+  status SubscriptionStatus @default(ACTIVE)
+
+  stripeCustomerId     String?
+  stripeSubscriptionId String? @unique
+  stripePriceId        String?
+
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean   @default(false)
+
+  /// Counted on ingest. Hitting the cap prompts an upgrade but never discards
+  /// a customer's users' feedback, that data is theirs.
+  feedbackUsedThisPeriod Int      @default(0)
+  usageResetAt           DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId])
+}

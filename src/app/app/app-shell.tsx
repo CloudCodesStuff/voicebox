@@ -1,0 +1,326 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  BarChart3,
+  Check,
+  ChevronsUpDown,
+  Inbox,
+  LayoutGrid,
+  Layers,
+  LogOut,
+  Menu,
+  Settings,
+  Sparkles,
+  X,
+} from "lucide-react";
+import { useState, type ReactNode } from "react";
+
+import { Wordmark } from "@/components/marketing/brand";
+import { Avatar } from "@/components/app/avatar";
+import { useProject } from "@/components/app/project-context";
+import { Tour } from "@/components/app/tour";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { signOutAction } from "@/server/actions/auth";
+import { cn } from "@/lib/utils";
+import { api } from "@/trpc/client";
+
+const nav = [
+  { href: "/app", label: "Overview", icon: Sparkles, exact: true, tour: undefined },
+  { href: "/app/inbox", label: "Inbox", icon: Inbox, tour: "nav-inbox" },
+  { href: "/app/themes", label: "Themes", icon: Layers, tour: "nav-themes" },
+  { href: "/app/trends", label: "Trends", icon: BarChart3, tour: "nav-trends" },
+  { href: "/app/widget", label: "Widget", icon: LayoutGrid, tour: "nav-widget" },
+  { href: "/app/settings", label: "Settings", icon: Settings, tour: undefined },
+];
+
+export function AppShell({
+  orgName,
+  userName,
+  userEmail,
+  userImage,
+  children,
+}: {
+  orgName: string;
+  userName: string;
+  userEmail: string;
+  userImage: string | null;
+  children: ReactNode;
+}) {
+  const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // The menu closes from the link's own onClick rather than an effect watching
+  // the pathname, the click is the actual event, and it avoids a second render.
+  const closeMobile = () => setMobileOpen(false);
+
+  return (
+    <div className="flex min-h-dvh bg-paper">
+      {/* Desktop sidebar */}
+      {/* Sticky and viewport-height: the nav scrolls inside it, so the usage
+          meter and account menu never leave the screen on long pages. */}
+      <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-line bg-paper-2 lg:flex">
+        <div className="flex h-16 items-center px-5">
+          <Link href="/app" aria-label="Voicebox">
+            <Wordmark />
+          </Link>
+        </div>
+
+        <div className="px-3">
+          <ProjectSwitcher />
+        </div>
+
+        <nav className="mt-4 min-h-0 flex-1 space-y-0.5 overflow-y-auto px-3">
+          {nav.map((item) => (
+            <NavLink key={item.href} item={item} pathname={pathname} />
+          ))}
+        </nav>
+
+        <div className="border-t border-line p-3">
+          <UsageMeter />
+          <AccountMenu
+            userName={userName}
+            userEmail={userEmail}
+            userImage={userImage}
+            orgName={orgName}
+          />
+        </div>
+      </aside>
+
+      {/* Mobile header */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex h-16 items-center justify-between border-b border-line bg-paper-2 px-4 lg:hidden">
+          <Link href="/app" aria-label="Voicebox">
+            <Wordmark />
+          </Link>
+          <button
+            type="button"
+            onClick={() => setMobileOpen((v) => !v)}
+            className="flex size-11 items-center justify-center"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          >
+            {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
+        </header>
+
+        {mobileOpen && (
+          <div className="border-b border-line bg-paper-2 px-3 pb-4 lg:hidden">
+            <div className="pt-3">
+              <ProjectSwitcher />
+            </div>
+            <nav className="mt-3 space-y-0.5">
+              {nav.map((item) => (
+                <NavLink
+                  key={item.href}
+                  item={item}
+                  pathname={pathname}
+                  onNavigate={closeMobile}
+                />
+              ))}
+            </nav>
+            <div className="mt-3 border-t border-line pt-3">
+              <UsageMeter />
+              <AccountMenu
+                userName={userName}
+                userEmail={userEmail}
+                userImage={userImage}
+                orgName={orgName}
+              />
+            </div>
+          </div>
+        )}
+
+        <main className="min-w-0 flex-1">{children}</main>
+      </div>
+
+      {/* Desktop only: the tour spotlights the sidebar, which isn't on screen
+          at mobile widths, so pointing at it there would highlight nothing. */}
+      <div className="hidden lg:block">
+        <Tour enabled />
+      </div>
+    </div>
+  );
+}
+
+function NavLink({
+  item,
+  pathname,
+  onNavigate,
+}: {
+  item: (typeof nav)[number];
+  pathname: string;
+  onNavigate?: () => void;
+}) {
+  const active = item.exact
+    ? pathname === item.href
+    : pathname.startsWith(item.href);
+
+  return (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      data-tour={item.tour}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[0.875rem] font-medium transition-colors",
+        active
+          ? "bg-muted text-ink"
+          : "text-steel hover:bg-muted/60 hover:text-ink",
+      )}
+    >
+      <item.icon
+        className={cn("size-4", active && "text-mint-deep")}
+        strokeWidth={1.9}
+      />
+      {item.label}
+    </Link>
+  );
+}
+
+function ProjectSwitcher() {
+  const { projects, activeProject, setActiveProjectId } = useProject();
+
+  if (!activeProject) {
+    return (
+      <div className="h-11 animate-pulse rounded-lg bg-muted" aria-hidden="true" />
+    );
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className="flex h-11 w-full items-center justify-between gap-2 rounded-lg border border-line px-3 text-left transition-colors hover:bg-muted/60"
+        >
+          <div className="min-w-0">
+            <div className="label">Project</div>
+            <div className="truncate text-[0.875rem] font-medium text-ink">
+              {activeProject.name}
+            </div>
+          </div>
+          <ChevronsUpDown className="size-3.5 shrink-0 text-steel" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-56">
+        {projects.map((p) => (
+          <DropdownMenuItem
+            key={p.id}
+            onClick={() => setActiveProjectId(p.id)}
+            className="cursor-pointer"
+          >
+            <span className="flex-1 truncate">{p.name}</span>
+            {p.id === activeProject.id && (
+              <Check className="size-3.5 text-mint-deep" />
+            )}
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/app/settings/projects" className="cursor-pointer">
+            Manage projects
+          </Link>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function UsageMeter() {
+  const { data } = api.org.current.useQuery();
+  if (!data) return null;
+
+  const { usage } = data;
+
+  return (
+    <Link
+      href="/app/settings/billing"
+      aria-label={`${usage.plan.toLowerCase()} plan: ${usage.used.toLocaleString()} of ${usage.limit.toLocaleString()} feedback used this period`}
+      className="mb-3 block rounded-lg border border-line p-3 transition-colors hover:bg-muted/60"
+    >
+      <div className="flex items-center justify-between">
+        {/* CSS `capitalize` Title-Cases Every Word, so it wraps only the plan
+            name; "plan" stays lowercase. */}
+        <span className="label text-ink">
+          <span className="capitalize">{usage.plan.toLowerCase()}</span> plan
+        </span>
+        <span className="tnum text-[0.75rem] text-steel">
+          {usage.used.toLocaleString()} / {usage.limit.toLocaleString()}
+        </span>
+      </div>
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
+        <div
+          className={cn(
+            "h-full rounded-full transition-all",
+            usage.percent >= 90 ? "bg-negative" : "bg-mint",
+          )}
+          style={{ width: `${usage.percent}%` }}
+        />
+      </div>
+    </Link>
+  );
+}
+
+function AccountMenu({
+  userName,
+  userEmail,
+  userImage,
+  orgName,
+}: {
+  userName: string;
+  userEmail: string;
+  userImage: string | null;
+  orgName: string;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left transition-colors hover:bg-muted/60"
+        >
+          <Avatar src={userImage} name={userName} email={userEmail} size={28} />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[0.84rem] font-medium text-ink">
+              {userName || "Account"}
+            </span>
+            <span className="block truncate text-[0.75rem] text-steel">
+              {orgName}
+            </span>
+          </span>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-56">
+        <div className="px-2 py-1.5">
+          <div className="truncate text-[0.84rem] font-semibold text-ink">
+            {userName || "Signed in"}
+          </div>
+          <div className="truncate text-[0.78rem] text-steel">{userEmail}</div>
+        </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/app/settings/general" className="cursor-pointer">
+            <Settings className="mr-2 size-4" />
+            Settings
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <form action={signOutAction} className="w-full">
+            <button type="submit" className="flex w-full cursor-pointer items-center">
+              <LogOut className="mr-2 size-4" />
+              Sign out
+            </button>
+          </form>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}

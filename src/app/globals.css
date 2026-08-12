@@ -1,0 +1,278 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ---------------------------------------------------------------------------
+   Sift design tokens
+
+   The reference points are Linear and Vercel: near-monochrome surfaces, hairline
+   borders doing the work that shadows usually do, tight type, and one colour
+   used sparingly enough that it still means something when it shows up.
+
+   Mint is that colour. It is deliberately NOT the primary button. Primary
+   actions are near-black, the way Vercel does it, because an accent used on
+   every control stops reading as an accent. Mint marks the live thing: active
+   nav, focus, links, positive sentiment, the mark itself.
+
+   Two mints, because one cannot do both jobs. The vivid one fails contrast as
+   text; the deep one looks muddy as a fill.
+--------------------------------------------------------------------------- */
+
+:root {
+  --radius: 0.5rem;
+
+  /* Surfaces */
+  --bg: #ffffff;
+  --bg-subtle: #fafafa;
+  --bg-sunken: #f4f4f5;
+
+  /* Text */
+  --fg: #09090b;
+  --fg-muted: #62626b;
+  --fg-subtle: #8f8f98;
+
+  /* Lines. Hairlines carry structure here, not shadows. */
+  --line: #ebebed;
+  --line-strong: #dcdce0;
+
+  /* Mint */
+  --mint: #00c48c; /* fills and graphics; needs dark text on it */
+  --mint-deep: #00785a; /* 5.4:1 on white, safe for text and icons */
+  --mint-wash: #e6f9f1;
+  --mint-line: #b4ead8;
+  /* The only text colour allowed on a mint fill. 7.4:1, and it stays put in
+     dark mode because mint stays bright in dark mode. */
+  --mint-ink: #04231b;
+
+  /* A surface that is dark in BOTH themes: code blocks, terminal frames, the
+     install snippet. `--fg` cannot do this job, because it inverts. */
+  --slab: #0a0d0c;
+  --slab-fg: #e4eae8;
+
+  /* Sentiment. Positive borrows the mint so the palette stays one family. */
+  --positive: #00785a;
+  --positive-wash: #e6f9f1;
+  --neutral: #8f8f98;
+  --neutral-wash: #f4f4f5;
+  --negative: #d33c33;
+  --negative-wash: #fdeceb;
+  --mixed: #b0770e;
+  --mixed-wash: #fdf3e2;
+
+  /* shadcn contract */
+  --background: var(--bg);
+  --foreground: var(--fg);
+  --card: var(--bg);
+  --card-foreground: var(--fg);
+  --popover: var(--bg);
+  --popover-foreground: var(--fg);
+  --primary: var(--fg);
+  --primary-foreground: var(--bg);
+  --secondary: var(--bg-sunken);
+  --secondary-foreground: var(--fg);
+  --muted: var(--bg-sunken);
+  --muted-foreground: var(--fg-muted);
+  /* shadcn's `accent` is a hover/selected SURFACE, not a brand colour. Pointing
+     it at mint turned every menu hover into a green block and every skeleton
+     into a solid green bar. Brand mint is `--mint*`; these two are separate
+     jobs that happen to share a word. */
+  --accent: var(--bg-sunken);
+  --accent-foreground: var(--fg);
+  --destructive: var(--negative);
+  --destructive-foreground: #ffffff;
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--mint-deep);
+}
+
+/* ---------------------------------------------------------------------------
+   Dark, and the reason it works.
+
+   Pure neutral greys next to a saturated mint read as two unrelated systems
+   pasted together: the greys look dead and the mint looks stuck on. Every
+   neutral below carries a few percent of mint's own hue, so the whole surface
+   is quietly the same family and the accent lands as the bright member of it
+   rather than as a foreign object.
+--------------------------------------------------------------------------- */
+.dark {
+  --bg: #080a0a;
+  --bg-subtle: #0d1110;
+  --bg-sunken: #141918;
+
+  --fg: #ecf1ef;
+  --fg-muted: #9fada7;
+  --fg-subtle: #75827c;
+
+  /* Bright enough that a control's edge is visible at a glance. Hairlines are
+     the only depth cue this UI uses; if they vanish, everything melts into
+     one dark pool. */
+  --line: #202927;
+  --line-strong: #33403b;
+
+  /* Brighter than the light-mode mint: on a dark ground a colour has to emit
+     light to read as an accent rather than as a stain. */
+  --mint: #00e5a0;
+  --mint-deep: #4fedba; /* inverted: on dark, the "deep" one must be the bright one */
+  --mint-wash: #0a211a;
+  --mint-line: #1b4536;
+  --mint-ink: #04231b;
+
+  /* Slabs sit above the background here, not below it. */
+  --slab: #101514;
+
+  --positive: #4fedba;
+  --positive-wash: #0a211a;
+  --neutral: #67736e;
+  --neutral-wash: #141918;
+  /* Softened so it argues with the mint instead of shouting over it. */
+  --negative: #ff7d70;
+  --negative-wash: #2a1310;
+  --mixed: #e8b04b;
+  --mixed-wash: #2a1f0b;
+
+  --background: var(--bg);
+  --foreground: var(--fg);
+  --card: var(--bg-subtle);
+  --card-foreground: var(--fg);
+  --popover: var(--bg-subtle);
+  --popover-foreground: var(--fg);
+  --primary: var(--fg);
+  --primary-foreground: var(--bg);
+  --secondary: var(--bg-sunken);
+  --secondary-foreground: var(--fg);
+  --muted: var(--bg-sunken);
+  --muted-foreground: var(--fg-muted);
+  --accent: var(--bg-sunken);
+  --accent-foreground: var(--fg);
+  --destructive: var(--negative);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--mint-deep);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Brand utilities */
+  --color-ink: var(--fg);
+  --color-steel: var(--fg-muted);
+  --color-faint: var(--fg-subtle);
+  --color-paper: var(--bg);
+  --color-paper-2: var(--bg-subtle);
+  --color-sunken: var(--bg-sunken);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-mint: var(--mint);
+  --color-mint-deep: var(--mint-deep);
+  --color-mint-wash: var(--mint-wash);
+  --color-mint-line: var(--mint-line);
+  --color-mint-ink: var(--mint-ink);
+  --color-slab: var(--slab);
+  --color-slab-fg: var(--slab-fg);
+
+  --color-positive: var(--positive);
+  --color-positive-wash: var(--positive-wash);
+  --color-neutral: var(--neutral);
+  --color-neutral-wash: var(--neutral-wash);
+  --color-negative: var(--negative);
+  --color-negative-wash: var(--negative-wash);
+  --color-mixed: var(--mixed);
+  --color-mixed-wash: var(--mixed-wash);
+
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 6px);
+
+  /* One typeface. Hierarchy comes from size, weight and tracking, which is
+     what makes Linear and Vercel read as considered rather than decorated. */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  /* Tells the browser to paint its own furniture dark too: scrollbars, form
+     controls, and the flash of background before React hydrates. */
+  html.dark {
+    color-scheme: dark;
+  }
+
+  /* Keyboard focus is visible everywhere, full stop. :where() keeps the
+     specificity at zero so any component that draws its own ring wins. */
+  :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Optical tracking: the larger the text, the tighter it wants to be. */
+  h1 {
+    @apply tracking-[-0.035em];
+  }
+  h2 {
+    @apply tracking-[-0.028em];
+  }
+  h3 {
+    @apply tracking-[-0.02em];
+  }
+
+  ::selection {
+    background: var(--mint-wash);
+    color: var(--fg);
+  }
+}
+
+@layer utilities {
+  /*
+    Replaces the uppercase monospace label that used to be everywhere.
+    Monospace is for code, keys and measurements. A section label is none of
+    those, and setting every one of them in tracked caps is a costume.
+  */
+  .label {
+    @apply text-[0.8rem] font-medium text-steel;
+  }
+
+  /* Figures that sit in a column and must not jitter as they change. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* The in-flight shimmer used by WorkingButton. */
+@keyframes working-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
