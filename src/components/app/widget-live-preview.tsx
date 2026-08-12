@@ -159,7 +159,18 @@ export function WidgetLivePreview({
 
           <div className="px-4 pt-3.5 pb-4">
             {config.enabledTypes.length > 0 && (
-              <div className="mb-3 flex flex-wrap gap-1.5">
+              // Mirrors the shipped widget: an even grid, never wrapping
+              // ragged. Four types become a 2x2 block, fewer sit on one row.
+              <div
+                className="mb-3 grid gap-1.5"
+                style={{
+                  gridTemplateColumns: `repeat(${
+                    config.enabledTypes.length === 4
+                      ? 2
+                      : Math.max(config.enabledTypes.length, 1)
+                  }, minmax(0, 1fr))`,
+                }}
+              >
                 {config.enabledTypes.map((t) => {
                   const Icon = ICONS[t];
                   const on = activeType === t;
@@ -168,7 +179,7 @@ export function WidgetLivePreview({
                       key={t}
                       type="button"
                       onClick={() => setSelectedType(t)}
-                      className="inline-flex h-[30px] items-center gap-1.5 px-[11px] text-[12.5px] font-medium transition-colors"
+                      className="inline-flex h-[30px] min-w-0 items-center justify-center gap-1.5 px-2 text-[12.5px] font-medium transition-colors"
                       style={{
                         borderRadius: r > 0 ? 999 : 0,
                         border: `1px solid ${on ? "transparent" : border}`,
@@ -189,32 +200,25 @@ export function WidgetLivePreview({
               </div>
             )}
 
-            <div
-              className="min-h-[82px] px-[11px] py-2.5 text-[13.5px] leading-relaxed"
-              style={{
-                border: `1px solid ${border}`,
-                borderRadius: Math.max(r - 2, 0),
-                background: field,
-                color: faint,
-                letterSpacing: "-0.005em",
-              }}
-            >
-              {placeholder}
-            </div>
-
             {config.askRating && (
-              <div className="mt-3 flex min-h-[26px] items-center gap-[9px]">
+              <div className="mb-2.5 flex min-h-[28px] items-center gap-2.5">
                 <span className="text-[12.5px]" style={{ color: muted }}>
                   How was it?
                 </span>
-                <div className="flex gap-px">
+                <div
+                  className={
+                    config.ratingStyle === "numbers"
+                      ? "flex flex-1 gap-1.5"
+                      : "ml-auto flex gap-px"
+                  }
+                >
                   {[1, 2, 3, 4, 5].map((n) =>
                     config.ratingStyle === "numbers" ? (
                       <button
                         key={n}
                         type="button"
                         onClick={() => setRating(n)}
-                        className="grid h-7 min-w-[30px] place-items-center text-[12.5px] tabular-nums transition-colors"
+                        className="grid h-7 flex-1 place-items-center text-[12.5px] tabular-nums transition-colors"
                         style={{
                           borderRadius: r > 0 ? 6 : 0,
                           border: `1px solid ${n <= rating ? "transparent" : border}`,
@@ -252,6 +256,19 @@ export function WidgetLivePreview({
                 </span>
               </div>
             )}
+
+            <div
+              className="min-h-[82px] px-[11px] py-2.5 text-[13.5px] leading-relaxed"
+              style={{
+                border: `1px solid ${border}`,
+                borderRadius: Math.max(r - 2, 0),
+                background: field,
+                color: faint,
+                letterSpacing: "-0.005em",
+              }}
+            >
+              {placeholder}
+            </div>
 
             {config.askEmail && (
               <div

@@ -516,7 +516,7 @@ function StudioEditor({
 
               <Toggle
                 label="Ask for a rating"
-                hint="A quick score under the message box."
+                hint="A quick score above the message box."
                 checked={config.askRating}
                 onChange={(v) => set("askRating", v)}
               />
