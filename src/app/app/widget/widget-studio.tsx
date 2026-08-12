@@ -38,6 +38,13 @@ import {
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/client";
 
+/** ["a", "b", "c"] -> "a, b, and c". Used to summarise what auto-brand actually found. */
+function joinWithAnd(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? "";
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
+}
+
 const POSITIONS = [
   { key: "top-left", label: "Top left" },
   { key: "top-right", label: "Top right" },
@@ -130,6 +137,12 @@ function StudioEditor({
 
   function set<K extends keyof WidgetConfig>(key: K, value: WidgetConfig[K]) {
     setConfig((c) => ({ ...c, [key]: value }));
+    setDirty(true);
+  }
+
+  /** Applies several fields at once, for the auto-brand guess: colour, font, theme, radius together. */
+  function applyBrand(patch: Partial<WidgetConfig>) {
+    setConfig((c) => ({ ...c, ...patch }));
     setDirty(true);
   }
 
@@ -273,7 +286,8 @@ function StudioEditor({
 
             <AutoColor
               projectUrl={projectUrl}
-              onPick={(hex) => set("accentColor", hex)}
+              onApply={applyBrand}
+              onPickColorOnly={(hex) => set("accentColor", hex)}
             />
           </Panel>
 
@@ -680,31 +694,61 @@ function StudioEditor({
   );
 }
 
-/* --------------------------------------------------------------- auto colour */
+/* --------------------------------------------------------------- auto brand */
+
+const FONT_LABELS: Record<string, string> = {
+  sans: "Sans",
+  serif: "Serif",
+  rounded: "Rounded",
+  mono: "Mono",
+};
 
 function AutoColor({
   projectUrl,
-  onPick,
+  onApply,
+  onPickColorOnly,
 }: {
   projectUrl: string | null;
-  onPick: (hex: string) => void;
+  /** Colour, and whichever of font/theme/radius the page actually yielded. */
+  onApply: (patch: Partial<WidgetConfig>) => void;
+  /** A screenshot can only ever tell us a colour, never a font or theme. */
+  onPickColorOnly: (hex: string) => void;
 }) {
   const [url, setUrl] = useState(projectUrl ?? "");
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const suggest = api.project.suggestColor.useMutation({
+  const suggest = api.project.suggestBrand.useMutation({
     onSuccess(result) {
-      if (!result) {
-        toast.error("Couldn't find a brand colour on that page. Try a screenshot.");
+      if (!result || (!result.color && !result.font && !result.theme && result.radius == null)) {
+        toast.error("Couldn't find a brand on that page. Try a screenshot for the colour.");
         return;
       }
-      onPick(result.color);
-      toast.success(
-        result.confidence === "high"
-          ? `Found ${result.color} in their theme colour.`
-          : `Best guess: ${result.color}. Adjust if it's off.`,
-      );
+
+      const patch: Partial<WidgetConfig> = {};
+      const applied: string[] = [];
+
+      if (result.color) {
+        patch.accentColor = result.color;
+        applied.push(
+          result.colorConfidence === "high" ? `colour (${result.color})` : "a best-guess colour",
+        );
+      }
+      if (result.font) {
+        patch.font = result.font;
+        applied.push(`${FONT_LABELS[result.font] ?? result.font} type`);
+      }
+      if (result.theme) {
+        patch.theme = result.theme;
+        applied.push(`${result.theme} theme`);
+      }
+      if (result.radius != null) {
+        patch.radius = result.radius;
+        applied.push("corner radius");
+      }
+
+      onApply(patch);
+      toast.success(`Matched ${joinWithAnd(applied)}. Adjust anything that's off.`);
     },
     onError: () => toast.error("Couldn't reach that page."),
   });
@@ -717,7 +761,7 @@ function AutoColor({
         toast.error("No strong colour in that image. Try one with more of your UI in it.");
         return;
       }
-      onPick(result.color);
+      onPickColorOnly(result.color);
       toast.success(`Pulled ${result.color} from your screenshot.`);
     } finally {
       setBusy(false);

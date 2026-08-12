@@ -165,18 +165,21 @@ export const projectRouter = createTRPCRouter({
     }),
 
   /**
-   * Guesses a brand colour from a public URL so nobody has to hunt for their
-   * own hex code. Returns null rather than throwing when a site can't be read
-   * or has nothing usable in it; the studio just says so and moves on.
+   * Guesses a brand — colour, typeface, theme, corner radius — from a public
+   * URL so nobody has to hunt down their own hex code by hand. Returns null
+   * rather than throwing when a site can't be read; the studio just says so
+   * and moves on. Each field is independently nullable: a site might yield a
+   * confident colour and nothing usable for font, or the reverse.
    */
-  suggestColor: orgProcedure
+  suggestBrand: orgProcedure
     .input(z.object({ url: z.string().trim().min(3).max(300) }))
     .mutation(async ({ ctx, input }) => {
-      // Each call is an outbound fetch from our egress IP. Cap it so a member
-      // can't turn N parallel calls into a port scanner or a DDoS reflector.
-      assertRate(`suggestColor:${ctx.orgId}`, 10, 60_000);
-      const { guessBrandColor } = await import("@/server/lib/brand-color");
-      return guessBrandColor(input.url);
+      // Each call fetches the page plus a handful of stylesheets and a
+      // favicon from our egress IP. Cap it so a member can't turn N parallel
+      // calls into a port scanner or a DDoS reflector.
+      assertRate(`suggestBrand:${ctx.orgId}`, 10, 60_000);
+      const { guessBrand } = await import("@/server/lib/brand-color");
+      return guessBrand(input.url);
     }),
 
   /** Polled by onboarding to detect the first real submission. */

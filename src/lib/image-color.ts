@@ -47,8 +47,27 @@ export async function extractBrandColor(
     return null;
   }
 
-  // 24 hue buckets, 15° each. Fine enough to separate blue from purple,
-  // coarse enough that anti-aliasing doesn't shatter one colour into ten.
+  return dominantVividColor(pixels);
+}
+
+/**
+ * Bucket-and-count the dominant vivid hue in a flat RGBA byte buffer.
+ *
+ * Pure, so it works on any source of pixels: canvas `ImageData.data` here in
+ * the browser, or a decoded image buffer on the server (see
+ * `server/lib/brand-color.ts`, which pulls a colour out of a site's favicon
+ * the same way). One algorithm, because "what counts as a brand colour in a
+ * bitmap" shouldn't have two different answers depending on which side of the
+ * network drew the pixels.
+ *
+ * Bucketing beats averaging: most of any real image is white, grey, and text,
+ * so an average comes out mud. 24 hue buckets (15° each) group what's left,
+ * fine enough to separate blue from purple, coarse enough that anti-aliasing
+ * doesn't shatter one colour into ten.
+ */
+export function dominantVividColor(
+  pixels: ArrayLike<number>,
+): ExtractedColor | null {
   const buckets = new Map<number, { count: number; r: number; g: number; b: number }>();
   let considered = 0;
 
@@ -62,7 +81,7 @@ export async function extractBrandColor(
     considered++;
 
     const { h: hue, s, l } = rgbToHsl(r, g, b);
-    // The same "is this a brand colour" test the server-side guesser uses.
+    // The same "is this a brand colour" test the server-side page guesser uses.
     if (s < 0.3 || l < 0.15 || l > 0.88) continue;
 
     const key = Math.floor(hue / 15);
