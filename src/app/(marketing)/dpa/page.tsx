@@ -173,9 +173,10 @@ export default function DpaPage() {
       <Clause n="10" heading="Contact">
         <p>
           Data protection questions go to{" "}
-          <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>, or{" "}
-          {site.legalEntity}, {site.postalAddress}. Where this agreement and the
-          Terms of Service disagree about personal data, this one wins.
+          <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>. The
+          processor under this agreement is {site.legalEntity}. Where this
+          agreement and the Terms of Service disagree about personal data, this
+          one wins.
         </p>
       </Clause>
     </LegalPage>

@@ -31,8 +31,7 @@ export default function PrivacyPage() {
           {site.legalEntity} operates {site.name}, a feedback widget and
           analysis service, and is the data controller for customer accounts.
           Write to us at{" "}
-          <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> or{" "}
-          {site.postalAddress}.
+          <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>.
         </p>
       </Clause>
 

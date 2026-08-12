@@ -17,16 +17,20 @@ passes 31/31 pages, AI pipeline confirmed working against the live provider
 `npm run env:check` fails while these are placeholders, on purpose.
 
 ```
-NEXT_PUBLIC_LEGAL_ENTITY="Your Company Ltd (company no. …)"
-NEXT_PUBLIC_POSTAL_ADDRESS="…"
-NEXT_PUBLIC_GOVERNING_LAW="England and Wales"
-NEXT_PUBLIC_VENUE="London, England"
+NEXT_PUBLIC_LEGAL_ENTITY="Arc Labs LLC"
+NEXT_PUBLIC_GOVERNING_LAW="the State of New Jersey"
+NEXT_PUBLIC_VENUE="the state and federal courts of New Jersey"
 ```
 
 These are interpolated into the Terms, Privacy Policy, DPA, and the footer of
 every email. A contract naming a brand rather than a registered company binds
-nobody, Terms with no governing law are hard to enforce, and commercial email
-without a postal address breaches CAN-SPAM §7704(a)(5).
+nobody, and Terms with no governing law are hard to enforce.
+
+There is no postal-address setting, by design: nothing renders one, and the
+Terms name email as the channel for formal notice instead. CAN-SPAM's
+physical-address rule covers *commercial* email only, and everything sent from
+here is transactional or relationship mail. Start sending marketing email and
+that mail needs a real mailing address, which must not be a home address.
 
 ### 2. Replace the placeholder testimonials
 

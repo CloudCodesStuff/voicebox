@@ -241,7 +241,23 @@ export const orgRouter = createTRPCRouter({
 
     const result = await sendDigest(email, digest);
     if (!result.ok) {
-      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: result.error });
+      // A refused send is a configuration problem, not a crash, and it must
+      // not arrive as an opaque 500: `errorFormatter` replaces the message on
+      // INTERNAL_SERVER_ERROR, so throwing that code would discard the one
+      // sentence explaining what to fix and leave a log dive as the only way
+      // to find out. This cost a real debugging session: EMAIL_FROM was still
+      // Resend's shared onboarding@resend.dev sender, which silently only
+      // delivers to the address that owns the Resend account.
+      console.error("[digest preview] send failed:", result.error);
+
+      // The provider's own text is logged but not returned. Resend's 403 for
+      // the shared sender names the account owner's email address, and that is
+      // not something to echo to whoever clicked the button.
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message:
+          "The email provider refused the message. Check that EMAIL_FROM uses a domain verified in Resend. The full reason is in the server logs.",
+      });
     }
 
     return { to: email, delivered: result.delivered };
