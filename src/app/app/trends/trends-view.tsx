@@ -1,6 +1,7 @@
 "use client";
 
-import { Download } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Download } from "lucide-react";
 import { useState } from "react";
 
 import { useProject } from "@/components/app/project-context";
@@ -112,7 +113,16 @@ export function TrendsView() {
         <EmptyState
           className="mt-8"
           title="Nothing to chart yet."
-          body="Once feedback starts arriving, volume and sentiment over time appear here."
+          body="Volume and sentiment over time appear here once feedback starts arriving. A chart needs a few days of data before it says anything useful."
+          action={
+            <Link
+              href="/app/widget"
+              className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-[0.85rem] font-semibold text-paper"
+            >
+              Set up the widget
+              <ArrowRight className="size-3.5" />
+            </Link>
+          }
         />
       ) : (
         <>

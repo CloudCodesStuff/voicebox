@@ -18,6 +18,12 @@
  *
  * Public API:
  *   Voicebox('open') | Voicebox('close') | Voicebox('identify', { plan: 'pro', ... })
+ *
+ * Calls made before the config arrives are honoured, not dropped: 'open'
+ * queues and fires on boot, 'identify' traits accumulate and are attached to
+ * whatever gets submitted. The same is true of clicks on any host-page
+ * [data-voicebox-trigger] element, whose listener is bound at script execution
+ * rather than after mount.
  */
 (function () {
   "use strict";
@@ -41,6 +47,17 @@
   var open = false;
   var openedAt = 0;
   var state = { type: null, rating: null, sent: false };
+
+  /**
+   * Someone asked for the panel before the config arrived.
+   *
+   * Boot waits for an idle callback and then a network round trip, so there is
+   * a real one-to-three second window after page load where the widget exists
+   * as a script but cannot render. A click on a host-page trigger during that
+   * window used to vanish silently, which reads as a broken button on the
+   * host's own site. Remember the request and honour it once config lands.
+   */
+  var pendingOpen = false;
 
   var reduceMotion =
     window.matchMedia &&
@@ -135,11 +152,34 @@
     var onAccent = readableOn(c.accentColor);
     var r = c.radius;
 
-    var vertical = c.position.indexOf("top") === 0 ? "top:20px;" : "bottom:20px;";
-    var horizontal = c.position.indexOf("left") > -1 ? "left:20px;" : "right:20px;";
-    var slideFrom = c.position.indexOf("top") === 0 ? "-8px" : "8px";
+    var atTop = c.position.indexOf("top") === 0;
+    var atLeft = c.position.indexOf("left") > -1;
+
+    var vertical = atTop ? "top:20px;" : "bottom:20px;";
+    var horizontal = atLeft ? "left:20px;" : "right:20px;";
+    var slideFrom = atTop ? "-8px" : "8px";
+
+    // The panel is absolutely positioned inside `.wrap`, which is already
+    // inset from the viewport and shrink-wraps the trigger. Its offset is
+    // therefore measured from the trigger's own edge, and must be 0 for the
+    // two to line up. Reusing `horizontal` here (as this did) inset the panel
+    // a second 20px, so it sat visibly off-centre from the button on desktop
+    // and ran off the screen on mobile, where the panel is nearly as wide as
+    // the viewport.
+    var panelEdge = atLeft ? "left:0;" : "right:0;";
+
+    // Distance from the viewport edge to the panel on mobile, where the panel
+    // is pinned to the viewport rather than to the trigger:
+    // 20px wrap inset + 40px trigger + 16px gap.
+    var MOBILE_CLEAR = 76;
 
     var font = FONTS[c.font] || FONTS.sans;
+
+    // Four types read best as a 2x2 block; three or fewer fit one row at this
+    // width. Anything else would either crowd the labels or leave one pill
+    // stranded on its own line.
+    var typeCount = (c.enabledTypes || []).length;
+    var typeColumns = typeCount === 4 ? 2 : Math.max(typeCount, 1);
 
     return (
       ":host{all:initial;}" +
@@ -158,10 +198,17 @@
       ".trigger:focus-visible{outline:2px solid " + c.accentColor + ";outline-offset:3px;}" +
 
       // Panel
-      ".panel{position:absolute;" + vertical.replace(/(\d+)px/, "56px") + horizontal +
+      ".panel{position:absolute;" + vertical.replace(/(\d+)px/, "56px") + panelEdge +
       "width:352px;max-width:calc(100vw - 32px);background:" + bg + ";color:" + fg + ";" +
       "border:1px solid " + border + ";border-radius:" + (r > 0 ? r + 4 : 0) + "px;" +
       "box-shadow:" + shadow + ";overflow:hidden;" +
+      // Never taller than the screen. Landscape phones and small windows
+      // otherwise push the submit button off the bottom, which makes the form
+      // look complete while being impossible to finish. dvh where supported,
+      // so an iOS toolbar sliding in doesn't clip it.
+      "display:flex;flex-direction:column;" +
+      "max-height:calc(100vh - " + (MOBILE_CLEAR + 20) + "px);" +
+      "max-height:calc(100dvh - " + (MOBILE_CLEAR + 20) + "px);" +
       (reduceMotion
         ? ""
         : "opacity:0;transform:translateY(" + slideFrom + ") scale(.99);" +
@@ -177,16 +224,36 @@
       "border:none;background:transparent;color:" + faint + ";cursor:pointer;border-radius:" + (r > 0 ? 6 : 0) + "px;" +
       "transition:background .12s,color .12s;}" +
       ".x:hover{background:" + field + ";color:" + fg + ";}" +
-      ".body{padding:14px 16px 16px;}" +
+      // Scrolls inside the panel rather than growing it. The header, the
+      // submit bar and the footer stay put, so the close button and the
+      // primary action are always reachable.
+      ".body{padding:14px 16px 12px;overflow-y:auto;-webkit-overflow-scrolling:touch;}" +
+      // Submit lives outside the scroll area. Inside it, a short window plus
+      // four types and a rating pushed "Send feedback" below the fold of the
+      // panel's own scroll, so the form looked finished with no way to send it
+      // unless you thought to scroll a box that gives no hint it scrolls.
+      ".actions{flex:none;padding:0 16px 14px;}" +
 
       // Type chips: inline pills that wrap. Stacked icon-over-label cards read
       // as four buttons of unclear weight; a pill row reads as one choice.
-      ".types{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}" +
-      ".type{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;" +
+      // A grid, not wrapping flex. Four content-sized pills overflow 320px of
+      // panel and drop the last one onto a line of its own, which reads as a
+      // layout accident rather than a choice. Equal columns fill the width
+      // edge to edge and can never go ragged: four becomes a balanced 2x2,
+      // three sits on one row, and nothing depends on how long a label is in
+      // whatever language it was translated into.
+      ".types{display:grid;grid-template-columns:repeat(" +
+      typeColumns +
+      ",minmax(0,1fr));gap:6px;margin-bottom:12px;}" +
+      ".type{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:30px;padding:0 8px;" +
+      "min-width:0;" +
       "border:1px solid " + border + ";border-radius:" + (r > 0 ? 999 : 0) + "px;background:transparent;color:" + muted + ";" +
       "cursor:pointer;font-size:12.5px;font-weight:500;letter-spacing:-.005em;" +
       "transition:border-color .13s,color .13s,background .13s;}" +
-      ".type svg{opacity:.75;}" +
+      ".type svg{opacity:.75;flex:none;}" +
+      // The label, not the icon, is what gets long. Let it ellipsis inside its
+      // column rather than pushing the pill wider than the grid allows.
+      ".type span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}" +
       ".type:hover{border-color:" + (dark ? "#33333b" : "#d4d4d8") + ";color:" + fg + ";}" +
       ".type.on{border-color:transparent;background:" + c.accentColor + ";color:" + onAccent + ";}" +
       ".type.on svg{opacity:1;}" +
@@ -213,9 +280,20 @@
 
       // Rating. Fills left to right on hover so the control explains itself,
       // and the chosen score is echoed in words so it isn't guesswork.
-      ".rate{display:flex;align-items:center;gap:9px;margin-top:12px;min-height:26px;}" +
-      ".rate-label{font-size:12.5px;color:" + muted + ";}" +
-      ".stars{display:flex;gap:1px;}" +
+      //
+      // Sits above the message box and spans the full width. Left-aligned
+      // under the textarea it occupied about two thirds of the panel and left
+      // a ragged gap on the right, which broke the column of full-width
+      // controls either side of it. Asking for the score before the sentence
+      // also matches the order people answer in.
+      ".rate{display:flex;align-items:center;gap:10px;margin-bottom:10px;min-height:28px;}" +
+      ".rate-label{font-size:12.5px;color:" + muted + ";white-space:nowrap;}" +
+      // Pushed to the right edge, so the row is anchored at both ends.
+      ".stars{display:flex;gap:1px;margin-left:auto;}" +
+      // Numbers are boxes rather than glyphs, so they stretch to share the
+      // whole remaining width instead of huddling in a corner.
+      ".stars.nums{flex:1;margin-left:0;gap:6px;}" +
+      ".stars.nums .num{flex:1;}" +
       ".star{width:26px;height:26px;display:grid;place-items:center;border:none;background:transparent;" +
       "cursor:pointer;color:" + (dark ? "#2c2c33" : "#dcdce0") + ";padding:0;" +
       "transition:color .12s;}" +
@@ -229,7 +307,7 @@
       ".num.on{border-color:transparent;background:" + c.accentColor + ";color:" + onAccent + ";}" +
 
       // Submit
-      ".submit{width:100%;height:38px;margin-top:12px;display:inline-flex;align-items:center;" +
+      ".submit{width:100%;height:38px;display:inline-flex;align-items:center;" +
       "justify-content:center;gap:6px;border:none;border-radius:" + Math.max(r - 2, 0) + "px;" +
       "background:" + c.accentColor + ";color:" + onAccent + ";" +
       "font-size:13.5px;font-weight:560;letter-spacing:-.005em;cursor:pointer;" +
@@ -252,7 +330,22 @@
       ".foot{padding:8px 16px;border-top:1px solid " + border + ";text-align:center;}" +
       ".foot a{font-size:11px;color:" + faint + ";text-decoration:none;transition:color .12s;}" +
       ".foot a:hover{color:" + muted + ";}" +
-      "@media(max-width:420px){.panel{width:calc(100vw - 24px);}}"
+      // Mobile. The panel stops hanging off the trigger and pins to the
+      // viewport with equal margins on both sides, because at this width it is
+      // effectively a sheet, and a sheet aligned to a corner button reads as
+      // broken rather than deliberate. `width:auto` with both insets set lets
+      // it size itself, so it stays even on every screen width.
+      "@media(max-width:420px){" +
+      ".panel{position:fixed;left:12px;right:12px;width:auto;max-width:none;" +
+      (atTop
+        ? "top:" + MOBILE_CLEAR + "px;bottom:auto;"
+        : "bottom:" + MOBILE_CLEAR + "px;top:auto;") +
+      "max-height:calc(100vh - " + (MOBILE_CLEAR + 16) + "px);" +
+      "max-height:calc(100dvh - " + (MOBILE_CLEAR + 16) + "px);}" +
+      // 16px is the smallest size iOS will render without zooming the whole
+      // page on focus, which on a fixed panel leaves it scrolled off-screen.
+      ".panel textarea,.panel input[type=email]{font-size:16px;}" +
+      "}"
     );
   }
 
@@ -284,8 +377,8 @@
       rating =
         '<div class="rate">' +
         '<span class="rate-label">How was it?</span>' +
-        '<div class="stars">' + marks + "</div>" +
-        '<span class="rate-value"></span>' +
+        '<div class="stars' + (useStars ? "" : " nums") + '">' + marks + "</div>" +
+        (useStars ? '<span class="rate-value"></span>' : "") +
         "</div>";
     }
 
@@ -298,12 +391,14 @@
       "</div>" +
       '<div class="body">' +
       (types ? '<div class="types">' + types + "</div>" : "") +
+      rating +
       '<textarea placeholder="Tell us what\'s on your mind…"></textarea>' +
       '<input class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />' +
-      rating +
       (c.askEmail
         ? '<input type="email" placeholder="Email (optional, if you\'d like a reply)" />'
         : "") +
+      "</div>" +
+      '<div class="actions">' +
       '<button class="submit">' + icon("send", 15) + "<span>Send feedback</span></button>" +
       '<div class="err" hidden></div>' +
       "</div>" +
@@ -344,7 +439,18 @@
     root.appendChild(css);
     root.appendChild(wrap);
     document.body.appendChild(host);
+  }
 
+  /**
+   * Listeners that must exist before the widget can render.
+   *
+   * These used to be registered at the end of mount(), which meant a page's
+   * own "Send feedback" button did nothing at all until boot finished. The
+   * host has no way to know when that is, so the only visible behaviour was an
+   * unreliable button on their site. Bound at script execution instead, and
+   * openPanel() queues if config hasn't landed.
+   */
+  function listen() {
     // Host-page elements can open the widget without our button.
     document.addEventListener("click", function (e) {
       var t = e.target.closest && e.target.closest("[data-voicebox-trigger]");
@@ -365,7 +471,12 @@
   }
 
   function openPanel() {
-    if (open || !config) return;
+    if (open) return;
+    if (!config) {
+      // Not booted yet. Queue it rather than dropping it, boot() replays this.
+      pendingOpen = true;
+      return;
+    }
     open = true;
     openedAt = Date.now();
     state = { type: null, rating: null, sent: false };
@@ -502,6 +613,12 @@
         return r.json();
       })
       .then(function () {
+        // The submit bar is a sibling of .body now, so it has to go too.
+        // Leaving it would show a live "Send feedback" button underneath a
+        // thank-you message.
+        var actions = panel.querySelector(".actions");
+        if (actions) actions.remove();
+
         panel.querySelector(".body").outerHTML =
           '<div class="done">' +
           '<div class="tick">' + icon("check", 20) + "</div>" +
@@ -529,6 +646,11 @@
         if (!c || c.error) return;
         config = c;
         mount(c);
+        // Honour anything clicked or called while we were still loading.
+        if (pendingOpen) {
+          pendingOpen = false;
+          openPanel();
+        }
       })
       .catch(function () {
         /* A broken widget must never break the host page. */
@@ -545,6 +667,10 @@
       });
     }
   };
+
+  // Listeners first, rendering when the browser is idle. A trigger click that
+  // beats the config is remembered, not lost.
+  listen();
 
   if ("requestIdleCallback" in window) {
     requestIdleCallback(boot, { timeout: 2500 });
