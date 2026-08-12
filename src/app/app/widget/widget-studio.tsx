@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import {
   Check,
@@ -598,6 +599,21 @@ function StudioEditor({
             <p className="mt-3 text-[0.8rem] text-steel">
               Already installed? Everything you save here reaches it within a
               minute, no redeploy.
+            </p>
+
+            {/* Said at the moment the key is copied, which is when it stops
+                being abstract: from here on it is public. */}
+            <p className="mt-2 text-[0.8rem] leading-relaxed text-steel">
+              The key in this snippet is public by design and will be visible in
+              your page source. Lock the project to your domains under{" "}
+              <Link
+                href="/app/settings/projects"
+                className="font-medium text-ink underline underline-offset-2"
+              >
+                Settings → Projects
+              </Link>
+              , or anyone who reads it can post feedback into your inbox from
+              their own site.
             </p>
           </Panel>
         </div>

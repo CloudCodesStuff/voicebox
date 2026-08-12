@@ -17,7 +17,10 @@ import {
 } from "@/server/lib/active-org";
 import { projectKey, slugify, withSuffix } from "@/server/lib/ids";
 import {
+  FREE_WORKSPACE_LIMIT,
+  MAX_WORKSPACES,
   assertFeature,
+  countFreeWorkspacesOwned,
   describeUsage,
   ensureUsageWindow,
   planRules,
@@ -81,19 +84,29 @@ export const orgRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // Each workspace carries its own free plan and its own monthly quota,
-      // so unlimited creation is unlimited free tier. A person juggling more
-      // than a handful of workspaces is not the case this product serves.
       assertRate(`createOrg:${ctx.session.user.id}`, 5, 60_000);
 
-      const owned = await ctx.db.membership.count({
-        where: { userId: ctx.session.user.id, role: "OWNER" },
-      });
-      if (owned >= 10) {
+      // Every new workspace starts on Free with its own monthly quota, so
+      // uncapped creation is an uncapped free tier: make ten workspaces and
+      // you have ten times the allowance for nothing. The cap is on *free*
+      // workspaces specifically rather than on workspaces in general, so
+      // paying for one is what lifts it, and a customer who is already paying
+      // is never told they have too many.
+      const owned = await countFreeWorkspacesOwned(ctx.db, ctx.session.user.id);
+
+      if (owned.free >= FREE_WORKSPACE_LIMIT) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message:
-            "You've reached the limit of 10 workspaces. Delete one you no longer use, or get in touch.",
+          message: `FREE_WORKSPACE_LIMIT:${FREE_WORKSPACE_LIMIT}`,
+        });
+      }
+
+      // A backstop above the plan rule. Someone with paid workspaces can still
+      // make free ones, and this stops that becoming unbounded.
+      if (owned.total >= MAX_WORKSPACES) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: `You've reached the limit of ${MAX_WORKSPACES} workspaces. Delete one you no longer use, or get in touch.`,
         });
       }
 

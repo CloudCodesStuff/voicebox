@@ -3,6 +3,10 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
+import {
+  FREE_WORKSPACE_LIMIT,
+  countFreeWorkspacesOwned,
+} from "@/server/lib/plan";
 import { site } from "@/lib/site";
 
 import { OnboardingFlow } from "./onboarding-flow";
@@ -33,10 +37,19 @@ export default async function OnboardingPage({
     if (existing) redirect("/app");
   }
 
+  // Checked here, not only on submit. Letting someone name a workspace, name a
+  // project, and press Continue before telling them they aren't allowed one
+  // wastes their time to say something we knew when the page loaded.
+  const owned = wantsAnother
+    ? await countFreeWorkspacesOwned(db, session.user.id)
+    : { free: 0, total: 0 };
+
   return (
     <OnboardingFlow
       defaultName={session.user.name ?? ""}
       additional={wantsAnother}
+      atFreeLimit={owned.free >= FREE_WORKSPACE_LIMIT}
+      freeLimit={FREE_WORKSPACE_LIMIT}
     />
   );
 }

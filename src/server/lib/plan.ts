@@ -53,6 +53,40 @@ export const planRules: Record<Plan, PlanRules> = {
   },
 };
 
+/**
+ * How many Free workspaces one person may own.
+ *
+ * Two, so the common honest case still works: your own product plus a side
+ * project, or a real workspace plus one to experiment in. The third is where
+ * "I'd like another" turns into "I'd rather not pay for the quota", since
+ * every workspace carries its own monthly allowance.
+ *
+ * The cap counts *free* workspaces rather than workspaces in general, so
+ * paying is what lifts it and a paying customer is never told they have too
+ * many.
+ */
+export const FREE_WORKSPACE_LIMIT = 2;
+
+/** Backstop for anyone whose paid workspaces put them past the free rule. */
+export const MAX_WORKSPACES = 10;
+
+/** Counts the Free workspaces a user owns, for the limit above. */
+export async function countFreeWorkspacesOwned(
+  db: typeof import("@/server/db").db,
+  userId: string,
+): Promise<{ free: number; total: number }> {
+  const owned = await db.membership.findMany({
+    where: { userId, role: "OWNER" },
+    select: { org: { select: { subscription: { select: { plan: true } } } } },
+  });
+
+  return {
+    free: owned.filter((m) => (m.org.subscription?.plan ?? "FREE") === "FREE")
+      .length,
+    total: owned.length,
+  };
+}
+
 export const planLabels: Record<Plan, string> = {
   FREE: "Free",
   STARTER: "Starter",

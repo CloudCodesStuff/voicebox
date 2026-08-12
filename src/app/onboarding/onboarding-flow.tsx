@@ -1,6 +1,15 @@
 "use client";
 
-import { ArrowRight, Check, Copy, Loader2, Radio, Sparkles } from "lucide-react";
+import Link from "next/link";
+import {
+  ArrowRight,
+  Check,
+  Copy,
+  Loader2,
+  Radio,
+  Sparkles,
+  TriangleAlert,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -13,10 +22,15 @@ import { api } from "@/trpc/client";
 export function OnboardingFlow({
   defaultName,
   additional = false,
+  atFreeLimit = false,
+  freeLimit = 2,
 }: {
   defaultName: string;
   /** True when this is a second workspace, not a first run. */
   additional?: boolean;
+  /** Already at the Free workspace cap, known before the form is touched. */
+  atFreeLimit?: boolean;
+  freeLimit?: number;
 }) {
   const utils = api.useUtils();
 
@@ -28,6 +42,12 @@ export function OnboardingFlow({
   const [projectKey, setProjectKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [sendingTest, setSendingTest] = useState(false);
+  /** A refusal that needs to stay on screen, not a toast that slides away. */
+  const [blocked, setBlocked] = useState<string | null>(
+    atFreeLimit
+      ? `Free accounts can have ${freeLimit} workspaces, and you already have ${freeLimit}. Upgrade one of them to Pro and you can add more, or delete one you have finished with.`
+      : null,
+  );
 
   const create = api.org.create.useMutation({
     onSuccess(org) {
@@ -39,7 +59,18 @@ export function OnboardingFlow({
       setStep(2);
       void utils.org.invalidate();
     },
-    onError: (e) => toast.error(e.message),
+    onError(e) {
+      // The server sends a code rather than a sentence so the number and the
+      // wording live in one place each. Anything else is already readable.
+      if (e.message.startsWith("FREE_WORKSPACE_LIMIT:")) {
+        const limit = e.message.split(":")[1];
+        setBlocked(
+          `Free accounts can have ${limit} workspaces, and you already have ${limit}. Upgrade one of them to Pro and you can add more, or delete one you have finished with.`,
+        );
+        return;
+      }
+      toast.error(e.message);
+    },
   });
 
   // Polls until the widget's first submission lands, then flips to success.
@@ -189,16 +220,47 @@ export function OnboardingFlow({
               </div>
             </div>
 
+            {blocked && (
+              <div className="mt-8 rounded-xl border border-mixed/30 bg-mixed-wash p-4">
+                <div className="flex gap-3">
+                  <TriangleAlert className="mt-0.5 size-4 shrink-0 text-mixed" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[0.88rem] font-semibold text-ink">
+                      You&apos;ve used all your free workspaces
+                    </p>
+                    <p className="mt-1 text-[0.85rem] leading-relaxed text-steel">
+                      {blocked}
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Link
+                        href="/app/settings/billing"
+                        className="inline-flex min-h-9 items-center rounded-lg bg-ink px-3.5 text-[0.83rem] font-semibold text-paper"
+                      >
+                        See plans
+                      </Link>
+                      <Link
+                        href="/app"
+                        className="inline-flex min-h-9 items-center rounded-lg px-3 text-[0.83rem] font-medium text-steel hover:text-ink"
+                      >
+                        Back to dashboard
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <button
               type="button"
-              disabled={!canContinue || create.isPending}
-              onClick={() =>
+              disabled={!canContinue || create.isPending || Boolean(blocked)}
+              onClick={() => {
+                setBlocked(null);
                 create.mutate({
                   name: orgName.trim(),
                   projectName: projectName.trim(),
                   projectUrl: projectUrl.trim() || undefined,
-                })
-              }
+                });
+              }}
               className="mt-10 inline-flex min-h-12 items-center gap-2 rounded-lg bg-mint px-6 text-[0.94rem] font-semibold text-mint-ink transition-opacity disabled:opacity-40"
             >
               {create.isPending && <Loader2 className="size-4 animate-spin" />}

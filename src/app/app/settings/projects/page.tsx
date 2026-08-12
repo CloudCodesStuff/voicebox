@@ -1,6 +1,14 @@
 "use client";
 
-import { Check, Copy, Loader2, Plus, RefreshCw, Trash2 } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Loader2,
+  Plus,
+  RefreshCw,
+  Trash2,
+  TriangleAlert,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -282,9 +290,41 @@ function DomainAllowlist({
         Allowed domains
       </Label>
       <p className="mt-0.5 text-[0.76rem] leading-relaxed text-steel">
-        One per line. Submissions from anywhere else are rejected. Empty means
-        anywhere, which is fine locally and risky in production.
+        One per line. Submissions from any other site are rejected. Subdomains
+        are covered, so <code className="font-mono">acme.com</code> also allows{" "}
+        <code className="font-mono">app.acme.com</code>.
       </p>
+
+      {/* An empty list is the dangerous state, and it is also the default, so
+          it cannot be a grey footnote under the field. Your project key is
+          published in your page source by design, and with no allowlist that
+          key is all anyone needs to post into your inbox from their own site.
+          Spelled out in full because the consequence is not obvious from the
+          words "allowed domains". */}
+      {domains.length === 0 && (
+        <div className="mt-2.5 rounded-lg border border-mixed/40 bg-mixed-wash p-3.5">
+          <div className="flex gap-2.5">
+            <TriangleAlert className="mt-0.5 size-4 shrink-0 text-mixed" />
+            <div className="min-w-0 flex-1 text-[0.8rem] leading-relaxed">
+              <p className="font-semibold text-ink">
+                Anyone can send feedback to this project
+              </p>
+              <p className="mt-1 text-steel">
+                With no domains listed, this project accepts submissions from{" "}
+                <strong className="font-semibold text-ink">any website</strong>.
+                Your project key is visible in your page source, so anyone who
+                views it can paste your widget onto their own site and their
+                visitors&apos; feedback, or anything they choose to send, lands
+                in your inbox and counts against your monthly limit.
+              </p>
+              <p className="mt-1.5 text-steel">
+                Add your domains below to shut that off. Takes a few seconds and
+                you only do it once.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       <textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}
