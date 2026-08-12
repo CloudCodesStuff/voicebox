@@ -18,6 +18,12 @@
  *
  * Public API:
  *   Voicebox('open') | Voicebox('close') | Voicebox('identify', { plan: 'pro', ... })
+ *
+ * Calls made before the config arrives are honoured, not dropped: 'open'
+ * queues and fires on boot, 'identify' traits accumulate and are attached to
+ * whatever gets submitted. The same is true of clicks on any host-page
+ * [data-voicebox-trigger] element, whose listener is bound at script execution
+ * rather than after mount.
  */
 (function () {
   "use strict";
@@ -41,6 +47,17 @@
   var open = false;
   var openedAt = 0;
   var state = { type: null, rating: null, sent: false };
+
+  /**
+   * Someone asked for the panel before the config arrived.
+   *
+   * Boot waits for an idle callback and then a network round trip, so there is
+   * a real one-to-three second window after page load where the widget exists
+   * as a script but cannot render. A click on a host-page trigger during that
+   * window used to vanish silently, which reads as a broken button on the
+   * host's own site. Remember the request and honour it once config lands.
+   */
+  var pendingOpen = false;
 
   var reduceMotion =
     window.matchMedia &&
@@ -344,7 +361,18 @@
     root.appendChild(css);
     root.appendChild(wrap);
     document.body.appendChild(host);
+  }
 
+  /**
+   * Listeners that must exist before the widget can render.
+   *
+   * These used to be registered at the end of mount(), which meant a page's
+   * own "Send feedback" button did nothing at all until boot finished. The
+   * host has no way to know when that is, so the only visible behaviour was an
+   * unreliable button on their site. Bound at script execution instead, and
+   * openPanel() queues if config hasn't landed.
+   */
+  function listen() {
     // Host-page elements can open the widget without our button.
     document.addEventListener("click", function (e) {
       var t = e.target.closest && e.target.closest("[data-voicebox-trigger]");
@@ -365,7 +393,12 @@
   }
 
   function openPanel() {
-    if (open || !config) return;
+    if (open) return;
+    if (!config) {
+      // Not booted yet. Queue it rather than dropping it, boot() replays this.
+      pendingOpen = true;
+      return;
+    }
     open = true;
     openedAt = Date.now();
     state = { type: null, rating: null, sent: false };
@@ -529,6 +562,11 @@
         if (!c || c.error) return;
         config = c;
         mount(c);
+        // Honour anything clicked or called while we were still loading.
+        if (pendingOpen) {
+          pendingOpen = false;
+          openPanel();
+        }
       })
       .catch(function () {
         /* A broken widget must never break the host page. */
@@ -545,6 +583,10 @@
       });
     }
   };
+
+  // Listeners first, rendering when the browser is idle. A trigger click that
+  // beats the config is remembered, not lost.
+  listen();
 
   if ("requestIdleCallback" in window) {
     requestIdleCallback(boot, { timeout: 2500 });
