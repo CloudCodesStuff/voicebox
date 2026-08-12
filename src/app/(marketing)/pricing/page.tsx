@@ -14,14 +14,15 @@ import {
   Section,
   SectionHeading,
 } from "@/components/marketing/primitives";
-import { site } from "@/lib/site";
+import { plans, site } from "@/lib/site";
 
 import { PricingTable } from "./pricing-table";
 
+const [, pro, scale] = plans;
+
 export const metadata: Metadata = {
   title: "Pricing",
-  description:
-    "Free for 50 pieces of feedback a month, then $49 or $99. The AI is on every plan. Cancel any time.",
+  description: `Free for 50 pieces of feedback a month, then $${pro.priceMonthly} or $${scale.priceMonthly}. The AI is on every plan. Cancel any time.`,
   alternates: { canonical: "/pricing" },
 };
 
