@@ -152,9 +152,26 @@
     var onAccent = readableOn(c.accentColor);
     var r = c.radius;
 
-    var vertical = c.position.indexOf("top") === 0 ? "top:20px;" : "bottom:20px;";
-    var horizontal = c.position.indexOf("left") > -1 ? "left:20px;" : "right:20px;";
-    var slideFrom = c.position.indexOf("top") === 0 ? "-8px" : "8px";
+    var atTop = c.position.indexOf("top") === 0;
+    var atLeft = c.position.indexOf("left") > -1;
+
+    var vertical = atTop ? "top:20px;" : "bottom:20px;";
+    var horizontal = atLeft ? "left:20px;" : "right:20px;";
+    var slideFrom = atTop ? "-8px" : "8px";
+
+    // The panel is absolutely positioned inside `.wrap`, which is already
+    // inset from the viewport and shrink-wraps the trigger. Its offset is
+    // therefore measured from the trigger's own edge, and must be 0 for the
+    // two to line up. Reusing `horizontal` here (as this did) inset the panel
+    // a second 20px, so it sat visibly off-centre from the button on desktop
+    // and ran off the screen on mobile, where the panel is nearly as wide as
+    // the viewport.
+    var panelEdge = atLeft ? "left:0;" : "right:0;";
+
+    // Distance from the viewport edge to the panel on mobile, where the panel
+    // is pinned to the viewport rather than to the trigger:
+    // 20px wrap inset + 40px trigger + 16px gap.
+    var MOBILE_CLEAR = 76;
 
     var font = FONTS[c.font] || FONTS.sans;
 
@@ -175,10 +192,17 @@
       ".trigger:focus-visible{outline:2px solid " + c.accentColor + ";outline-offset:3px;}" +
 
       // Panel
-      ".panel{position:absolute;" + vertical.replace(/(\d+)px/, "56px") + horizontal +
+      ".panel{position:absolute;" + vertical.replace(/(\d+)px/, "56px") + panelEdge +
       "width:352px;max-width:calc(100vw - 32px);background:" + bg + ";color:" + fg + ";" +
       "border:1px solid " + border + ";border-radius:" + (r > 0 ? r + 4 : 0) + "px;" +
       "box-shadow:" + shadow + ";overflow:hidden;" +
+      // Never taller than the screen. Landscape phones and small windows
+      // otherwise push the submit button off the bottom, which makes the form
+      // look complete while being impossible to finish. dvh where supported,
+      // so an iOS toolbar sliding in doesn't clip it.
+      "display:flex;flex-direction:column;" +
+      "max-height:calc(100vh - " + (MOBILE_CLEAR + 20) + "px);" +
+      "max-height:calc(100dvh - " + (MOBILE_CLEAR + 20) + "px);" +
       (reduceMotion
         ? ""
         : "opacity:0;transform:translateY(" + slideFrom + ") scale(.99);" +
@@ -194,7 +218,9 @@
       "border:none;background:transparent;color:" + faint + ";cursor:pointer;border-radius:" + (r > 0 ? 6 : 0) + "px;" +
       "transition:background .12s,color .12s;}" +
       ".x:hover{background:" + field + ";color:" + fg + ";}" +
-      ".body{padding:14px 16px 16px;}" +
+      // Scrolls inside the panel rather than growing it. The header and the
+      // "powered by" footer stay put, so the close button is always reachable.
+      ".body{padding:14px 16px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch;}" +
 
       // Type chips: inline pills that wrap. Stacked icon-over-label cards read
       // as four buttons of unclear weight; a pill row reads as one choice.
@@ -269,7 +295,22 @@
       ".foot{padding:8px 16px;border-top:1px solid " + border + ";text-align:center;}" +
       ".foot a{font-size:11px;color:" + faint + ";text-decoration:none;transition:color .12s;}" +
       ".foot a:hover{color:" + muted + ";}" +
-      "@media(max-width:420px){.panel{width:calc(100vw - 24px);}}"
+      // Mobile. The panel stops hanging off the trigger and pins to the
+      // viewport with equal margins on both sides, because at this width it is
+      // effectively a sheet, and a sheet aligned to a corner button reads as
+      // broken rather than deliberate. `width:auto` with both insets set lets
+      // it size itself, so it stays even on every screen width.
+      "@media(max-width:420px){" +
+      ".panel{position:fixed;left:12px;right:12px;width:auto;max-width:none;" +
+      (atTop
+        ? "top:" + MOBILE_CLEAR + "px;bottom:auto;"
+        : "bottom:" + MOBILE_CLEAR + "px;top:auto;") +
+      "max-height:calc(100vh - " + (MOBILE_CLEAR + 16) + "px);" +
+      "max-height:calc(100dvh - " + (MOBILE_CLEAR + 16) + "px);}" +
+      // 16px is the smallest size iOS will render without zooming the whole
+      // page on focus, which on a fixed panel leaves it scrolled off-screen.
+      ".panel textarea,.panel input[type=email]{font-size:16px;}" +
+      "}"
     );
   }
 
