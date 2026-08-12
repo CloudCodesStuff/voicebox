@@ -4,12 +4,19 @@
  * pages can't drift apart.
  */
 
+import { clientEnv } from "@/env";
+
 export const site = {
   name: "Voicebox",
   tagline: "Stop reading feedback. Start acting on it.",
   description:
     "A feedback widget for your site, and an AI that groups every reply into a ranked list of what to fix next.",
-  url: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+  // Read through the validated env module, not process.env directly: a
+  // malformed value (someone pastes a markdown link instead of a bare URL,
+  // say) then fails fast with the variable's name in the message, rather than
+  // shipping a bad string that crashes `new URL(site.url)` deep in layout.tsx
+  // with an error that never mentions NEXT_PUBLIC_APP_URL.
+  url: clientEnv.NEXT_PUBLIC_APP_URL,
   supportEmail: "support@usevoicebox.dev",
   twitter: "@usevoicebox",
 

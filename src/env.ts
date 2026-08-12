@@ -146,10 +146,25 @@ export const env = new Proxy({} as ServerEnv, {
 
 /**
  * Client env is inlined at build time by Next, so it must be read statically.
+ *
+ * Parsed eagerly (not through the lazy `env` proxy above) so a malformed value
+ * fails the build right here, with the variable's name in the message, instead
+ * of surfacing later as a cryptic native error wherever the raw string first
+ * gets used, e.g. `new URL(process.env.NEXT_PUBLIC_APP_URL)` deep inside
+ * layout.tsx failing with just "Invalid URL" and no indication which env var
+ * or dashboard field caused it.
  */
-export const clientEnv: ClientEnv = clientSchema.parse({
-  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-});
+function loadClientEnv(): ClientEnv {
+  const parsed = clientSchema.safeParse({
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  });
+  if (!parsed.success) {
+    throw new Error(formatIssues(parsed.error, clientSchema));
+  }
+  return parsed.data;
+}
+
+export const clientEnv: ClientEnv = loadClientEnv();
 
 /* --- Feature availability ---------------------------------------------------
    Every optional integration is checked through one of these. Features degrade
