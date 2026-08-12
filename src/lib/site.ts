@@ -78,8 +78,8 @@ export const plans = [
   {
     id: "PRO",
     name: "Pro",
-    priceMonthly: 49,
-    priceAnnual: 490,
+    priceMonthly: 19,
+    priceAnnual: 190,
     feedbackPerMonth: 3000,
     projects: 10,
     seats: 10,
@@ -96,8 +96,8 @@ export const plans = [
   {
     id: "SCALE",
     name: "Scale",
-    priceMonthly: 99,
-    priceAnnual: 990,
+    priceMonthly: 49,
+    priceAnnual: 490,
     feedbackPerMonth: 15000,
     projects: null,
     seats: null,
