@@ -224,8 +224,10 @@ export default function TermsPage() {
           </li>
           <li>
             <strong>Notices.</strong> To you, by email to your account address.
-            To us, at {site.postalAddress}, copied to{" "}
+            To us, by email to{" "}
             <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>.
+            Email is the agreed channel for formal notice under this agreement,
+            and a notice is given when sent.
           </li>
           <li>
             <strong>No third-party beneficiaries.</strong> This agreement is
@@ -237,8 +239,8 @@ export default function TermsPage() {
       <Clause n="16" heading="Changes and contact">
         <p>
           We&apos;ll email account holders before material changes. Questions to{" "}
-          <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>, or{" "}
-          {site.legalEntity}, {site.postalAddress}.
+          <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>. This
+          agreement is with {site.legalEntity}.
         </p>
       </Clause>
     </LegalPage>

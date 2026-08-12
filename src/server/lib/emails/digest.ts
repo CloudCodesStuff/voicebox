@@ -248,7 +248,7 @@ export function renderDigest(
     optOutUrl
       ? `Unsubscribe: ${optOutUrl}`
       : `Manage email preferences: ${appUrl}/app/settings/general`,
-    `${site.legalEntity}, ${site.postalAddress}`,
+    site.legalEntity,
   ].join("\n");
 
   return {

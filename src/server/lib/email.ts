@@ -143,7 +143,7 @@ export function emailShell(options: {
       <tr>
         <td style="padding:18px 28px;border-top:1px solid ${LINE};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:${STEEL};font-size:12.5px;line-height:1.6">
           ${options.footer ?? `Sent by ${site.name}. <a href="${appUrl}/app/settings/general" style="color:${STEEL}">Manage your email preferences</a>.`}
-          <div style="margin-top:10px;color:${STEEL};opacity:.75">${escapeHtml(site.legalEntity)}, ${escapeHtml(site.postalAddress)}</div>
+          <div style="margin-top:10px;color:${STEEL};opacity:.75">${escapeHtml(site.legalEntity)}</div>
         </td>
       </tr>
     </table>

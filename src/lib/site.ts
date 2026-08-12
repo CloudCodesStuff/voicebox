@@ -28,32 +28,39 @@ export const site = {
 
        legalEntity   the party the contract is actually with. A brand name is
                      not a legal person, so a contract with a product name
-                     binds nobody. Use the registered company, e.g.
-                     "Acme Feedback LLC".
-       postalAddress a physical mailing address, REQUIRED in commercial email
-                     by CAN-SPAM §7704(a)(5), and the notice address for the
-                     Terms. Use a PO Box, a commercial mailbox, or a
-                     registered agent. NEVER a home address: this string is
-                     rendered publicly on three legal pages and in the footer
-                     of every email, and cannot be un-published.
+                     binds nobody. This is the registered company.
        governingLaw  the law the Terms are read under. Without it, the
                      liability cap and every other clause are of uncertain
                      enforceability.
        venue         where disputes are heard.
 
-     `npm run env:check` fails while any of these is still a placeholder.
+     There is deliberately no postal address here, and nothing in the app
+     renders one. Every address a one-person company has to hand is a home
+     address, and these strings publish to three legal pages and the footer of
+     every email, which cannot be un-published. Notice is served by email
+     instead, which the Terms say explicitly so it is actually binding.
+
+     CAN-SPAM §7704(a)(5) does require a physical address, but only in
+     *commercial* email. Everything sent from here is transactional or
+     relationship mail to existing users, invites and the digest they switched
+     on, so the requirement isn't triggered. Adding marketing email later means
+     adding an address back, on that mail at least.
+
+     All three default to the real values rather than to placeholders. They are
+     public information that already renders in the footer, there is nothing
+     secret to protect by keeping them in env, and a forgotten variable on a
+     new deployment would otherwise ship legal pages that name no party. The
+     env vars still override, for a fork under a different company.
   ----------------------------------------------------------------------- */
-  legalEntity: process.env.NEXT_PUBLIC_LEGAL_ENTITY ?? "[Your registered company name]",
-  postalAddress: process.env.NEXT_PUBLIC_POSTAL_ADDRESS ?? "[Your mailing address]",
-  governingLaw: process.env.NEXT_PUBLIC_GOVERNING_LAW ?? "[Your jurisdiction]",
-  venue: process.env.NEXT_PUBLIC_VENUE ?? "[Your courts]",
+  legalEntity: process.env.NEXT_PUBLIC_LEGAL_ENTITY ?? "Arc Labs LLC",
+  governingLaw: process.env.NEXT_PUBLIC_GOVERNING_LAW ?? "the State of New Jersey",
+  venue:
+    process.env.NEXT_PUBLIC_VENUE ?? "the state and federal courts of New Jersey",
 } as const;
 
 /** True when the legal placeholders above have been filled in. */
 export const legalConfigured =
-  !site.legalEntity.startsWith("[") &&
-  !site.postalAddress.startsWith("[") &&
-  !site.governingLaw.startsWith("[");
+  !site.legalEntity.startsWith("[") && !site.governingLaw.startsWith("[");
 
 /**
  * Three plans, described by what changes between them.

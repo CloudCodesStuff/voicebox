@@ -35,6 +35,24 @@ function check(name: string, validate?: (v: string) => string | null): Check {
   return { name, present: !problem, problem: problem ?? undefined };
 }
 
+/**
+ * For variables that have a real default in code rather than a placeholder.
+ *
+ * Unset is the normal, correct state for these: src/lib/site.ts already holds
+ * the shipping values. Only a value that IS set and wrong is worth reporting,
+ * so this passes on absence instead of demanding the variable be typed out
+ * again in every environment.
+ */
+function checkOptional(
+  name: string,
+  validate?: (v: string) => string | null,
+): Check {
+  const raw = process.env[name]?.trim();
+  if (!raw) return { name, present: true };
+  const problem = validate ? validate(raw) : null;
+  return { name, present: !problem, problem: problem ?? undefined };
+}
+
 const startsWith = (prefix: string) => (v: string) =>
   v.startsWith(prefix) ? null : `should start with "${prefix}"`;
 
@@ -67,25 +85,22 @@ const groups: Group[] = [
   {
     // These are not decoration. They are interpolated into the Terms, the
     // Privacy Policy, the DPA, and the footer of every email. Shipping with the
-    // placeholders means the contract names no legal party, the Terms have no
-    // governing law, and commercial email carries no postal address.
+    // placeholders means the contract names no legal party and the Terms have
+    // no governing law.
     title: "Legal identity",
     required: true,
     consequence:
-      "The Terms name no contracting party, have no governing law, and email lacks the postal address CAN-SPAM requires.",
+      "The Terms name no contracting party and have no governing law.",
     checks: [
-      check("NEXT_PUBLIC_LEGAL_ENTITY", (v) =>
+      checkOptional("NEXT_PUBLIC_LEGAL_ENTITY", (v) =>
         v.startsWith("[")
           ? "is still the placeholder, use your registered company name"
           : null,
       ),
-      check("NEXT_PUBLIC_POSTAL_ADDRESS", (v) =>
+      checkOptional("NEXT_PUBLIC_GOVERNING_LAW", (v) =>
         v.startsWith("[") ? "is still the placeholder" : null,
       ),
-      check("NEXT_PUBLIC_GOVERNING_LAW", (v) =>
-        v.startsWith("[") ? "is still the placeholder" : null,
-      ),
-      check("NEXT_PUBLIC_VENUE", (v) =>
+      checkOptional("NEXT_PUBLIC_VENUE", (v) =>
         v.startsWith("[") ? "is still the placeholder" : null,
       ),
     ],
