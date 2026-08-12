@@ -128,7 +128,10 @@ export const themeRouter = createTRPCRouter({
       if (!isAnalysisConfigured()) {
         throw new TRPCError({
           code: "PRECONDITION_FAILED",
-          message: "AI analysis is not configured. Add DEEPSEEK_API_KEY.",
+          // Reaches the customer as a toast, so it names no environment
+          // variable: they cannot set one on a server they don't run.
+          message:
+            "Theme grouping is unavailable right now. Your feedback is still being collected.",
         });
       }
 
