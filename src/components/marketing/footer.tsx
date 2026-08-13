@@ -17,13 +17,24 @@ const columns = [
     links: [
       { href: "/docs", label: "Documentation" },
       { href: "/docs/install", label: "Install the widget" },
-      { href: "/docs/customize", label: "Customization" },
+      { href: "/docs/triggers", label: "Triggers & JS API" },
+      { href: "/docs/security", label: "Security & privacy" },
       { href: "/docs/api", label: "API reference" },
+    ],
+  },
+  {
+    heading: "Compare",
+    links: [
+      { href: "/vs/canny", label: "vs Canny" },
+      { href: "/vs/featurebase", label: "vs Featurebase" },
+      { href: "/vs/hotjar", label: "vs Hotjar" },
+      { href: "/vs/usersnap", label: "vs Usersnap" },
     ],
   },
   {
     heading: "Company",
     links: [
+      { href: "/blog", label: "Blog" },
       { href: "/changelog", label: "Changelog" },
       { href: `mailto:${site.supportEmail}`, label: "Contact" },
     ],
