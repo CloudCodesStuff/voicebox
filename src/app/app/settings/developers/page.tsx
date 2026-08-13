@@ -190,6 +190,31 @@ function ApiKeys({ locked }: { locked: boolean }) {
           No keys yet. Create one above and it appears here.
         </p>
       )}
+
+      {/* The same key drives the MCP server, so this is where an agent user
+          picks it up. Read-only, one line to wire in. */}
+      <div className="mt-6 rounded-lg border border-line bg-paper p-4">
+        <div className="text-[0.83rem] font-medium text-ink">
+          Use it from a coding agent
+        </div>
+        <p className="mt-1 text-[0.8rem] leading-relaxed text-steel">
+          The same key connects Voicebox as an MCP server, so Claude Code or
+          Cursor can read your ranked themes while you work.
+        </p>
+        <pre className="mt-2.5 overflow-x-auto rounded-md bg-slab p-3 font-mono text-[0.72rem] leading-relaxed text-slab-fg">
+          <code>
+            {`claude mcp add --transport http voicebox \\
+  https://usevoicebox.dev/api/mcp \\
+  --header "Authorization: Bearer sk_…"`}
+          </code>
+        </pre>
+        <Link
+          href="/docs/api#model-context-protocol"
+          className="mt-2 inline-block text-[0.8rem] text-mint-deep hover:underline"
+        >
+          MCP setup and tools
+        </Link>
+      </div>
     </section>
   );
 }

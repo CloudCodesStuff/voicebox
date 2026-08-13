@@ -46,6 +46,9 @@ problem into ranked themes.
 - Sends a weekly digest email of the themes worth acting on. Quiet weeks send
   nothing.
 - Offers a read API and webhooks for pulling data into other tools.
+- Exposes a remote MCP (Model Context Protocol) server, so a coding agent can
+  read the ranked themes and raw feedback directly. Read-only, authenticated
+  with the same API key.
 
 ## What it does not do
 
@@ -88,7 +91,8 @@ operate rate limiting, then deleted.
 - ${site.url}/docs/install — install for HTML, Next.js, React, Vue, Svelte, Astro, WordPress, Shopify, Webflow, Squarespace and Google Tag Manager
 - ${site.url}/docs/triggers — JavaScript API and custom triggers
 - ${site.url}/docs/security — keys, domain allowlist, Content Security Policy, and exactly what data is transmitted
-- ${site.url}/docs/api — read API and webhooks
+- ${site.url}/docs/api — read API, webhooks, and the MCP server
+- ${site.url}/api/mcp — MCP endpoint (JSON-RPC over HTTP; Bearer API key)
 - ${site.url}/blog — articles
 
 ## Comparisons

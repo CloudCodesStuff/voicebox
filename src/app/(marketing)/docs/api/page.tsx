@@ -178,6 +178,59 @@ export default function ApiDocs() {
 }`}
       />
 
+      {/* ------------------------------------------------------------ mcp */}
+
+      <h2
+        id="model-context-protocol"
+        className="mt-12 scroll-mt-24 text-[1.25rem] font-bold tracking-tight text-ink"
+      >
+        Model Context Protocol
+      </h2>
+      <p className="mt-3 text-[0.9rem] leading-relaxed text-steel">
+        The same read access, but for your coding agent. Point Claude Code,
+        Cursor, or any MCP client at Voicebox and it can pull your ranked themes
+        straight into wherever you write code, so &ldquo;what should I build
+        next&rdquo; is answered from what your users actually said. It&apos;s a
+        remote server, so there&apos;s nothing to install.
+      </p>
+
+      <CodeBlock
+        className="mt-4"
+        filename="Add it to Claude Code"
+        code={`claude mcp add --transport http voicebox \\
+  https://usevoicebox.dev/api/mcp \\
+  --header "Authorization: Bearer sk_your_secret_key"`}
+      />
+
+      <p className="mt-4 text-[0.9rem] leading-relaxed text-steel">
+        Same secret key as the API above, so it&apos;s behind the same plan and
+        the same rate limit, and revoking the key cuts off the agent too. Every
+        tool is read-only, an agent can read your feedback but never change it.
+      </p>
+
+      <div className="mt-4 overflow-hidden rounded-xl border border-line">
+        <table className="w-full text-left text-[0.85rem]">
+          <tbody className="divide-y divide-line">
+            {[
+              ["list_projects", "Your projects, to get a project_id."],
+              ["list_themes", "The ranked list of what to work on, top item first."],
+              ["get_theme", "One theme plus the real messages behind it."],
+              ["list_feedback", "Raw feedback, filterable by type, sentiment, and date."],
+              ["project_overview", "Totals, sentiment split, and negative share."],
+            ].map(([name, note]) => (
+              <tr key={name} className="bg-paper-2">
+                <td className="py-3 pr-4 pl-4 align-top">
+                  <code className="font-mono text-[0.82rem] text-ink">{name}</code>
+                </td>
+                <td className="py-3 pr-4 align-top text-[0.8rem] leading-relaxed text-steel">
+                  {note}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       {/* ------------------------------------------------------- webhooks */}
 
       <h2 className="mt-12 text-[1.25rem] font-bold tracking-tight text-ink">
