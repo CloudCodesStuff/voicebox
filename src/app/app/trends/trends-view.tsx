@@ -20,6 +20,29 @@ import { api } from "@/trpc/client";
 
 const RANGES = [7, 30, 90, 365] as const;
 
+/**
+ * Feedback types carry meaning, so the bars carry colour.
+ *
+ * Every bar used to be mint, which made the chart a length comparison with a
+ * decorative fill. An issue and a piece of praise are not the same news, and
+ * these are the colours this product already uses to say so everywhere else.
+ */
+const TYPE_FILL: Record<string, string> = {
+  ISSUE: "bg-negative",
+  PRAISE: "bg-positive",
+  IDEA: "bg-mint",
+  QUESTION: "bg-mixed",
+  OTHER: "bg-neutral",
+};
+
+const TYPE_TONE: Record<string, string> = {
+  ISSUE: "text-negative",
+  PRAISE: "text-positive",
+  IDEA: "text-mint-deep",
+  QUESTION: "text-mixed",
+  OTHER: "text-steel",
+};
+
 export function TrendsView() {
   const { activeProject } = useProject();
   const [days, setDays] = useState<(typeof RANGES)[number]>(30);
@@ -46,6 +69,7 @@ export function TrendsView() {
         ).toFixed(2);
 
   const typeTotal = (byType.data ?? []).reduce((a, t) => a + t.count, 0) || 1;
+  const typeMax = Math.max(1, ...(byType.data ?? []).map((t) => t.count));
 
   function exportCsv() {
     const rows = [
@@ -173,24 +197,41 @@ export function TrendsView() {
             <SectionHeading>
               By type
             </SectionHeading>
-            <div className="mt-4 space-y-2.5 rounded-xl border border-line bg-paper-2 p-5">
-              {(byType.data ?? []).map((t) => (
-                <div key={t.type} className="flex items-center gap-3">
-                  <TypeIcon type={t.type} className="shrink-0 text-steel" />
-                  <span className="w-20 shrink-0 text-[0.82rem] capitalize text-ink">
-                    {t.type.toLowerCase()}
-                  </span>
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-mint"
-                      style={{ width: `${(t.count / typeTotal) * 100}%` }}
+            {/* Scaled to the largest type rather than to the total: against the
+                total, four categories each sit under a quarter of the track and
+                every bar looks the same length. */}
+            <div className="mt-4 space-y-3 rounded-xl border border-line bg-paper-2 p-5">
+              {(byType.data ?? []).map((t) => {
+                const share = t.count / typeTotal;
+                return (
+                  <div key={t.type} className="flex items-center gap-3">
+                    <TypeIcon
+                      type={t.type}
+                      className={cn("shrink-0", TYPE_TONE[t.type] ?? "text-steel")}
                     />
+                    <span className="w-20 shrink-0 text-[0.82rem] text-ink capitalize">
+                      {t.type.toLowerCase()}
+                    </span>
+                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className={cn(
+                          "h-full rounded-full",
+                          TYPE_FILL[t.type] ?? "bg-neutral",
+                        )}
+                        style={{
+                          width: `${Math.max(2, (t.count / typeMax) * 100)}%`,
+                        }}
+                      />
+                    </div>
+                    <span className="w-12 shrink-0 text-right text-[0.78rem] tabular-nums text-ink">
+                      {t.count}
+                    </span>
+                    <span className="w-10 shrink-0 text-right text-[0.75rem] tabular-nums text-steel">
+                      {Math.round(share * 100)}%
+                    </span>
                   </div>
-                  <span className="tnum w-10 shrink-0 text-right text-[0.78rem] text-steel">
-                    {t.count}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         </>
