@@ -264,6 +264,31 @@ export function EmptyState({
   );
 }
 
+/**
+ * Which way a theme is heading, from its own twelve-week trend.
+ *
+ * Reads the last three buckets against the three before them. A ranked list of
+ * problems is only half useful without this: "34 people" and "34 people, and it
+ * doubled this month" call for different decisions, and the data to tell them
+ * apart was already being fetched and thrown away.
+ */
+export function trendDirection(
+  data: Array<{ week: string; count: number }> | null | undefined,
+): "rising" | "cooling" | "steady" | null {
+  if (!data || data.length < 4) return null;
+  const sum = (xs: Array<{ count: number }>) =>
+    xs.reduce((a, x) => a + x.count, 0);
+
+  const recent = sum(data.slice(-3));
+  const prior = sum(data.slice(-6, -3));
+
+  // Nothing to compare against, and a jump from zero is noise, not a trend.
+  if (prior === 0) return recent > 0 ? "rising" : null;
+  if (recent > prior * 1.25) return "rising";
+  if (recent < prior * 0.75) return "cooling";
+  return "steady";
+}
+
 /** Twelve-bucket sparkline from the theme trend JSON. */
 export function Sparkline({
   data,

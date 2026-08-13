@@ -211,11 +211,15 @@ export function Overview() {
                           </p>
                         )}
 
+                        {/* Negative against everything else, both real. The
+                            fixed 10% positive slice this used to draw was not
+                            in the data: a Theme carries a negative share and
+                            no positive one. */}
                         <SentimentBar
                           className="mt-2.5 max-w-[220px]"
                           negative={theme.negativeShare}
-                          neutral={Math.max(0, 1 - theme.negativeShare - 0.1)}
-                          positive={0.1}
+                          neutral={1 - theme.negativeShare}
+                          positive={0}
                         />
                       </div>
 

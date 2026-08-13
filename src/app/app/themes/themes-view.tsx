@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { RefreshCw } from "lucide-react";
+import { Minus, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -14,6 +14,7 @@ import {
   SentimentBar,
   Sparkline,
   relativeTime,
+  trendDirection,
 } from "@/components/app/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -30,6 +31,33 @@ const SORTS: Array<{ key: Sort; label: string }> = [
 ];
 
 const STATUSES: Status[] = ["ACTIVE", "RESOLVED", "IGNORED", "ALL"];
+
+/**
+ * Which way a theme is moving.
+ *
+ * Amber for rising rather than red: on a list of problems, growth is the thing
+ * to look at next, not a failure in itself. Cooling earns the positive colour
+ * because a shrinking complaint is the outcome this product exists to produce.
+ */
+function Momentum({
+  direction,
+}: {
+  direction: "rising" | "cooling" | "steady";
+}) {
+  const map = {
+    rising: { Icon: TrendingUp, label: "rising", className: "text-mixed" },
+    cooling: { Icon: TrendingDown, label: "cooling", className: "text-positive" },
+    steady: { Icon: Minus, label: "steady", className: "text-steel" },
+  } as const;
+
+  const { Icon, label, className } = map[direction];
+  return (
+    <span className={cn("inline-flex items-center gap-1", className)}>
+      <Icon className="size-3" strokeWidth={2.5} />
+      {label}
+    </span>
+  );
+}
 
 export function ThemesView() {
   const { activeProject } = useProject();
@@ -57,6 +85,9 @@ export function ThemesView() {
   });
 
   const list = themes.data ?? [];
+
+  /** Scale for the volume bars: the biggest theme currently in view. */
+  const maxCount = Math.max(1, ...list.map((t) => t.itemCount));
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 pb-24 sm:px-6">
@@ -133,64 +164,133 @@ export function ThemesView() {
           />
         ) : (
           <ul className="space-y-2">
-            {list.map((theme) => (
-              <li key={theme.id}>
-                <Link
-                  href={`/app/themes/${theme.id}`}
-                  className="block rounded-xl border border-line bg-paper-2 p-5 transition-colors hover:border-steel"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-[1rem] font-semibold text-ink">
-                          {theme.title}
-                        </h3>
-                        <SentimentBadge sentiment={theme.sentiment} />
-                        {theme.status !== "ACTIVE" && (
-                          <span className="rounded-full bg-sunken px-2 py-0.5 text-[0.75rem] font-medium text-steel capitalize">
-                            {theme.status.toLowerCase()}
-                          </span>
-                        )}
-                      </div>
-                      <p className="mt-1.5 line-clamp-2 max-w-[62ch] text-[0.86rem] leading-relaxed text-steel">
-                        {theme.description}
-                      </p>
-                    </div>
+            {list.map((theme, i) => {
+              const trend = theme.trend as
+                | Array<{ week: string; count: number }>
+                | null;
+              const direction = trendDirection(trend);
+              const negPct = Math.round(theme.negativeShare * 100);
 
-                    <div className="flex shrink-0 items-center gap-5">
-                      <div className="text-steel">
-                        <Sparkline
-                          data={
-                            theme.trend as Array<{ week: string; count: number }> | null
-                          }
-                        />
-                      </div>
-                      <div className="text-right">
-                        <div className="text-[1.35rem] font-bold leading-none text-ink">
-                          {theme.itemCount}
+              return (
+                <li key={theme.id}>
+                  <Link
+                    href={`/app/themes/${theme.id}`}
+                    className="group relative block rounded-xl border border-line bg-paper-2 py-4 pr-4 pl-12 transition-colors hover:border-steel"
+                  >
+                    {/* Position in the current sort. The page tells people to
+                        start at the top, so the order has to be countable
+                        rather than merely implied. */}
+                    <span
+                      className={cn(
+                        "absolute top-4 left-0 w-12 text-center text-[0.95rem] leading-none font-bold tabular-nums",
+                        i === 0 ? "text-mint-deep" : "text-faint",
+                      )}
+                    >
+                      {i + 1}
+                    </span>
+
+                    <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="text-[1rem] font-semibold text-ink">
+                            {theme.title}
+                          </h3>
+                          <SentimentBadge sentiment={theme.sentiment} />
+                          {theme.status !== "ACTIVE" && (
+                            <span className="rounded-full bg-sunken px-2 py-0.5 text-[0.75rem] font-medium text-steel capitalize">
+                              {theme.status.toLowerCase()}
+                            </span>
+                          )}
                         </div>
-                        <div className="label mt-1">items</div>
+                        <p className="mt-1.5 line-clamp-2 max-w-[62ch] text-[0.86rem] leading-relaxed text-steel">
+                          {theme.description}
+                        </p>
+                      </div>
+
+                      {/* The number the list is sorted by. It was computed,
+                          used to order the page, and then never shown, which
+                          left "ranked by priority" as something to take on
+                          trust rather than something to read. */}
+                      <div className="flex shrink-0 items-center gap-4">
+                        <div className="hidden text-steel sm:block">
+                          <Sparkline data={trend} />
+                        </div>
+                        <div className="text-right">
+                          <div
+                            className={cn(
+                              "text-[1.15rem] leading-none font-bold tabular-nums",
+                              sort === "priority" ? "text-ink" : "text-steel",
+                            )}
+                          >
+                            {Math.round(theme.priorityScore)}
+                          </div>
+                          <div className="label mt-1">priority</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="mt-4 flex items-center gap-4">
-                    <SentimentBar
-                      className="max-w-[240px] flex-1"
-                      negative={theme.negativeShare}
-                      neutral={Math.max(0, 1 - theme.negativeShare - 0.12)}
-                      positive={0.12}
-                    />
-                    <span className="tnum text-[0.75rem] text-steel">
-                      {Math.round(theme.negativeShare * 100)}% negative
-                    </span>
-                    <span className="tnum ml-auto text-[0.75rem] text-steel">
-                      last seen {relativeTime(theme.lastSeenAt)}
-                    </span>
-                  </div>
-                </Link>
-              </li>
-            ))}
+                    <div className="mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.75rem]">
+                      {/* Volume against the biggest theme in view, so seven
+                          items and two items stop looking alike. */}
+                      <span className="flex items-center gap-2">
+                        <span className="h-1.5 w-20 overflow-hidden rounded-full bg-sunken">
+                          <span
+                            className="block h-full rounded-full bg-mint"
+                            style={{
+                              width: `${Math.max(4, (theme.itemCount / maxCount) * 100)}%`,
+                            }}
+                          />
+                        </span>
+                        <span
+                          className={cn(
+                            "tabular-nums",
+                            sort === "volume"
+                              ? "font-semibold text-ink"
+                              : "text-steel",
+                          )}
+                        >
+                          {theme.itemCount} items
+                        </span>
+                      </span>
+
+                      <span className="flex items-center gap-2">
+                        {/* Two parts, both real. This used to add a fixed 12%
+                            positive slice that no data supported. */}
+                        <SentimentBar
+                          className="w-16"
+                          negative={theme.negativeShare}
+                          neutral={1 - theme.negativeShare}
+                          positive={0}
+                        />
+                        <span
+                          className={cn(
+                            "tabular-nums",
+                            sort === "sentiment"
+                              ? "font-semibold text-ink"
+                              : "text-steel",
+                          )}
+                        >
+                          {negPct}% negative
+                        </span>
+                      </span>
+
+                      {direction && <Momentum direction={direction} />}
+
+                      <span
+                        className={cn(
+                          "ml-auto tabular-nums",
+                          sort === "recent"
+                            ? "font-semibold text-ink"
+                            : "text-steel",
+                        )}
+                      >
+                        last seen {relativeTime(theme.lastSeenAt)}
+                      </span>
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
