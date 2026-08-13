@@ -446,7 +446,7 @@ function slide4() {
     .join("")}</text>`;
 
   const facts = [
-    ["~11KB", "over the wire, gzipped"],
+    ["5.9KB", "over the wire, gzipped"],
     ["0", "dependencies, no build step"],
     ["Shadow DOM", "your CSS and ours never meet"],
   ];

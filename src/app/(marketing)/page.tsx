@@ -159,7 +159,7 @@ export default function LandingPage() {
                 {
                   n: "01",
                   t: "Paste one line",
-                  d: "One script tag, anywhere before your closing body tag. No package. No build step. 11KB.",
+                  d: "One script tag, anywhere before your closing body tag. No package. No build step. Under 6KB.",
                 },
                 {
                   n: "02",
@@ -239,7 +239,7 @@ export default function LandingPage() {
             className="md:row-span-2"
             eyebrow="Drop-in"
             title="A widget you'd actually ship"
-            body="One script tag. Your colour, your words, your typeface, any corner. 11KB over the wire."
+            body="One script tag. Your colour, your words, your typeface, any corner. Under 6KB over the wire."
           >
             <WidgetSkeleton />
           </BentoCard>

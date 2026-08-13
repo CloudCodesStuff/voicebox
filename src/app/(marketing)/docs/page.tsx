@@ -15,7 +15,7 @@ export const metadata: Metadata = pageMetadata({
 const stages = [
   {
     t: "The widget collects",
-    d: "A button in the corner of your site, or your own button. Renders in a shadow root so your CSS and ours can never collide, around 11KB over the wire, loaded on idle, and it never blocks your page.",
+    d: "A button in the corner of your site, or your own button. Renders in a shadow root so your CSS and ours can never collide, under 6KB over the wire, loaded on idle, and it never blocks your page.",
   },
   {
     t: "Ingest validates",
