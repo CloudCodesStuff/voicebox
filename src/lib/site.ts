@@ -8,7 +8,7 @@ import { clientEnv } from "@/env";
 
 export const site = {
   name: "Voicebox",
-  tagline: "Stop reading feedback. Start acting on it.",
+  tagline: "Feedback in. Fix list out.",
   description:
     "A feedback widget for your site, and an AI that groups every reply into a ranked list of what to fix next.",
   // Read through the validated env module, not process.env directly: a

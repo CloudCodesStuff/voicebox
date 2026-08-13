@@ -16,12 +16,20 @@ import { cn } from "@/lib/utils";
 --------------------------------------------------------------------------- */
 
 export function BentoCard({
+  eyebrow,
   title,
   body,
   children,
   className,
   visualClassName,
 }: {
+  /**
+   * One or two words naming the category before the headline.
+   *
+   * It does the work of a sentence: someone scanning six cards reads six
+   * eyebrows and knows the shape of the product without reading a single body.
+   */
+  eyebrow: string;
   title: string;
   body: string;
   children: ReactNode;
@@ -36,8 +44,13 @@ export function BentoCard({
       )}
     >
       <div className="flex h-full flex-col">
-        <div className="flex flex-col gap-2 p-6">
-          <h3 className="text-[0.95rem] font-semibold text-ink">{title}</h3>
+        <div className="flex flex-col gap-1.5 p-6">
+          <span className="text-[0.7rem] font-semibold tracking-[0.08em] text-mint-deep uppercase">
+            {eyebrow}
+          </span>
+          <h3 className="text-[1.05rem] font-semibold tracking-[-0.01em] text-ink">
+            {title}
+          </h3>
           <p className="text-[0.875rem] leading-relaxed text-balance text-steel">
             {body}
           </p>

@@ -115,7 +115,7 @@ export default function LandingPage() {
           </Reveal>
 
           <WordReveal
-            text="Stop reading feedback. Start acting on it."
+            text="Feedback in. Fix list out."
             className="mt-5 max-w-4xl text-[2.5rem] leading-[1.05] font-medium tracking-[-0.035em] text-ink md:text-7xl"
           />
 
@@ -126,8 +126,8 @@ export default function LandingPage() {
               looking at. */}
           <Reveal delay={0.3}>
             <p className="mt-6 max-w-3xl text-[1.15rem] leading-relaxed text-ink/85 md:text-[1.45rem]">
-              A feedback widget you paste into your site, and an AI that reads
-              every reply and tells you what to fix first.
+              The feedback widget and analysis layer that reads every reply,
+              groups it by problem, and ranks what to fix. One line to install.
             </p>
           </Reveal>
 
@@ -159,17 +159,17 @@ export default function LandingPage() {
                 {
                   n: "01",
                   t: "Paste one line",
-                  d: "A script tag, anywhere before your closing body tag. No package, no build step.",
+                  d: "One script tag, anywhere before your closing body tag. No package. No build step. 11KB.",
                 },
                 {
                   n: "02",
                   t: "Your users write in",
-                  d: "A button in the corner of your site, styled to match it. They pick a type and type.",
+                  d: "A button in the corner, styled to match your site. They pick a type and write.",
                 },
                 {
                   n: "03",
                   t: "You get a ranked list",
-                  d: "Every reply scored and grouped, so the top of the list is the thing worth fixing next.",
+                  d: "Every reply scored and grouped. The top of the list is what to fix next.",
                 },
               ].map((s) => (
                 <li key={s.n} className="border-t border-line pt-4">
@@ -198,7 +198,7 @@ export default function LandingPage() {
       {/* -------------------------------------------------------- PLATFORMS */}
       <section className="py-10 md:py-20 lg:py-28">
         <h2 className="mx-auto max-w-xl px-4 text-center text-[1.05rem] font-medium text-steel">
-          One script tag, anywhere you ship.{" "}
+          Runs anywhere you ship.{" "}
           <br className="hidden sm:block" />
           <span className="text-faint">
             No package to install, no framework to match.
@@ -224,42 +224,47 @@ export default function LandingPage() {
       >
         <Reveal>
           <h2 className="text-2xl tracking-tight text-balance text-ink md:text-4xl lg:text-5xl">
-            Everything between someone typing and you fixing it.
+            Collect. Score. Group. Rank.
           </h2>
         </Reveal>
         <Reveal delay={0.05}>
           <p className="mt-3 text-sm text-steel md:text-base lg:text-lg">
-            Collect it, read it, rank it. You do the last part.
+            Everything between someone typing and you shipping the fix. You
+            do the last part.
           </p>
         </Reveal>
 
         <div className="mx-auto mt-8 grid grid-cols-1 gap-4 md:mt-12 md:grid-cols-3 md:grid-rows-2">
           <BentoCard
             className="md:row-span-2"
+            eyebrow="Drop-in"
             title="A widget you'd actually ship"
-            body="One line to install. Your colour, your words, your typeface, light or dark, any corner."
+            body="One script tag. Your colour, your words, your typeface, any corner. 11KB over the wire."
           >
             <WidgetSkeleton />
           </BentoCard>
 
           <BentoCard
-            title="Scored the moment it lands"
-            body="Tone, intent, a category and a one-line summary, within seconds of arrival."
+            eyebrow="Instant"
+            title="Scored on arrival"
+            body="Sentiment, intent, category, one-line summary. Seconds, not a nightly batch."
           >
             <ScoringSkeleton />
           </BentoCard>
 
           <BentoCard
             className="md:row-span-2"
+            eyebrow="Grouping"
             title="Themes, not tags"
-            body="Grouped by the problem underneath, not the keyword. Five wordings of the same complaint become one theme with a count."
+            body="Grouped by the problem underneath, not the keyword. Five wordings of one complaint become one theme with a count."
           >
             <ClusterSkeleton />
           </BentoCard>
 
           <BentoCard
-            title="Yours, not ours"
-            body="Colour, copy, typeface, corners and position. On Pro the branding comes off entirely."
+            eyebrow="Yours"
+            title="Looks like your product"
+            body="Colour, copy, typeface, corners, position. On Pro the branding comes off entirely."
           >
             <CustomiseSkeleton />
           </BentoCard>
@@ -267,15 +272,17 @@ export default function LandingPage() {
 
         <div className="mx-auto mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <BentoCard
-            title="Four minutes to live"
-            body="No npm package, no build step. Paste it before your closing body tag and the setup screen tells you the moment your first submission lands."
+            eyebrow="Setup"
+            title="Live in four minutes"
+            body="No package, no build step. The setup screen tells you the moment your first submission lands."
           >
             <InstallSkeleton />
           </BentoCard>
 
           <BentoCard
-            title="The Monday email"
-            body="Three themes worth acting on, how the volume moved, and a few quotes worth reading. Quiet weeks send nothing."
+            eyebrow="Monday"
+            title="The weekly email"
+            body="Three themes worth acting on, how volume moved, quotes worth reading. Quiet weeks send nothing."
           >
             <DigestSkeleton />
           </BentoCard>
@@ -287,13 +294,13 @@ export default function LandingPage() {
         <div className="relative my-12 flex w-full flex-1 flex-col py-0 sm:my-10 md:my-20">
           <Reveal>
             <h2 className="pt-4 text-center text-2xl font-bold tracking-tight text-balance text-ink md:text-4xl lg:text-5xl">
-              Simple, transparent pricing
+              Priced on volume, not features
             </h2>
           </Reveal>
           <Reveal delay={0.05}>
             <p className="mx-auto mt-4 max-w-md text-center text-base text-steel md:text-lg">
-              Priced on how much feedback you collect, not on which features you
-              get to use. The AI is on every plan.
+              You pay for how much feedback you collect. The AI is on every
+              plan, including free.
             </p>
           </Reveal>
 
@@ -339,8 +346,8 @@ export default function LandingPage() {
             </h2>
             <p className="mt-6 max-w-lg text-base text-steel lg:text-lg">
               Paste one line today. Your users are already telling you what to
-              build, and by the morning it will be a list of six things instead
-              of four hundred you keep meaning to read.
+              build. By morning it is six things to fix, not four hundred
+              messages you keep meaning to read.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <CtaButton href="/signin" variant="accent">
