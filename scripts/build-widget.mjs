@@ -45,13 +45,14 @@ const OUT = join(root, "public", "widget.js");
 
 /**
  * Prepended AFTER obfuscation, because the obfuscator strips comments. Someone
- * reading view-source needs to land somewhere, and the licence line has to
- * survive. Pointing at the readable source is also the honest move: the code is
- * scrambled to keep it off a casual reader's screen, not to pretend it is
- * secret, and a reviewer who wants to read it should be able to.
+ * reading view-source needs a licence line and a place to ask what the widget
+ * does. Deliberately NO link to the source repo: scrambling the code and then
+ * linking the unscrambled original next to it defeats the point, and the repo
+ * is not something to advertise from a file on every customer's page. The docs
+ * page already says exactly what gets transmitted, which is the thing a
+ * reviewer actually needs.
  */
 const banner = `/*! Voicebox widget | (c) Arc Labs LLC | https://www.usevoicebox.dev
- * Readable source: https://github.com/CloudCodesStuff/voicebox/blob/main/widget/widget.js
  * What this transmits: https://www.usevoicebox.dev/docs/security
  */`;
 
