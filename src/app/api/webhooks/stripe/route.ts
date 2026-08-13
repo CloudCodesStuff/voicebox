@@ -4,6 +4,7 @@ import { env, features } from "@/env";
 import { db } from "@/server/db";
 import { stripe, planForPriceId } from "@/server/lib/stripe";
 import type Stripe from "stripe";
+import { captureError } from "@/server/lib/errors";
 
 export const dynamic = "force-dynamic";
 
@@ -142,33 +143,52 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  switch (event.type) {
-    case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      if (typeof session.subscription === "string") {
-        await syncSubscription(await stripe().subscriptions.retrieve(session.subscription));
+  // The handlers below move money-affecting state. If one throws, Stripe must
+  // retry, and we must find out: a silently failed checkout.session.completed
+  // is a customer who paid and never got upgraded, which is the worst bug this
+  // system can have and the one least likely to be reported by the person it
+  // happened to.
+  try {
+    switch (event.type) {
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        if (typeof session.subscription === "string") {
+          await syncSubscription(
+            await stripe().subscriptions.retrieve(session.subscription),
+          );
+        }
+        break;
       }
-      break;
+      case "customer.subscription.updated": {
+        await syncSubscription(event.data.object as Stripe.Subscription);
+        break;
+      }
+      case "customer.subscription.deleted": {
+        await handleDeleted(event.data.object as Stripe.Subscription);
+        break;
+      }
+      case "invoice.payment_failed": {
+        handlePaymentFailed(event.data.object as Stripe.Invoice);
+        break;
+      }
+      default:
+        // Stripe endpoints commonly receive events beyond what they're
+        // "subscribed to" (account-level events, or ones added to the
+        // dashboard after this file was last touched). Acknowledging with 200
+        // is correct either way — retrying an event this code doesn't act on
+        // wouldn't produce a different outcome.
+        break;
     }
-    case "customer.subscription.updated": {
-      await syncSubscription(event.data.object as Stripe.Subscription);
-      break;
-    }
-    case "customer.subscription.deleted": {
-      await handleDeleted(event.data.object as Stripe.Subscription);
-      break;
-    }
-    case "invoice.payment_failed": {
-      handlePaymentFailed(event.data.object as Stripe.Invoice);
-      break;
-    }
-    default:
-      // Stripe endpoints commonly receive events beyond what they're
-      // "subscribed to" (account-level events, or ones added to the
-      // dashboard after this file was last touched). Acknowledging with 200
-      // is correct either way — retrying an event this code doesn't act on
-      // wouldn't produce a different outcome.
-      break;
+  } catch (cause) {
+    await captureError({
+      source: "stripe",
+      error: cause,
+      context: { eventType: event.type, eventId: event.id },
+    });
+
+    // 500 so Stripe retries on its own schedule. Swallowing this would turn a
+    // recoverable blip into a permanently unupgraded account.
+    return NextResponse.json({ error: "Handler failed" }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });

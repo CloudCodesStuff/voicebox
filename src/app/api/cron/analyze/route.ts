@@ -6,6 +6,7 @@ import { isAnalysisConfigured } from "@/server/ai/analyze";
 import { analyzePending, runClustering } from "@/server/ai/pipeline";
 import { db } from "@/server/db";
 import { authorizeCron } from "@/server/lib/cron-auth";
+import { purgeOldErrors } from "@/server/lib/errors";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -88,9 +89,12 @@ export async function GET(req: NextRequest) {
   // Runs before the AI check, because retention is not conditional on the model
   // being configured.
   const ipsPurged = await purgeExpiredIps();
+  // Retention for the error log rides along with the IP purge: both are
+  // housekeeping that must happen whether or not the AI provider is reachable.
+  const errorsPurged = await purgeOldErrors().catch(() => 0);
 
   if (!isAnalysisConfigured()) {
-    return NextResponse.json({ ok: true, ipsPurged, skipped: "no DEEPSEEK_API_KEY" });
+    return NextResponse.json({ ok: true, ipsPurged, errorsPurged, skipped: "no DEEPSEEK_API_KEY" });
   }
 
   const projects = await db.project.findMany({

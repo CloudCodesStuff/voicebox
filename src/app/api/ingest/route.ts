@@ -6,6 +6,7 @@ import { db } from "@/server/db";
 import { serializeFeedback } from "@/server/lib/api-shapes";
 import { ensureUsageWindow, ingestDecision } from "@/server/lib/plan";
 import { dispatchWebhookInBackground } from "@/server/lib/webhooks";
+import { captureError } from "@/server/lib/errors";
 
 export const dynamic = "force-dynamic";
 
@@ -268,8 +269,19 @@ export async function POST(req: NextRequest) {
 
   // Enrich without making the submitter wait. The cron sweep catches anything
   // that fails or gets cut short by the function ending.
+  //
+  // The catch used to be empty, which meant a systematically broken analysis
+  // path (a revoked provider key, a changed response shape) looked exactly
+  // like a slow one: feedback kept arriving, nothing was ever scored, and the
+  // only symptom was a backlog nobody was watching.
   if (decision.analyze) {
-    void analyzeOne(feedback.id).catch(() => {});
+    void analyzeOne(feedback.id).catch((cause: unknown) => {
+      void captureError({
+        source: "analysis",
+        error: cause,
+        context: { orgId: project.orgId, projectId: project.id },
+      });
+    });
   }
 
   return NextResponse.json({ ok: true, id: feedback.id }, { headers });

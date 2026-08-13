@@ -237,7 +237,7 @@ model Feedback {
   sentiment      Sentiment?
   sentimentScore Float?
   aiCategory     String?
-  summary        String?  @db.Text
+  summary        String?    @db.Text
   themeId        String?
   analyzedAt     DateTime?
 
@@ -350,8 +350,8 @@ model ApiKey {
   name String
 
   /// Only the hash is stored. The plaintext is shown exactly once at creation.
-  hashedKey String  @unique
-  prefix    String
+  hashedKey  String    @unique
+  prefix     String
   lastUsedAt DateTime?
 
   createdAt DateTime  @default(now())
@@ -408,10 +408,10 @@ model ScheduledJob {
   payload Json
   runAt   DateTime
 
-  status   JobStatus @default(PENDING)
-  attempts Int       @default(0)
+  status    JobStatus @default(PENDING)
+  attempts  Int       @default(0)
   lastError String?   @db.Text
-  lockedAt DateTime?
+  lockedAt  DateTime?
 
   /// Makes enqueueing idempotent, the same clustering run can't be queued twice.
   dedupeKey String? @unique
@@ -469,4 +469,49 @@ model Subscription {
   org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@index([stripeCustomerId])
+}
+
+// ---------------------------------------------------------------------------
+// Operations
+// ---------------------------------------------------------------------------
+
+/// One *kind* of error, not one occurrence.
+///
+/// Rows are keyed by a fingerprint derived from the source and a normalised
+/// message, so the thousandth occurrence of the same fault bumps a counter
+/// rather than writing a thousandth row. Without that, a single hot loop fills
+/// the database you are paying for and buries every other error while doing it.
+///
+/// PRIVACY: nothing customer-written goes in here. No feedback bodies, no
+/// end-user email addresses. An error tracker is the classic place for personal
+/// data to accumulate somewhere nobody remembers to look, so `captureError`
+/// redacts before writing and this table is aggregate-only by design.
+model ErrorEvent {
+  id String @id @default(cuid())
+
+  /// sha256(source + normalised message), truncated. The grouping key.
+  fingerprint String @unique
+
+  /// Where it happened: ingest, cron, trpc, stripe, email, widget.
+  source String
+  level  String @default("error")
+
+  message String  @db.Text
+  stack   String? @db.Text
+
+  /// Operational breadcrumbs only: route, org id, job name. Never content.
+  context Json?
+
+  count       Int      @default(1)
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+
+  /// Set when someone marks it handled. Cleared automatically if it recurs.
+  resolvedAt DateTime?
+
+  /// When the "this is new" email went out. Stops repeat alerts for one fault.
+  notifiedAt DateTime?
+
+  @@index([resolvedAt, lastSeenAt])
+  @@index([lastSeenAt])
 }

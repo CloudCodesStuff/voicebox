@@ -51,6 +51,14 @@ const serverSchema = z.object({
     .optional()
     .describe('Verified sender, e.g. "Voicebox <hello@yourdomain.com>"'),
 
+  // --- Operator access ------------------------------------------------------
+  ADMIN_EMAILS: z
+    .string()
+    .optional()
+    .describe(
+      "Comma-separated emails allowed into /admin. Unset means nobody, never everybody.",
+    ),
+
   // --- AI (DeepSeek via Vercel AI SDK) --------------------------------------
   DEEPSEEK_API_KEY: z
     .string()

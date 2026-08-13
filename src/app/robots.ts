@@ -11,6 +11,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           "/api/",
           "/app/",
+          "/admin",
           "/signin",
           // Customer status pages are unlisted by design. The token in the URL
           // is unguessable, but they must never end up in a search index.
