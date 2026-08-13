@@ -15,7 +15,7 @@ import {
 import { BrowserFrame, DashboardMock } from "@/components/marketing/dashboard-mock";
 import { FaqGroups, type FaqGroup } from "@/components/marketing/faq-groups";
 import { RatingProof } from "@/components/marketing/rating-proof";
-import { Reveal, RevealGroup, WordReveal } from "@/components/marketing/motion";
+import { Reveal, RevealGroup, ScrollPitch, WordReveal } from "@/components/marketing/motion";
 import { PlanCard } from "@/components/marketing/plan-card";
 import { CtaButton } from "@/components/marketing/primitives";
 import { plans, site } from "@/lib/site";
@@ -150,11 +150,11 @@ export default function LandingPage() {
           </Reveal>
 
           <Reveal delay={0.54}>
-            <div className="mt-14 md:mt-20">
+            <ScrollPitch className="mt-14 md:mt-20">
               <BrowserFrame className="mx-auto max-w-full">
                 <DashboardMock className="absolute inset-0" />
               </BrowserFrame>
-            </div>
+            </ScrollPitch>
           </Reveal>
         </div>
       </div>

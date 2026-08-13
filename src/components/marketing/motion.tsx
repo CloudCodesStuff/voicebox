@@ -335,6 +335,74 @@ export function CountUp({
 }
 
 /**
+ * Scroll-driven pitch. The child tilts on its X axis as the section travels
+ * through the viewport: pitched back when it sits low on screen, easing toward
+ * flat as it rises. Used once, on the hero product shot, so the dashboard reads
+ * as an object in space rather than a flat screenshot.
+ *
+ * Perspective lives on the outer element and the rotation on the inner one,
+ * because a CSS 3D transform only foreshortens when its perspective comes from
+ * an ancestor. Desktop only and motion-safe only: a tilt fighting momentum
+ * scroll on a phone reads as jank, and reduced-motion users get the flat state.
+ */
+export function ScrollPitch({
+  children,
+  className,
+  from = 11,
+  to = -5,
+  perspective = 1500,
+}: {
+  children: ReactNode;
+  className?: string;
+  from?: number;
+  to?: number;
+  perspective?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      const el = ref.current;
+      const inner = el?.firstElementChild;
+      if (!el || !inner) return;
+
+      const mm = gsap.matchMedia();
+
+      mm.add(
+        "(prefers-reduced-motion: no-preference) and (min-width: 768px)",
+        () => {
+          gsap.fromTo(
+            inner,
+            { rotateX: from },
+            {
+              rotateX: to,
+              ease: "none",
+              scrollTrigger: {
+                trigger: el,
+                start: "top 78%",
+                end: "bottom top",
+                scrub: 0.5,
+              },
+            },
+          );
+        },
+      );
+
+      return () => mm.revert();
+    },
+    { scope: ref },
+  );
+
+  return (
+    <div ref={ref} className={className} style={{ perspective: `${perspective}px` }}>
+      <div style={{ transformStyle: "preserve-3d", willChange: "transform" }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/**
  * Slow vertical drift as the section passes through the viewport. Used once,
  * on the hero product visual, to give the page a sense of depth without
  * turning scrolling into a ride.
