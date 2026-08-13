@@ -39,9 +39,9 @@ export function PlanCard({
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-[1.05rem] font-bold tracking-tight text-ink">
+        <h2 className="text-[1.05rem] font-bold tracking-tight text-ink">
           {plan.name}
-        </h3>
+        </h2>
         {popular && (
           <span className="rounded-full bg-mint-wash px-2.5 py-1 text-[0.68rem] font-medium text-mint-deep">
             Most teams

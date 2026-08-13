@@ -15,6 +15,15 @@ export type PostCategory = "Guide" | "Comparison" | "Opinion" | "Reference";
 export type Post = {
   slug: string;
   title: string;
+  /**
+   * Short form for the <title> tag, when the headline is too long for one.
+   *
+   * Google shows roughly 60 characters and this site appends " · Voicebox",
+   * so a headline over about 48 characters gets cut mid-word in results. The
+   * H1 stays long because a reader who already clicked benefits from it; the
+   * title tag has to earn the click first.
+   */
+  seoTitle?: string;
   /** Used as the meta description and the index card blurb. Keep under 155. */
   description: string;
   category: PostCategory;
@@ -30,8 +39,9 @@ export const posts: Post[] = [
   {
     slug: "best-feedback-widget-reddit",
     title: "The best feedback widget, according to the questions Reddit keeps asking",
+    seoTitle: "Best feedback widget: the Reddit answer",
     description:
-      "People ask for a website feedback widget on Reddit constantly. Here is a straight comparison of the real options, what each is actually good at, and when to pick none of them.",
+      "People ask for a website feedback widget on Reddit constantly. A straight comparison of the real options and what each is actually good at.",
     category: "Comparison",
     published: "2026-08-13",
     updated: "2026-08-13",
@@ -45,8 +55,9 @@ export const posts: Post[] = [
   {
     slug: "canny-alternatives-reddit",
     title: "Canny alternatives: what people on Reddit are actually asking for",
+    seoTitle: "Canny alternatives, compared",
     description:
-      "Canny prices on tracked users, which surprises teams as they grow. Here is what the alternatives cost, how their pricing models differ, and which one fits which situation.",
+      "Canny prices on tracked users, which surprises teams as they grow. What the alternatives cost, how their pricing differs, and which fits when.",
     category: "Comparison",
     published: "2026-08-13",
     updated: "2026-08-13",
@@ -60,8 +71,9 @@ export const posts: Post[] = [
   {
     slug: "how-to-collect-user-feedback-on-your-website",
     title: "How to collect user feedback on your website without annoying anyone",
+    seoTitle: "How to collect website feedback",
     description:
-      "Where to put the button, what to ask, how many questions is too many, and what to do with the replies once they arrive. A practical guide with the tradeoffs stated.",
+      "Where to put the button, what to ask, how many questions is too many, and what to do with the replies once they arrive.",
     category: "Guide",
     published: "2026-08-13",
     updated: "2026-08-13",
@@ -75,8 +87,9 @@ export const posts: Post[] = [
   {
     slug: "tracked-user-pricing-is-a-trap",
     title: "Why tracked-user pricing punishes you for succeeding",
+    seoTitle: "Why tracked-user pricing backfires",
     description:
-      "Feedback tools that bill per tracked user charge you more the better your product does. Here is the arithmetic, with real 2026 numbers, and what to look for instead.",
+      "Feedback tools that bill per tracked user charge you more the better your product does. The arithmetic, with real 2026 numbers.",
     category: "Opinion",
     published: "2026-08-13",
     updated: "2026-08-13",
@@ -90,8 +103,9 @@ export const posts: Post[] = [
   {
     slug: "what-to-do-with-user-feedback",
     title: "You have 400 pieces of feedback. Now what?",
+    seoTitle: "What to do with user feedback",
     description:
-      "Reading everything does not scale and tagging by keyword misses the point. How to group feedback by the underlying problem and rank what to fix first.",
+      "Reading everything does not scale and tagging by keyword misses the point. How to group feedback by problem and rank what to fix first.",
     category: "Guide",
     published: "2026-08-13",
     updated: "2026-08-13",
@@ -105,8 +119,9 @@ export const posts: Post[] = [
   {
     slug: "feedback-widget-vs-survey-tool",
     title: "Feedback widget vs survey tool: which one do you actually need?",
+    seoTitle: "Feedback widget vs survey tool",
     description:
-      "Surveys ask everyone the same question at a moment you chose. Widgets wait for the moment they chose. The difference decides which answers you get.",
+      "Surveys ask everyone the same question at a moment you chose. Widgets wait for the moment they chose. That decides which answers you get.",
     category: "Guide",
     published: "2026-08-13",
     updated: "2026-08-13",

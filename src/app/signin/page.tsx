@@ -9,7 +9,7 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: `Sign in to ${site.name} with Google.`,
+  description: `Sign in to ${site.name} with Google to see your feedback inbox, themes and trends. No password to remember.`,
   robots: { index: false, follow: false },
 };
 

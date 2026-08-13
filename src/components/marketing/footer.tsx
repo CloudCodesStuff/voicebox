@@ -55,9 +55,9 @@ export function MarketingFooter() {
 
           {columns.map((col) => (
             <div key={col.heading}>
-              <h3 className="text-[0.78rem] font-medium text-steel">
+              <h2 className="text-[0.78rem] font-medium text-steel">
                 {col.heading}
-              </h3>
+              </h2>
               <ul className="mt-4 space-y-2.5">
                 {col.links.map((l) => (
                   <li key={l.href}>

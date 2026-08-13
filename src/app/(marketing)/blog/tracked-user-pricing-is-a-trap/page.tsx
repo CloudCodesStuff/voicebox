@@ -23,7 +23,7 @@ import { pageMetadata } from "@/lib/seo";
 const post = getPost("tracked-user-pricing-is-a-trap")!;
 
 export const metadata: Metadata = pageMetadata({
-  title: post.title,
+  title: post.seoTitle ?? post.title,
   description: post.description,
   path: `/blog/${post.slug}`,
   type: "article",

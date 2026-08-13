@@ -48,7 +48,7 @@ export const comparisons: Comparison[] = [
     what: "a public feedback board with voting, a roadmap and a changelog",
     title: "Voicebox vs Canny",
     description:
-      "Canny is a public voting board priced by tracked users. Voicebox is a widget plus AI analysis priced by feedback volume. An honest comparison of both, updated August 2026.",
+      "Canny is a public voting board priced by tracked users. Voicebox is a widget plus AI analysis priced by feedback volume. Compared honestly, August 2026.",
     verifiedOn: "August 2026",
     pricingModel: "Per tracked user",
     pricingDetail:
@@ -63,7 +63,7 @@ export const comparisons: Comparison[] = [
       "Priced on how much feedback you collect, not how many people send it. A viral month raises your volume, not your per-user count.",
       "Feedback is private by default. Nothing your users write is published to a board other customers can read.",
       "Grouping is done by an AI reading the text, so five different wordings of one problem become one theme without anyone tagging or merging by hand.",
-      "The widget is the product rather than a way onto a board, so it is under 30KB, styled to your site and takes one script tag.",
+      "The widget is the product rather than a way onto a board, so it is around 11KB over the wire, styled to your site and takes one script tag.",
     ],
     pickThemIf:
       "you want a public place where customers vote on what you build next, and you are comfortable with a bill that grows as more of them participate.",
@@ -83,7 +83,7 @@ export const comparisons: Comparison[] = [
     what: "feedback boards, roadmaps, changelogs, surveys, a help centre and a support inbox in one product",
     title: "Voicebox vs Featurebase",
     description:
-      "Featurebase is an all-in-one support and feedback suite priced per seat. Voicebox does one thing: collect feedback and rank what to fix. Compared honestly, August 2026.",
+      "Featurebase is an all-in-one support and feedback suite priced per seat. Voicebox does one thing: collect feedback and rank what to fix. Compared, August 2026.",
     verifiedOn: "August 2026",
     pricingModel: "Per seat, plus usage for AI",
     pricingDetail:

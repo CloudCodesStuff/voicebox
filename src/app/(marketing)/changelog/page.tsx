@@ -7,7 +7,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Changelog",
-  description: `What's new in ${site.name}.`,
+  description: `Every change to ${site.name}: new features, fixes and improvements to the widget, the analysis and the dashboard, newest first.`,
   path: "/changelog",
 });
 

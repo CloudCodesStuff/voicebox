@@ -59,6 +59,15 @@
    */
   var pendingOpen = false;
 
+  /**
+   * What had focus before the panel opened.
+   *
+   * Closing a dialog and dumping focus back at the top of the document loses a
+   * keyboard user's place entirely on somebody else's site, which is not ours
+   * to do.
+   */
+  var lastFocused = null;
+
   var reduceMotion =
     window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -357,7 +366,7 @@
         var m = TYPE_META[t];
         if (!m) return "";
         return (
-          '<button class="type" data-type="' + t + '">' +
+          '<button class="type" type="button" aria-pressed="false" data-type="' + t + '">' +
           icon(m.icon, 14) +
           "<span>" + m.label + "</span></button>"
         );
@@ -372,7 +381,8 @@
         marks += useStars
           ? '<button class="star" data-rate="' + i + '" aria-label="' + i + ' out of 5">' +
             icon("star", 22) + "</button>"
-          : '<button class="num" data-rate="' + i + '">' + i + "</button>";
+          : '<button class="num" type="button" aria-label="' + i + ' out of 5" data-rate="' +
+            i + '">' + i + "</button>";
       }
       rating =
         '<div class="rate">' +
@@ -383,9 +393,13 @@
     }
 
     return (
-      '<div class="panel" part="panel">' +
+      // role/aria-modal so assistive tech announces a dialog opening rather
+      // than silently moving focus into unlabelled content, and labelled by
+      // its own heading so the announcement says what it is for.
+      '<div class="panel" part="panel" role="dialog" aria-modal="true" ' +
+      'aria-labelledby="vb-title">' +
       '<div class="head">' +
-      '<div class="title">' + esc(c.heading) + "</div>" +
+      '<div class="title" id="vb-title">' + esc(c.heading) + "</div>" +
       '<div class="sub">' + esc(c.subheading) + "</div>" +
       '<button class="x" aria-label="Close">' + icon("close", 15) + "</button>" +
       "</div>" +
@@ -400,7 +414,7 @@
       "</div>" +
       '<div class="actions">' +
       '<button class="submit">' + icon("send", 15) + "<span>Send feedback</span></button>" +
-      '<div class="err" hidden></div>' +
+      '<div class="err" role="alert" hidden></div>' +
       "</div>" +
       (c.hideBranding
         ? ""
@@ -461,7 +475,35 @@
     });
 
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && open) closePanel();
+      if (e.key === "Escape" && open) {
+        closePanel();
+        return;
+      }
+
+      // Keep Tab inside the dialog. Without this, tabbing out of the panel
+      // walks into the host page behind it while the panel is still covering
+      // it, which leaves a keyboard user driving something they cannot see.
+      if (e.key !== "Tab" || !open || !root) return;
+
+      var panel = root.querySelector(".panel");
+      if (!panel) return;
+
+      var focusable = panel.querySelectorAll(
+        'button:not([disabled]), textarea, input[type=email], a[href]',
+      );
+      if (focusable.length === 0) return;
+
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      var active = root.activeElement;
+
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     });
   }
 
@@ -479,6 +521,7 @@
     }
     open = true;
     openedAt = Date.now();
+    lastFocused = document.activeElement;
     state = { type: null, rating: null, sent: false };
 
     var wrap = root.querySelector(".wrap");
@@ -497,6 +540,18 @@
   function closePanel() {
     if (!open) return;
     open = false;
+
+    // Back where they were. Guarded because the element may have been removed
+    // by the host page while the panel was open.
+    if (lastFocused && typeof lastFocused.focus === "function") {
+      try {
+        if (document.contains(lastFocused)) lastFocused.focus();
+      } catch {
+        /* Focus is a courtesy, never a reason to throw on someone's site. */
+      }
+    }
+    lastFocused = null;
+
     var panel = root.querySelector(".panel");
     if (!panel) return;
 
@@ -522,8 +577,13 @@
       btn.addEventListener("click", function () {
         panel.querySelectorAll(".type").forEach(function (b) {
           b.classList.remove("on");
+          // Selection is state, and colour alone does not carry it. Without
+          // aria-pressed a screen reader reads four identical buttons and
+          // gives no way to tell which one is chosen.
+          b.setAttribute("aria-pressed", "false");
         });
         btn.classList.add("on");
+        btn.setAttribute("aria-pressed", "true");
         state.type = btn.getAttribute("data-type");
         var meta = TYPE_META[state.type];
         if (meta) ta.setAttribute("placeholder", meta.ph);
@@ -620,7 +680,7 @@
         if (actions) actions.remove();
 
         panel.querySelector(".body").outerHTML =
-          '<div class="done">' +
+          '<div class="done" role="status" aria-live="polite">' +
           '<div class="tick">' + icon("check", 20) + "</div>" +
           "<p>" + esc(config.successMessage) + "</p>" +
           "</div>";

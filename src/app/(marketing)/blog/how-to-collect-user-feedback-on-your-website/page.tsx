@@ -23,7 +23,7 @@ import { pageMetadata } from "@/lib/seo";
 const post = getPost("how-to-collect-user-feedback-on-your-website")!;
 
 export const metadata: Metadata = pageMetadata({
-  title: post.title,
+  title: post.seoTitle ?? post.title,
   description: post.description,
   path: `/blog/${post.slug}`,
   type: "article",

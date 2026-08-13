@@ -88,8 +88,17 @@ function SidebarSections({ pathname }: { pathname: string }) {
     <div className="space-y-6">
       {docsNav.map((section) => (
         <div key={section.heading}>
-          <h3 className="label">{section.heading}</h3>
-          <ul className="mt-3 space-y-0.5">
+          {/* A div, not a heading. These name navigation groups rather than
+              document sections, and as headings they landed in the outline
+              ahead of the page's own h1. The list is labelled instead, so the
+              grouping is still announced without inventing structure. */}
+          <div className="label" id={`docs-group-${section.heading.replace(/\s+/g, "-").toLowerCase()}`}>
+            {section.heading}
+          </div>
+          <ul
+            aria-labelledby={`docs-group-${section.heading.replace(/\s+/g, "-").toLowerCase()}`}
+            className="mt-3 space-y-0.5"
+          >
             {section.items.map((item) => {
               const active = pathname === item.href;
               return (
