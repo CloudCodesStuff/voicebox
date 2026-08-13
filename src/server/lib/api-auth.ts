@@ -4,7 +4,13 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { db } from "@/server/db";
 import { hashApiKey } from "@/server/lib/ids";
-import { ensureUsageWindow, hasFeature, requiredPlanFor } from "@/server/lib/plan";
+import {
+  ensureUsageWindow,
+  hasFeature,
+  planLabels,
+  requiredPlanFor,
+  type Feature,
+} from "@/server/lib/plan";
 import { checkRate } from "@/server/lib/rate-limit";
 
 const RATE_LIMIT_PER_MINUTE = 120;
@@ -48,6 +54,13 @@ export function apiError(
  */
 export async function authenticateApi(
   req: NextRequest,
+  /**
+   * Which plan feature this surface needs. The REST endpoints require "api"
+   * (paid); the MCP endpoint requires "mcp" (every plan). Same key, same rate
+   * limit, different gate, so a Free key can drive an agent through MCP but
+   * gets a clean upgrade prompt from /api/v1.
+   */
+  requiredFeature: Feature = "api",
 ): Promise<ApiIdentity | ApiAuthFailure> {
   const header = req.headers.get("authorization") ?? "";
   const token = header.startsWith("Bearer ") ? header.slice(7).trim() : "";
@@ -77,16 +90,17 @@ export async function authenticateApi(
     };
   }
 
-  // The API is a paid feature, and the check lives here rather than in the UI
-  // so downgrading actually closes the door.
+  // The gate lives here rather than in the UI so downgrading actually closes
+  // the door. Which feature is required depends on the surface (see the param).
   const subscription = await ensureUsageWindow(db, key.orgId);
-  if (!hasFeature(subscription.plan, "api")) {
+  if (!hasFeature(subscription.plan, requiredFeature)) {
+    const needed = requiredPlanFor(requiredFeature);
     return {
       response: apiError(
         403,
         "upgrade_required",
-        `API access is available on the ${requiredPlanFor("api")} plan and above.`,
-        { requiredPlan: requiredPlanFor("api") },
+        `This is available on the ${planLabels[needed]} plan and above.`,
+        { requiredPlan: needed },
       ),
     };
   }

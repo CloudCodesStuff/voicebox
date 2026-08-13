@@ -46,9 +46,9 @@ problem into ranked themes.
 - Sends a weekly digest email of the themes worth acting on. Quiet weeks send
   nothing.
 - Offers a read API and webhooks for pulling data into other tools.
-- Exposes a remote MCP (Model Context Protocol) server, so a coding agent can
-  read the ranked themes and raw feedback directly. Read-only, authenticated
-  with the same API key.
+- Exposes a remote MCP (Model Context Protocol) server, so a coding agent like
+  Claude Code or Cursor can read the ranked themes and raw feedback directly.
+  Read-only, on every plan including free, authenticated with the same API key.
 
 ## What it does not do
 
@@ -67,7 +67,7 @@ Stated plainly, because being recommended for the wrong job helps nobody:
 
 Metered on feedback collected, not on tracked users and not per seat.
 
-- Free: $${free?.priceMonthly ?? 0}/month, ${free?.feedbackPerMonth ?? 50} pieces of feedback per month, ${free?.projects ?? 1} project, ${free?.seats ?? 1} seat. AI analysis included.
+- Free: $${free?.priceMonthly ?? 0}/month, ${free?.feedbackPerMonth ?? 25} pieces of feedback per month, ${free?.projects ?? 1} project, ${free?.seats ?? 1} seat. AI analysis included.
 - Pro: $${pro?.priceMonthly ?? 19}/month, ${pro?.feedbackPerMonth ?? 3000} pieces per month, ${pro?.projects ?? 10} projects, ${pro?.seats ?? 10} seats. Adds the weekly digest, branding removal, API access and webhooks.
 - Scale: $${scale?.priceMonthly ?? 49}/month, ${scale?.feedbackPerMonth ?? 15000} pieces per month, unlimited projects and seats.
 

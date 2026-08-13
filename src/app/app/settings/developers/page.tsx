@@ -33,7 +33,10 @@ export default function DeveloperSettings() {
 
   // Ask the plan rules rather than naming plans here. Listing "PRO or SCALE"
   // in the UI is how a gate drifts out of step with the server that enforces it.
-  const gated = org.data ? !org.data.limits.features.includes("api") : false;
+  // Keys are on the "mcp" feature (every plan), the REST API and webhooks on
+  // "api" (paid), so the two gates are read separately.
+  const features = org.data?.limits.features ?? [];
+  const restGated = org.data ? !features.includes("api") : false;
 
   if (org.isLoading) return <Skeleton className="h-64 rounded-xl" />;
 
@@ -41,11 +44,11 @@ export default function DeveloperSettings() {
     <div className="space-y-6">
       <SectionHeader
         title="Developers"
-        description="Pull your feedback and themes into your own tools. API keys are for reading data out; webhooks push an event to you the moment something arrives, so you can post it to Slack or open a ticket automatically."
+        description="Connect a coding agent over MCP on any plan, or on Pro, read the REST API and push webhooks the moment feedback arrives."
       />
-      {gated && <UpgradeNotice />}
-      <ApiKeys locked={gated} />
-      <Webhooks locked={gated} />
+      <ApiKeys restGated={restGated} />
+      {restGated && <UpgradeNotice />}
+      <Webhooks locked={restGated} />
     </div>
   );
 }
@@ -54,11 +57,12 @@ function UpgradeNotice() {
   return (
     <div className="rounded-xl border border-mint-line bg-mint-wash p-5">
       <h2 className="text-[0.95rem] font-semibold text-ink">
-        The API and webhooks are on Pro.
+        The REST API and webhooks are on Pro.
       </h2>
       <p className="mt-1.5 max-w-[60ch] text-[0.85rem] leading-relaxed text-steel">
-        You can look around, but keys and endpoints can&apos;t be created until
-        you upgrade. Everything else here works exactly the same afterwards.
+        Your key already works with the MCP server on this plan. Upgrading adds
+        the REST endpoints under <code className="font-mono text-[0.8rem]">/api/v1</code>{" "}
+        and lets you point webhooks at your own URLs.
       </p>
       <Link
         href="/app/settings/billing"
@@ -72,7 +76,7 @@ function UpgradeNotice() {
 
 /* ------------------------------------------------------------------ keys */
 
-function ApiKeys({ locked }: { locked: boolean }) {
+function ApiKeys({ restGated }: { restGated: boolean }) {
   const utils = api.useUtils();
   const keys = api.developer.keys.useQuery();
   const [name, setName] = useState("");
@@ -107,15 +111,15 @@ function ApiKeys({ locked }: { locked: boolean }) {
         <div>
           <h2 className="text-[1rem] font-semibold text-ink">API keys</h2>
           <p className="mt-1 max-w-[62ch] text-[0.83rem] leading-relaxed text-steel">
-            Read your feedback, themes and projects from your own code. Send the
-            key as{" "}
+            One key, two uses. Connect a coding agent over MCP on any plan,
+            including this one; {restGated ? "on Pro it also unlocks" : "and use"} the
+            REST API to read feedback from your own code. Send it as{" "}
             <code className="rounded bg-sunken px-1 py-0.5 font-mono text-[0.78rem]">
               Authorization: Bearer sk_…
             </code>
-            . Keys are stored hashed, so we can show you a new one exactly once
-            and never again.{" "}
+            . Keys are stored hashed, so we show a new one exactly once.{" "}
             <Link href="/docs/api" className="text-mint-deep hover:underline">
-              Read the API docs
+              Read the docs
             </Link>
           </p>
         </div>
@@ -138,13 +142,13 @@ function ApiKeys({ locked }: { locked: boolean }) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Production sync"
-            disabled={locked}
+            disabled={create.isPending}
             className="mt-1.5 h-10 border-line bg-paper"
           />
         </div>
         <button
           type="button"
-          disabled={locked || name.trim().length === 0 || create.isPending}
+          disabled={name.trim().length === 0 || create.isPending}
           onClick={() => create.mutate({ name: name.trim() })}
           className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-[0.85rem] font-semibold text-paper disabled:opacity-40"
         >

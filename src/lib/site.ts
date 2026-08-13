@@ -76,15 +76,16 @@ export const plans = [
     name: "Free",
     priceMonthly: 0,
     priceAnnual: 0,
-    feedbackPerMonth: 50,
+    feedbackPerMonth: 25,
     projects: 1,
     seats: 1,
-    volume: "50 pieces of feedback a month",
+    volume: "25 pieces of feedback a month",
     scope: "1 project, 1 seat",
     included: [
       "The widget, fully customizable",
       "Sentiment on every submission",
       "AI themes and priority ranking",
+      "MCP server for your coding agent",
       "Trends and CSV export",
     ],
     adds: [],
@@ -104,7 +105,7 @@ export const plans = [
     adds: [
       "Weekly digest email",
       "Your branding, not ours",
-      "API access and webhooks",
+      "REST API and webhooks",
     ],
   },
   {

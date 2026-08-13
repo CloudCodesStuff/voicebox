@@ -174,7 +174,7 @@ export function ArticleCta() {
         Try it on your own site
       </h2>
       <p className="mt-2 text-[0.94rem] leading-relaxed text-steel">
-        One script tag, free for 50 pieces of feedback a month, no card. Every
+        One script tag, free for 25 pieces of feedback a month, no card. Every
         submission is scored and grouped automatically, on every plan.
       </p>
       <div className="mt-5 flex flex-wrap gap-3">

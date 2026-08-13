@@ -38,7 +38,7 @@ const faqs = [
   },
   {
     q: "What is the cheapest Canny alternative?",
-    a: "It depends on which limit you hit. Featurebase has a permanent free plan at one seat, and Voicebox is free for 50 pieces of feedback a month with AI analysis included. Beyond free, per-seat and per-volume pricing diverge sharply, so the cheapest option is whichever meters on the thing you have least of.",
+    a: "It depends on which limit you hit. Featurebase has a permanent free plan at one seat, and Voicebox is free for 25 pieces of feedback a month with AI analysis included. Beyond free, per-seat and per-volume pricing diverge sharply, so the cheapest option is whichever meters on the thing you have least of.",
   },
   {
     q: "Is there a free alternative to Canny with a public roadmap?",
@@ -127,7 +127,7 @@ export default function Page() {
         </LI>
         <LI>
           <strong className="text-ink">Voicebox</strong> — per piece of
-          feedback. Free for 50 a month, $19 for 3,000, $49 for 15,000 with
+          feedback. Free for 25 a month, $19 for 3,000, $49 for 15,000 with
           unlimited seats, AI analysis on every plan. No public board and no
           voting, so this is a swap only if the board was never the point.{" "}
           <Link href="/vs/canny" className="text-ink underline underline-offset-2">

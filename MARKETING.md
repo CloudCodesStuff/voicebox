@@ -95,7 +95,7 @@ earning its place somewhere around the point you can no longer hold the whole
 picture in your head.
 
 Pricing is on feedback volume rather than tracked users or seats, which is the
-thing I actually wanted to build differently. Free tier is 50 pieces a month
+thing I actually wanted to build differently. Free tier is 25 pieces a month
 with the AI included.
 
 No customers yet. Genuinely want to hear where this is wrong.
@@ -129,7 +129,7 @@ everything else by how many people, how unhappy, and how recently.
 It is around 11KB, renders in a Shadow DOM root so it cannot collide with your
 CSS, and takes about four minutes to install.
 
-Free tier is 50 pieces of feedback a month with the AI on. No customers yet,
+Free tier is 25 pieces of feedback a month with the AI on. No customers yet,
 this is the first time I have shown it to anyone.
 
 https://www.usevoicebox.dev
@@ -151,7 +151,7 @@ cheap, your product gets more popular, more people vote, and the bill goes up
 without your revenue going up. Pricing on tracked users means a good launch
 costs you money.
 
-So I built one metered on how much feedback you collect. $0 for 50 a month,
+So I built one metered on how much feedback you collect. $0 for 25 a month,
 $19 for 3,000, $49 for 15,000 with unlimited seats. AI analysis on every plan
 including free, because gating the useful part behind a tier is the other thing
 that annoyed me.
@@ -190,7 +190,7 @@ Three things I had to redo, in case they save someone else the time.
    step and users at another.
 
 Product is a feedback widget plus an analysis layer that groups replies into a
-ranked list of what to fix. Free tier is 50/month with the AI included.
+ranked list of what to fix. Free tier is 25/month with the AI included.
 
 https://www.usevoicebox.dev
 ```
@@ -242,7 +242,7 @@ meaning to read.
 - Renders in a Shadow DOM root, so it cannot collide with your styles.
 - Every submission scored for tone and intent within seconds.
 - Priced on feedback volume, not tracked users and not per seat.
-- Free for 50 pieces a month, with the AI included.
+- Free for 25 pieces a month, with the AI included.
 ```
 
 **First comment:**
@@ -264,7 +264,7 @@ voting on features in public, Canny or Featurebase do that properly and I have
 a comparison page saying where each of them wins. And there are no customers
 yet, so you would be early.
 
-Free tier is real: 50 pieces a month with the analysis on, no card.
+Free tier is real: 25 pieces a month with the analysis on, no card.
 
 Would love to know what would stop you installing it.
 ```

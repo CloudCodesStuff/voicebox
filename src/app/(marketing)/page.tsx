@@ -60,7 +60,7 @@ const faqGroups: FaqGroup[] = [
       },
       {
         q: "How much feedback before it's useful?",
-        a: "Sentiment and summaries start on the first submission. Themes need a pattern, so they appear around twenty pieces. The free plan's fifty a month clears that.",
+        a: "Sentiment and summaries start on the first submission. Themes need a pattern, so they appear once there are around twenty analyzed pieces, which the free plan's twenty-five a month is enough to reach.",
       },
       {
         q: "Can I run it on more than one product?",
@@ -145,7 +145,7 @@ export default function LandingPage() {
 
           <Reveal delay={0.46}>
             <p className="mt-4 text-[0.84rem] text-steel">
-              Free up to 50 pieces of feedback a month. No card.
+              Free up to 25 pieces of feedback a month. No card.
             </p>
           </Reveal>
 
@@ -251,6 +251,60 @@ export default function LandingPage() {
             <DigestSkeleton />
           </BentoCard>
         </div>
+      </section>
+
+      {/* ------------------------------------------------------------- MCP */}
+      <section className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-10 px-4 py-10 md:grid-cols-2 md:gap-16 md:px-8 md:py-20 lg:py-28">
+        <Reveal>
+          <div className="max-w-xl">
+            <div className="text-[0.8rem] font-semibold text-mint-deep">
+              New · works with your coding agent
+            </div>
+            <h2 className="mt-3 text-2xl font-bold tracking-tight text-balance text-ink md:text-4xl lg:text-5xl">
+              Ask your agent what to build next
+            </h2>
+            <p className="mt-6 max-w-lg text-base text-steel lg:text-lg">
+              Voicebox runs as an MCP server. Point Claude Code or Cursor at it
+              and your ranked feedback themes land right where you write code, so
+              &ldquo;what should I fix?&rdquo; is answered from what your users
+              actually said. Read-only, and on every plan, including free.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <CtaButton href="/docs/api#model-context-protocol" variant="accent">
+                Set it up
+                <ArrowRight className="size-4" />
+              </CtaButton>
+            </div>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.1}>
+          <div className="overflow-hidden rounded-2xl bg-slab shadow-sm ring-1 shadow-black/40 ring-white/[0.07]">
+            <div className="flex items-center gap-1.5 border-b border-white/[0.06] px-4 py-3">
+              <span className="size-2.5 rounded-full bg-[#FF5F57]" />
+              <span className="size-2.5 rounded-full bg-[#FEBC2E]" />
+              <span className="size-2.5 rounded-full bg-[#28C840]" />
+              <span className="ml-2 text-[0.72rem] text-slab-fg/50">
+                your terminal
+              </span>
+            </div>
+            <pre className="overflow-x-auto p-5 font-mono text-[0.78rem] leading-[1.9] text-slab-fg/85">
+              <code>
+                <span className="text-slab-fg/40"># one line, then it&apos;s in every session</span>
+                {"\n"}
+                <span className="text-mint">claude mcp add</span> --transport http voicebox \{"\n"}
+                {"  "}https://usevoicebox.dev/api/mcp \{"\n"}
+                {"  "}--header <span className="text-slab-fg">&quot;Authorization: Bearer sk_…&quot;</span>
+                {"\n\n"}
+                <span className="text-slab-fg/40"># then, mid-task, just ask</span>
+                {"\n"}
+                <span className="text-slab-fg">&gt; what are the top feedback themes,</span>
+                {"\n"}
+                <span className="text-slab-fg">{"  "}and what did people actually say?</span>
+              </code>
+            </pre>
+          </div>
+        </Reveal>
       </section>
 
       {/* --------------------------------------------------------- PRICING */}

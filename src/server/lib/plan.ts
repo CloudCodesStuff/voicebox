@@ -12,7 +12,13 @@ export type Feature =
   | "themes"
   | "digest"
   | "branding"
+  // The REST read API and webhooks. Paid.
   | "api"
+  // The MCP server. On every plan, including Free: letting a coding agent read
+  // the ranked themes is the differentiator, and the whole free tier exists to
+  // be shown off. It only reads, and it is metered by the same monthly feedback
+  // allowance as everything else, so opening it costs nothing to protect.
+  | "mcp"
   | "askAI";
 
 type PlanRules = {
@@ -26,10 +32,10 @@ export const planRules: Record<Plan, PlanRules> = {
   // The AI is the hook, so Free gets themes. Gating the one thing that makes
   // the product interesting would kill the demo and the word of mouth.
   FREE: {
-    feedbackPerMonth: 50,
+    feedbackPerMonth: 25,
     projects: 1,
     seats: 1,
-    features: ["themes"],
+    features: ["themes", "mcp"],
   },
   // Legacy, no longer sold. Kept because the enum value may exist in old
   // rows; treated as Free-plus-volume so nothing gated ever names it.
@@ -37,19 +43,19 @@ export const planRules: Record<Plan, PlanRules> = {
     feedbackPerMonth: 500,
     projects: 3,
     seats: 3,
-    features: ["themes"],
+    features: ["themes", "mcp"],
   },
   PRO: {
     feedbackPerMonth: 3_000,
     projects: 10,
     seats: 10,
-    features: ["themes", "digest", "branding", "api", "askAI"],
+    features: ["themes", "digest", "branding", "api", "mcp", "askAI"],
   },
   SCALE: {
     feedbackPerMonth: 15_000,
     projects: null,
     seats: null,
-    features: ["themes", "digest", "branding", "api", "askAI"],
+    features: ["themes", "digest", "branding", "api", "mcp", "askAI"],
   },
 };
 

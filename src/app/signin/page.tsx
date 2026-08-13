@@ -78,7 +78,7 @@ export default async function SignInPage({
             Find out what to build next.
           </h1>
           <p className="mt-3 text-[0.97rem] leading-relaxed text-steel">
-            Free up to 50 pieces of feedback a month. No card.
+            Free up to 25 pieces of feedback a month. No card.
           </p>
 
           <div className="mt-9 rounded-2xl border border-line bg-paper-2 p-7">

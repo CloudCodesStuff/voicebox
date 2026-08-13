@@ -149,7 +149,7 @@ export default function Page() {
 
       <P>
         For what it is worth, {site.name} meters on feedback collected: free for
-        50 a month, $19 for 3,000, $49 for 15,000 with unlimited seats. That has
+        25 a month, $19 for 3,000, $49 for 15,000 with unlimited seats. That has
         its own failure mode, which is a spam wave, and the fix is the domain
         allowlist rather than a bigger plan. Every meter fails somewhere; the
         useful question is whether it fails when things are going well or when

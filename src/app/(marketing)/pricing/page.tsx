@@ -19,11 +19,11 @@ import { plans, site } from "@/lib/site";
 import { PricingTable } from "./pricing-table";
 import { pageMetadata } from "@/lib/seo";
 
-const [, pro, scale] = plans;
+const [free, pro, scale] = plans;
 
 export const metadata: Metadata = pageMetadata({
   title: "Pricing",
-  description: `Free for 50 pieces of feedback a month, then $${pro.priceMonthly} or $${scale.priceMonthly}. The AI is on every plan. Cancel any time.`,
+  description: `Free for ${free.feedbackPerMonth} pieces of feedback a month, then $${pro.priceMonthly} or $${scale.priceMonthly}. The AI is on every plan. Cancel any time.`,
   path: "/pricing",
 });
 
@@ -34,7 +34,7 @@ const billingFaqs = [
   },
   {
     q: "Why is the AI on the free plan?",
-    a: "Because it's the point of the product. A feedback list with no themes is a worse spreadsheet. Free gets sentiment, themes and ranking on all 50 items.",
+    a: "Because it's the point of the product. A feedback list with no themes is a worse spreadsheet. Free gets sentiment, themes and ranking on all 25 items.",
   },
   {
     q: "What happens if I go over?",
@@ -111,7 +111,7 @@ export default function PricingPage() {
       <Section tone="ink" className="text-center">
         <Reveal>
           <SectionHeading className="mx-auto max-w-[20ch]">
-            Fifty pieces is enough to see your first themes.
+            Twenty-five pieces is enough to see your first themes.
           </SectionHeading>
         </Reveal>
         <Reveal delay={0.08}>

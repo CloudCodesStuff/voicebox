@@ -62,9 +62,12 @@ const webhookUrl = z
     return true;
   }, "Use a public https:// URL. Local and private addresses are rejected.");
 
-async function requireApiPlan(ctx: { db: Parameters<typeof ensureUsageWindow>[0]; orgId: string }) {
+async function requireFeature(
+  ctx: { db: Parameters<typeof ensureUsageWindow>[0]; orgId: string },
+  feature: "api" | "mcp",
+) {
   const subscription = await ensureUsageWindow(ctx.db, ctx.orgId);
-  assertFeature(subscription.plan, "api");
+  assertFeature(subscription.plan, feature);
 }
 
 export const developerRouter = createTRPCRouter({
@@ -89,7 +92,10 @@ export const developerRouter = createTRPCRouter({
   createKey: adminProcedure
     .input(z.object({ name: z.string().trim().min(1).max(40) }))
     .mutation(async ({ ctx, input }) => {
-      await requireApiPlan(ctx);
+      // Keys are gated on "mcp", which every plan has, so a Free user can mint a
+      // key to connect their agent. The key still gets 403 from the paid REST
+      // endpoints until they upgrade; the gate that matters lives in api-auth.
+      await requireFeature(ctx, "mcp");
 
       const count = await ctx.db.apiKey.count({
         where: { orgId: ctx.orgId, revokedAt: null },
@@ -163,7 +169,8 @@ export const developerRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await requireApiPlan(ctx);
+      // Webhooks stay on the paid "api" feature.
+      await requireFeature(ctx, "api");
 
       const count = await ctx.db.webhook.count({ where: { orgId: ctx.orgId } });
       if (count >= MAX_WEBHOOKS) {

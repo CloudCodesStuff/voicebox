@@ -153,7 +153,9 @@ async function handleRpc(
 }
 
 export async function POST(req: NextRequest) {
-  const auth = await authenticateApi(req);
+  // "mcp", not "api": the MCP server is on every plan including Free, while the
+  // REST endpoints under /api/v1 stay on the paid "api" feature.
+  const auth = await authenticateApi(req, "mcp");
   if (isAuthFailure(auth)) {
     // Carry CORS onto the auth failure too, so a browser client sees the 401
     // body instead of an opaque CORS error.

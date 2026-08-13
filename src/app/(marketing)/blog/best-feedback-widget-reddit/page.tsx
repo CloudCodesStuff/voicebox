@@ -38,7 +38,7 @@ const faqs = [
   },
   {
     q: "Is there a free feedback widget?",
-    a: "Yes, most tools in this category have a free tier. Canny is free up to 25 tracked users, Featurebase has a permanent free plan with one seat and no AI, and Voicebox is free for 50 pieces of feedback a month with AI analysis included. The limits differ in kind, so check which one you would hit first.",
+    a: "Yes, most tools in this category have a free tier. Canny is free up to 25 tracked users, Featurebase has a permanent free plan with one seat and no AI, and Voicebox is free for 25 pieces of feedback a month with AI analysis included. The limits differ in kind, so check which one you would hit first.",
   },
   {
     q: "Why do feedback tools get expensive so quickly?",
@@ -161,7 +161,7 @@ export default function Page() {
         </LI>
         <LI>
           <strong className="text-ink">Per piece of feedback</strong> is what
-          Voicebox uses: $0 for 50 a month, $19 for 3,000, $49 for 15,000, with
+          Voicebox uses: $0 for 25 a month, $19 for 3,000, $49 for 15,000, with
           unlimited seats on the top plan.
         </LI>
       </UL>

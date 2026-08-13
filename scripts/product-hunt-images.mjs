@@ -162,7 +162,7 @@ function slide1() {
   return svg(
     [
       wash,
-      frame(1, "Free for 50 pieces of feedback a month, AI included.", true),
+      frame(1, "Free for 25 pieces of feedback a month, AI included.", true),
       text(M, 210, "FEEDBACK, GROUPED", {
         size: 13,
         family: MONO,
@@ -583,7 +583,7 @@ function slide5() {
 ---------------------------------------------------------------------- */
 function slide6() {
   const plans = [
-    { name: "Free", price: "$0", vol: "50 a month", scope: "1 project, 1 seat", note: "AI included" },
+    { name: "Free", price: "$0", vol: "25 a month", scope: "1 project, 1 seat", note: "AI included" },
     { name: "Pro", price: "$19", vol: "3,000 a month", scope: "10 projects, 10 seats", note: "Digest, API, webhooks" },
     { name: "Scale", price: "$49", vol: "15,000 a month", scope: "Unlimited projects and seats", note: "Priority support" },
   ];

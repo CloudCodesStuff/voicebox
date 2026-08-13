@@ -8,7 +8,7 @@ import { plans } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const comparison: Array<{ label: string; values: Array<string | boolean> }> = [
-  { label: "Feedback per month", values: ["50", "3,000", "15,000"] },
+  { label: "Feedback per month", values: ["25", "3,000", "15,000"] },
   { label: "Projects", values: ["1", "10", "Unlimited"] },
   { label: "Team seats", values: ["1", "10", "Unlimited"] },
   { label: "The widget, fully customizable", values: [true, true, true] },

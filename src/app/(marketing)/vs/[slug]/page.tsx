@@ -58,7 +58,7 @@ export default async function ComparisonPage({
     },
     {
       q: `How does ${c.name} pricing compare?`,
-      a: `${c.name} is metered ${c.pricingModel.toLowerCase()}. ${c.pricingDetail} ${site.name} is metered on how much feedback you collect: free for ${free?.feedbackPerMonth ?? 50} pieces a month, $${pro?.priceMonthly ?? 19} for ${pro?.feedbackPerMonth ?? 3000}, and $${scale?.priceMonthly ?? 49} for ${scale?.feedbackPerMonth ?? 15000} with unlimited seats. Figures for ${c.name} were checked in ${c.verifiedOn}.`,
+      a: `${c.name} is metered ${c.pricingModel.toLowerCase()}. ${c.pricingDetail} ${site.name} is metered on how much feedback you collect: free for ${free?.feedbackPerMonth ?? 25} pieces a month, $${pro?.priceMonthly ?? 19} for ${pro?.feedbackPerMonth ?? 3000}, and $${scale?.priceMonthly ?? 49} for ${scale?.feedbackPerMonth ?? 15000} with unlimited seats. Figures for ${c.name} were checked in ${c.verifiedOn}.`,
     },
     {
       q: `Can I use both?`,
@@ -139,7 +139,7 @@ export default async function ComparisonPage({
                 Yes, see detail below
               </td>
               <td className="px-4 py-3 align-top text-[0.84rem] text-steel">
-                {free?.feedbackPerMonth ?? 50} pieces of feedback a month, AI included
+                {free?.feedbackPerMonth ?? 25} pieces of feedback a month, AI included
               </td>
             </tr>
             <tr className="border-b border-line">
