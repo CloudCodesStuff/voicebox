@@ -238,11 +238,10 @@ function RevealedKey({
   return (
     <div className="mt-5 rounded-xl border border-mint-line bg-mint-wash p-5">
       <h3 className="text-[0.9rem] font-semibold text-ink">
-        Copy {name} now. You won&apos;t see it again.
+        Copy {name} now
       </h3>
       <p className="mt-1 text-[0.82rem] leading-relaxed text-steel">
-        Only a hash is stored, so this is genuinely the last time it exists
-        anywhere but your clipboard.
+        Only a hash is stored. You won&apos;t be able to see this key again.
       </p>
 
       <div className="mt-3 flex items-center gap-2">
@@ -254,7 +253,7 @@ function RevealedKey({
           onClick={async () => {
             await navigator.clipboard.writeText(plaintext);
             setCopied(true);
-            toast.success("Copied. Put it somewhere safe.");
+            toast.success("Copied.");
             setTimeout(() => setCopied(false), 2000);
           }}
           className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg bg-mint px-4 text-[0.83rem] font-semibold text-mint-ink"
@@ -309,7 +308,7 @@ function Webhooks({ locked }: { locked: boolean }) {
   const test = api.developer.testWebhook.useMutation({
     onSuccess(result) {
       if (result.ok) {
-        toast.success(`Endpoint answered ${result.status}. You're wired up.`);
+        toast.success(`Endpoint answered ${result.status}.`);
       } else {
         toast.error(result.error ?? "Delivery failed.");
       }

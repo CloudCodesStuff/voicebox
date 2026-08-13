@@ -80,7 +80,7 @@ export function ThemeDetail({ themeId }: { themeId: string }) {
 
     await navigator.clipboard.writeText(text);
     setCopied(true);
-    toast.success("Copied, paste it into your planning doc.");
+    toast.success("Copied.");
     setTimeout(() => setCopied(false), 2000);
   }
 
