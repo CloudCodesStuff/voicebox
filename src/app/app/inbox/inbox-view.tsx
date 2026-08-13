@@ -255,58 +255,101 @@ export function InboxView({ initialId }: { initialId?: string }) {
             </label>
 
             <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-paper-2">
-              {items.map((f) => (
-                <li key={f.id} className="flex items-start gap-3 px-4 py-3.5">
-                  <Checkbox
-                    checked={checked.has(f.id)}
-                    onCheckedChange={() => toggle(f.id)}
-                    className="mt-1"
-                    aria-label="Select feedback"
-                  />
+              {items.map((f) => {
+                const isNew = f.status === "NEW";
+                // The summary is the model's one line about the message. When
+                // there is one, the person's own words were never shown in this
+                // list at all, so the row now reads subject-then-preview the way
+                // a mail client does.
+                const preview =
+                  f.summary && f.summary !== f.body ? f.body : null;
 
-                  <button
-                    type="button"
-                    onClick={() => setSelectedId(f.id)}
-                    className="flex min-w-0 flex-1 items-start gap-3 text-left"
+                return (
+                  <li
+                    key={f.id}
+                    className={cn(
+                      "relative flex items-start gap-3 py-3.5 pr-4 pl-4",
+                      isNew && "bg-mint-wash/25",
+                    )}
                   >
-                    <SentimentDot sentiment={f.sentiment} className="mt-1.5" />
+                    {/* Unread was a small word competing with three other
+                        chips. A rail reads before any of them. */}
+                    {isNew && (
+                      <span
+                        aria-hidden="true"
+                        className="absolute inset-y-0 left-0 w-[3px] bg-mint"
+                      />
+                    )}
 
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <TypeIcon type={f.type} className="shrink-0 text-steel" />
-                        <p className="min-w-0 flex-1 truncate text-[0.875rem] font-medium text-ink">
-                          {f.summary ?? f.body}
-                        </p>
+                    <Checkbox
+                      checked={checked.has(f.id)}
+                      onCheckedChange={() => toggle(f.id)}
+                      className="mt-1"
+                      aria-label="Select feedback"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setSelectedId(f.id)}
+                      className="flex min-w-0 flex-1 items-start gap-3 text-left"
+                    >
+                      <SentimentDot sentiment={f.sentiment} className="mt-1.5" />
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <TypeIcon
+                            type={f.type}
+                            className="shrink-0 text-steel"
+                          />
+                          <p
+                            className={cn(
+                              "min-w-0 flex-1 truncate text-[0.875rem] text-ink",
+                              isNew ? "font-semibold" : "font-medium",
+                            )}
+                          >
+                            {f.summary ?? f.body}
+                          </p>
+                          {isNew && (
+                            <span className="sr-only">Unread</span>
+                          )}
+                        </div>
+
+                        {preview && (
+                          <p className="mt-1 truncate text-[0.8rem] leading-relaxed text-steel">
+                            {preview}
+                          </p>
+                        )}
+
+                        <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.72rem] text-steel">
+                          {f.theme && (
+                            <span className="rounded-full bg-mint-wash px-2 py-0.5 font-medium text-mint-deep">
+                              {f.theme.title}
+                            </span>
+                          )}
+                          {f.rating != null && (
+                            <span className="tabular-nums">{f.rating}/5</span>
+                          )}
+                          {/* Where it was sent from. The single most useful
+                              piece of context for reproducing a complaint, and
+                              it was already stored and never shown here. */}
+                          {pagePath(f.pageUrl) && (
+                            <span className="truncate font-mono text-[0.7rem] text-faint">
+                              {pagePath(f.pageUrl)}
+                            </span>
+                          )}
+                        </div>
                       </div>
 
-                      <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                        {f.theme && (
-                          <span className="rounded-full bg-mint-wash px-2 py-0.5 text-[0.72rem] font-medium text-mint-deep">
-                            {f.theme.title}
-                          </span>
-                        )}
-                        {f.rating != null && (
-                          <span className="tnum text-[0.72rem] text-steel">
-                            {f.rating}/5
-                          </span>
-                        )}
-                        {f.status === "NEW" && (
-                          <span className="text-[0.75rem] font-medium text-mint-deep">
-                            New
-                          </span>
-                        )}
+                      <div className="flex shrink-0 flex-col items-end gap-1.5">
+                        <SentimentBadge sentiment={f.sentiment} />
+                        <span className="tabular-nums text-[0.72rem] text-steel">
+                          {relativeTime(f.createdAt)}
+                        </span>
                       </div>
-                    </div>
-
-                    <div className="flex shrink-0 flex-col items-end gap-1.5">
-                      <SentimentBadge sentiment={f.sentiment} />
-                      <span className="tnum text-[0.72rem] text-steel">
-                        {relativeTime(f.createdAt)}
-                      </span>
-                    </div>
-                  </button>
-                </li>
-              ))}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </>
         )}
@@ -321,6 +364,24 @@ export function InboxView({ initialId }: { initialId?: string }) {
       )}
     </div>
   );
+}
+
+/**
+ * Just the path from a stored page URL.
+ *
+ * The origin is the same for every row in a project, so showing it would spend
+ * the width on the one part that never varies. Anything unparseable is dropped
+ * rather than printed raw: this value came from a public endpoint.
+ */
+function pagePath(url: string | null): string | null {
+  if (!url) return null;
+  try {
+    const { pathname, search } = new URL(url);
+    const path = `${pathname}${search}`;
+    return path === "/" ? "/" : path.replace(/\/$/, "");
+  } catch {
+    return null;
+  }
 }
 
 function FilterChips<T extends string>({
