@@ -149,42 +149,6 @@ export default function LandingPage() {
             </p>
           </Reveal>
 
-          {/* The whole mechanism, above the fold, in three short phrases.
-              Everything else on this page elaborates on one of these; someone
-              who reads only this far should still be able to say what the
-              product does and what it would take to run it. */}
-          <Reveal delay={0.52}>
-            <ol className="mt-12 grid max-w-4xl gap-4 sm:grid-cols-3 sm:gap-6">
-              {[
-                {
-                  n: "01",
-                  t: "Paste one line",
-                  d: "One script tag, anywhere before your closing body tag. No package. No build step. Around 11KB.",
-                },
-                {
-                  n: "02",
-                  t: "Your users write in",
-                  d: "A button in the corner, styled to match your site. They pick a type and write.",
-                },
-                {
-                  n: "03",
-                  t: "You get a ranked list",
-                  d: "Every reply scored and grouped. The top of the list is what to fix next.",
-                },
-              ].map((s) => (
-                <li key={s.n} className="border-t border-line pt-4">
-                  <div className="tnum text-[0.72rem] text-mint-deep">{s.n}</div>
-                  <div className="mt-1.5 text-[0.98rem] font-semibold text-ink">
-                    {s.t}
-                  </div>
-                  <p className="mt-1 text-[0.86rem] leading-relaxed text-steel">
-                    {s.d}
-                  </p>
-                </li>
-              ))}
-            </ol>
-          </Reveal>
-
           <Reveal delay={0.54}>
             <div className="mt-14 md:mt-20">
               <BrowserFrame className="mx-auto max-w-full">
