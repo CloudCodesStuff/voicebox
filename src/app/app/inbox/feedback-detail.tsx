@@ -14,7 +14,12 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 
 import { useProject } from "@/components/app/project-context";
-import { SentimentBadge, TypeIcon, relativeTime } from "@/components/app/ui";
+import {
+  SectionHeading,
+  SentimentBadge,
+  TypeIcon,
+  relativeTime,
+} from "@/components/app/ui";
 import {
   Select,
   SelectContent,
@@ -103,9 +108,9 @@ export function FeedbackDetail({
         aria-label="Feedback detail"
       >
         <header className="flex items-center justify-between border-b border-line px-5 py-4">
-          <h2 className="text-[1.05rem] font-bold tracking-tight text-ink">
+          <SectionHeading>
             Feedback
-          </h2>
+          </SectionHeading>
           <button
             type="button"
             onClick={onClose}

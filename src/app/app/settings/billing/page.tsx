@@ -203,7 +203,7 @@ function PlanCard({
       )}
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-[0.92rem] font-semibold text-ink">{p.name}</h3>
+        <h3 className="text-[1rem] font-semibold text-ink">{p.name}</h3>
         {current && (
           <span className="rounded-full bg-ink px-2 py-0.5 text-[0.72rem] font-medium text-paper">
             Current

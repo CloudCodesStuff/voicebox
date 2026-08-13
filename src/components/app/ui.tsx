@@ -166,27 +166,69 @@ export function PageHeader({
   );
 }
 
+/**
+ * One heading for the sections inside a page ("What to work on", "By type").
+ *
+ * It exists because the same rank was being set seven different ways across the
+ * dashboard, from 0.9rem semibold to 1.15rem bold. Same-rank type has to look
+ * the same or the page reads as assembled rather than designed, and a shared
+ * component is the only version of that rule which cannot drift.
+ */
+export function SectionHeading({
+  children,
+  className,
+  as: Tag = "h2",
+}: {
+  children: ReactNode;
+  className?: string;
+  as?: "h2" | "h3";
+}) {
+  return (
+    <Tag
+      className={cn(
+        "text-[1.1rem] leading-tight font-bold tracking-tight text-ink",
+        className,
+      )}
+    >
+      {children}
+    </Tag>
+  );
+}
+
+/**
+ * `tone` is semantic, not decorative.
+ *
+ * It replaces an `accent` boolean that painted its value mint, which meant a
+ * negative share above 40% (the worst number on the page) was drawn in the
+ * colour this product uses for good news. A stat that is bad should look bad.
+ */
 export function StatCard({
   label,
   value,
   hint,
-  accent,
+  tone = "default",
 }: {
   label: string;
+  /** null or undefined renders as an em dash rather than an empty box. */
   value: ReactNode;
   hint?: ReactNode;
-  accent?: boolean;
+  tone?: "default" | "positive" | "negative";
 }) {
+  const empty = value === null || value === undefined || value === "";
+
   return (
     <div className="rounded-xl border border-line bg-paper-2 p-5">
       <div className="label">{label}</div>
       <div
         className={cn(
-          "mt-2 text-[1.7rem] font-bold leading-none tracking-tight",
-          accent ? "text-mint-deep" : "text-ink",
+          "mt-2 text-[1.7rem] leading-none font-bold tracking-tight tabular-nums",
+          empty && "text-faint",
+          !empty && tone === "negative" && "text-negative",
+          !empty && tone === "positive" && "text-positive",
+          !empty && tone === "default" && "text-ink",
         )}
       >
-        {value}
+        {empty ? "—" : value}
       </div>
       {hint && <div className="mt-2 text-[0.78rem] text-steel">{hint}</div>}
     </div>

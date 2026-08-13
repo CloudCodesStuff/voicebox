@@ -1,3 +1,5 @@
+import { SectionHeading } from "@/components/app/ui";
+
 /**
  * Title and purpose for one settings tab.
  *
@@ -15,9 +17,7 @@ export function SectionHeader({
 }) {
   return (
     <div className="mb-6">
-      <h2 className="text-[1.15rem] font-bold tracking-tight text-ink">
-        {title}
-      </h2>
+      <SectionHeading>{title}</SectionHeading>
       <p className="mt-1.5 max-w-[64ch] text-[0.88rem] leading-relaxed text-steel">
         {description}
       </p>

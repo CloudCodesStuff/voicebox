@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import {
+  SectionHeading,
   SentimentBadge,
   SentimentBar,
   SentimentDot,
@@ -120,7 +121,7 @@ export function ThemeDetail({ themeId }: { themeId: string }) {
       <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-[1.5rem] font-bold tracking-tight text-ink">
+            <h1 className="text-[1.55rem] font-bold tracking-tight text-ink">
               {t.title}
             </h1>
             <SentimentBadge sentiment={t.sentiment} />
@@ -217,9 +218,9 @@ export function ThemeDetail({ themeId }: { themeId: string }) {
 
       {/* Quotes */}
       <section className="mt-10">
-        <h2 className="text-[1.1rem] font-bold tracking-tight text-ink">
+        <SectionHeading>
           What people said
-        </h2>
+        </SectionHeading>
         <ul className="mt-4 space-y-2">
           {t.feedback.map((f) => (
             <li

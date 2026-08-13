@@ -6,7 +6,13 @@ import { useState } from "react";
 
 import { useProject } from "@/components/app/project-context";
 import { SentimentLegend, TrendChart } from "@/components/app/trend-chart";
-import { EmptyState, PageHeader, StatCard, TypeIcon } from "@/components/app/ui";
+import {
+  EmptyState,
+  PageHeader,
+  SectionHeading,
+  StatCard,
+  TypeIcon,
+} from "@/components/app/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import { csvCell } from "@/lib/export-safe";
 import { cn } from "@/lib/utils";
@@ -142,20 +148,20 @@ export function TrendsView() {
             <StatCard
               label="Negative share"
               value={`${Math.round((overview.data?.negativeShare ?? 0) * 100)}%`}
-              accent={(overview.data?.negativeShare ?? 0) > 0.4}
+              tone={(overview.data?.negativeShare ?? 0) > 0.4 ? "negative" : "default"}
             />
             <StatCard
               label="Avg rating"
-              value={avgRating ?? ", "}
+              value={avgRating}
               hint={avgRating ? "out of 5" : "no ratings yet"}
             />
           </div>
 
           <section className="mt-9">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-[1.1rem] font-bold tracking-tight text-ink">
+              <SectionHeading>
                 Volume &amp; sentiment
-              </h2>
+              </SectionHeading>
               <SentimentLegend />
             </div>
             <div className="mt-4 rounded-xl border border-line bg-paper-2 p-4">
@@ -164,9 +170,9 @@ export function TrendsView() {
           </section>
 
           <section className="mt-9">
-            <h2 className="text-[1.1rem] font-bold tracking-tight text-ink">
+            <SectionHeading>
               By type
-            </h2>
+            </SectionHeading>
             <div className="mt-4 space-y-2.5 rounded-xl border border-line bg-paper-2 p-5">
               {(byType.data ?? []).map((t) => (
                 <div key={t.type} className="flex items-center gap-3">

@@ -56,7 +56,7 @@ export default function DeveloperSettings() {
 function UpgradeNotice() {
   return (
     <div className="rounded-xl border border-mint-line bg-mint-wash p-5">
-      <h2 className="text-[0.95rem] font-semibold text-ink">
+      <h2 className="text-[1rem] font-semibold text-ink">
         The REST API and webhooks are on Pro.
       </h2>
       <p className="mt-1.5 max-w-[60ch] text-[0.85rem] leading-relaxed text-steel">
@@ -230,7 +230,7 @@ function RevealedKey({
 
   return (
     <div className="mt-5 rounded-xl border border-mint-line bg-mint-wash p-5">
-      <h3 className="text-[0.9rem] font-semibold text-ink">
+      <h3 className="text-[1rem] font-semibold text-ink">
         Copy {name} now
       </h3>
       <p className="mt-1 text-[0.82rem] leading-relaxed text-steel">

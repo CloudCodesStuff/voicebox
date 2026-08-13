@@ -374,7 +374,7 @@ function Step({
       <span className="absolute top-0 left-0 flex size-7 items-center justify-center rounded-full border border-line bg-paper-2 text-[0.75rem] font-semibold text-steel tabular-nums">
         {n}
       </span>
-      <h2 className="pt-1 text-[0.95rem] font-semibold text-ink">{title}</h2>
+      <h2 className="pt-1 text-[1rem] font-semibold text-ink">{title}</h2>
       <div className="mt-3">{children}</div>
     </li>
   );

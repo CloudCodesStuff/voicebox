@@ -11,6 +11,7 @@ import { useProject } from "@/components/app/project-context";
 import { SentimentLegend, TrendChart } from "@/components/app/trend-chart";
 import {
   EmptyState,
+  SectionHeading,
   PageHeader,
   SentimentBar,
   SentimentDot,
@@ -127,7 +128,7 @@ export function Overview() {
               label="Negative share"
               value={`${Math.round(data!.negativeShare * 100)}%`}
               hint={`${data!.sentiment.NEGATIVE} of ${data!.analyzed} analyzed`}
-              accent={data!.negativeShare > 0.4}
+              tone={data!.negativeShare > 0.4 ? "negative" : "default"}
             />
             <StatCard
               label="All time"
@@ -149,9 +150,9 @@ export function Overview() {
           <section className="mt-10">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h2 className="text-[1.15rem] font-bold tracking-tight text-ink">
+                <SectionHeading>
                   What to work on
-                </h2>
+                </SectionHeading>
                 <p className="mt-1 text-[0.8rem] text-steel">
                   How many people, how unhappy, and how recently
                 </p>
@@ -245,9 +246,9 @@ export function Overview() {
           {/* Trend */}
           <section className="mt-10">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-[1.15rem] font-bold tracking-tight text-ink">
+              <SectionHeading>
                 Sentiment over time
-              </h2>
+              </SectionHeading>
               <SentimentLegend />
             </div>
             <div className="mt-4 rounded-xl border border-line bg-paper-2 p-4">
@@ -262,9 +263,9 @@ export function Overview() {
           {/* Latest */}
           <section className="mt-10">
             <div className="flex items-center justify-between">
-              <h2 className="text-[1.15rem] font-bold tracking-tight text-ink">
+              <SectionHeading>
                 Latest feedback
-              </h2>
+              </SectionHeading>
               <Link
                 href="/app/inbox"
                 className="text-[0.82rem] font-medium text-steel hover:text-ink"

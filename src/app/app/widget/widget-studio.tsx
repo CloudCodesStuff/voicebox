@@ -632,7 +632,7 @@ function StudioEditor({
             already. */}
         <div className="order-first min-w-0 lg:order-none lg:sticky lg:top-8 lg:self-start">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-[0.9rem] font-semibold text-ink">Preview</h2>
+            <h2 className="text-[1rem] font-semibold text-ink">Preview</h2>
             <div
               role="group"
               aria-label="Preview state"
@@ -887,7 +887,7 @@ function Panel({
     >
       <div className="mb-5 flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
         <div>
-          <h2 className="text-[0.95rem] font-semibold text-ink">{title}</h2>
+          <h2 className="text-[1rem] font-semibold text-ink">{title}</h2>
           {hint && <p className="mt-1 text-[0.8rem] text-steel">{hint}</p>}
         </div>
         {/* The header answers "what's it set to right now" without reading
