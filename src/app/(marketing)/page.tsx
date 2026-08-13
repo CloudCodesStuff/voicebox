@@ -223,7 +223,7 @@ export default function LandingPage() {
         className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-20 lg:py-28"
       >
         <Reveal>
-          <h2 className="text-2xl tracking-tight text-balance text-ink md:text-4xl lg:text-5xl">
+          <h2 className="text-2xl font-bold tracking-tight text-balance text-ink md:text-4xl lg:text-5xl">
             Collect. Score. Group. Rank.
           </h2>
         </Reveal>
@@ -325,7 +325,7 @@ export default function LandingPage() {
       <div className="mx-auto max-w-4xl overflow-hidden px-4 py-16 md:px-8 md:py-28">
         <Reveal>
           <div className="text-center">
-            <h2 className="text-2xl tracking-tight text-balance text-ink md:text-4xl lg:text-5xl">
+            <h2 className="text-2xl font-bold tracking-tight text-balance text-ink md:text-4xl lg:text-5xl">
               Questions people ask
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-sm text-steel md:text-base lg:text-lg">
@@ -341,7 +341,7 @@ export default function LandingPage() {
       <section className="mx-auto my-10 grid w-full max-w-7xl grid-cols-1 items-center gap-10 px-4 md:my-20 md:grid-cols-2 md:gap-16 md:px-8">
         <Reveal>
           <div className="max-w-xl">
-            <h2 className="text-3xl font-bold tracking-tight text-balance text-ink md:text-4xl lg:text-5xl">
+            <h2 className="text-2xl font-bold tracking-tight text-balance text-ink md:text-4xl lg:text-5xl">
               Know what to fix by tomorrow.
             </h2>
             <p className="mt-6 max-w-lg text-base text-steel lg:text-lg">
