@@ -302,8 +302,11 @@
       // also matches the order people answer in.
       ".rate{display:flex;align-items:center;gap:10px;margin-bottom:10px;min-height:28px;}" +
       ".rate-label{font-size:12.5px;color:" + muted + ";white-space:nowrap;}" +
-      // Pushed to the right edge, so the row is anchored at both ends.
-      ".stars{display:flex;gap:1px;margin-left:auto;}" +
+      // The auto margin that anchors this row to the right edge lives on
+      // .rate-value now (the word before the stars), so the stars hold still
+      // while the word grows. The numbers layout has no word and fills the row
+      // with flex:1 instead, so it needs no push of its own.
+      ".stars{display:flex;gap:1px;}" +
       // Numbers are boxes rather than glyphs, so they stretch to share the
       // whole remaining width instead of huddling in a corner.
       ".stars.nums{flex:1;margin-left:0;gap:6px;}" +
@@ -314,7 +317,10 @@
       ".star svg{fill:currentColor;stroke:none;display:block;}" +
       ".star.on{color:" + c.accentColor + ";}" +
       ".star:focus-visible{outline:2px solid " + c.accentColor + ";outline-offset:1px;border-radius:4px;}" +
-      ".rate-value{font-size:12px;color:" + faint + ";font-variant-numeric:tabular-nums;}" +
+      // margin-left:auto anchors the word + stars to the right; the word grows
+      // into the empty space to its own left, leaving the stars fixed.
+      ".rate-value{font-size:12px;color:" + faint + ";font-variant-numeric:tabular-nums;" +
+      "margin-left:auto;white-space:nowrap;}" +
       ".num{min-width:30px;height:28px;display:grid;place-items:center;border:1px solid " + border + ";" +
       "border-radius:" + (r > 0 ? 6 : 0) + "px;background:transparent;cursor:pointer;font-size:12.5px;" +
       "font-variant-numeric:tabular-nums;color:" + muted + ";transition:all .12s;}" +
@@ -389,11 +395,16 @@
           : '<button class="num" type="button" aria-label="' + i + ' out of 5" data-rate="' +
             i + '">' + i + "</button>";
       }
+      // The score word sits BEFORE the stars, not after. It carries the
+      // right-pushing auto margin, so when a word appears on hover it grows
+      // leftward into empty space and the stars stay pinned to the right edge.
+      // After the stars, any width it gained would shove the whole group left
+      // and the stars would visibly jump on every hover.
       rating =
         '<div class="rate">' +
         '<span class="rate-label">How was it?</span>' +
-        '<div class="stars' + (useStars ? "" : " nums") + '">' + marks + "</div>" +
         (useStars ? '<span class="rate-value"></span>' : "") +
+        '<div class="stars' + (useStars ? "" : " nums") + '">' + marks + "</div>" +
         "</div>";
     }
 
