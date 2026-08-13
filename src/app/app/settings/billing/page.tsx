@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { plans } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/client";
+import { SectionHeader } from "../section-header";
 
 type BillingInterval = "monthly" | "annual";
 
@@ -22,6 +23,10 @@ export default function BillingSettings() {
 
   return (
     <div className="space-y-6">
+      <SectionHeader
+        title="Billing"
+        description="Your plan, how much of this month's feedback allowance you've used, and where to change either. Plans are priced on how much feedback you collect; the AI analysis is included on every one."
+      />
       <section className="rounded-xl border border-line bg-paper-2 p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>

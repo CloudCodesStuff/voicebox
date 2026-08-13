@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/trpc/client";
+import { SectionHeader } from "../section-header";
 
 export default function ProjectSettings() {
   const utils = api.useUtils();
@@ -89,6 +90,10 @@ export default function ProjectSettings() {
 
   return (
     <div className="space-y-4">
+      <SectionHeader
+        title="Projects"
+        description="One project per site or app you collect from, each with its own widget, its own feedback and its own themes. This is also where you get a project's key and lock it to your domains."
+      />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-[0.85rem] text-steel">
           {projects.data?.length} of {limit ?? "unlimited"} projects

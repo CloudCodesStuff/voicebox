@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/trpc/client";
+import { SectionHeader } from "../section-header";
 
 export default function GeneralSettings() {
   const org = api.org.current.useQuery();
@@ -89,6 +90,10 @@ function GeneralForm({
 
   return (
     <div className="space-y-6">
+      <SectionHeader
+        title="General"
+        description="Your workspace name and timezone, the weekly digest email, whether feedback is sent for AI analysis, and the controls for exporting or deleting everything you hold here."
+      />
       <section className="rounded-xl border border-line bg-paper-2 p-6">
         <h2 className="text-[1rem] font-semibold text-ink">Organization</h2>
         <p className="mt-1 text-[0.85rem] text-steel">

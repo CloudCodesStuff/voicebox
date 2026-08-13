@@ -26,6 +26,7 @@ import {
 } from "@/lib/webhook-events";
 import { api } from "@/trpc/client";
 import { cn } from "@/lib/utils";
+import { SectionHeader } from "../section-header";
 
 export default function DeveloperSettings() {
   const org = api.org.current.useQuery();
@@ -38,6 +39,10 @@ export default function DeveloperSettings() {
 
   return (
     <div className="space-y-6">
+      <SectionHeader
+        title="Developers"
+        description="Pull your feedback and themes into your own tools. API keys are for reading data out; webhooks push an event to you the moment something arrives, so you can post it to Slack or open a ticket automatically."
+      />
       {gated && <UpgradeNotice />}
       <ApiKeys locked={gated} />
       <Webhooks locked={gated} />

@@ -119,10 +119,15 @@ export default function LandingPage() {
             className="mt-5 max-w-4xl text-[2.5rem] leading-[1.05] font-medium tracking-[-0.035em] text-ink md:text-7xl"
           />
 
+          {/* This sentence, not the headline, is the one that says what the
+              product actually is, so it is sized and coloured to be read
+              rather than skimmed. As grey fine print under a slogan it left
+              people three seconds in still not knowing what they were
+              looking at. */}
           <Reveal delay={0.3}>
-            <p className="mt-5 max-w-2xl text-base text-steel md:text-xl">
-              {site.name} is a feedback widget you paste into your site, and an AI that
-              reads every reply and tells you what to fix first.
+            <p className="mt-6 max-w-3xl text-[1.15rem] leading-relaxed text-ink/85 md:text-[1.45rem]">
+              A feedback widget you paste into your site, and an AI that reads
+              every reply and tells you what to fix first.
             </p>
           </Reveal>
 
@@ -144,8 +149,44 @@ export default function LandingPage() {
             </p>
           </Reveal>
 
+          {/* The whole mechanism, above the fold, in three short phrases.
+              Everything else on this page elaborates on one of these; someone
+              who reads only this far should still be able to say what the
+              product does and what it would take to run it. */}
+          <Reveal delay={0.52}>
+            <ol className="mt-12 grid max-w-4xl gap-4 sm:grid-cols-3 sm:gap-6">
+              {[
+                {
+                  n: "01",
+                  t: "Paste one line",
+                  d: "A script tag, anywhere before your closing body tag. No package, no build step.",
+                },
+                {
+                  n: "02",
+                  t: "Your users write in",
+                  d: "A button in the corner of your site, styled to match it. They pick a type and type.",
+                },
+                {
+                  n: "03",
+                  t: "You get a ranked list",
+                  d: "Every reply scored and grouped, so the top of the list is the thing worth fixing next.",
+                },
+              ].map((s) => (
+                <li key={s.n} className="border-t border-line pt-4">
+                  <div className="tnum text-[0.72rem] text-mint-deep">{s.n}</div>
+                  <div className="mt-1.5 text-[0.98rem] font-semibold text-ink">
+                    {s.t}
+                  </div>
+                  <p className="mt-1 text-[0.86rem] leading-relaxed text-steel">
+                    {s.d}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </Reveal>
+
           <Reveal delay={0.54}>
-            <div className="mt-16 md:mt-24">
+            <div className="mt-14 md:mt-20">
               <BrowserFrame className="mx-auto max-w-full">
                 <DashboardMock className="absolute inset-0" />
               </BrowserFrame>

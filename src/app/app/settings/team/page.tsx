@@ -27,6 +27,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/trpc/client";
+import { SectionHeader } from "../section-header";
 
 /**
  * Pulls addresses out of whatever got pasted.
@@ -127,6 +128,10 @@ export default function TeamSettings() {
 
   return (
     <div className="space-y-6">
+      <SectionHeader
+        title="Team"
+        description="Who can see this workspace and what they can change. Admins invite people and manage projects; members read feedback and act on it. Everyone can leave on their own."
+      />
       <section className="rounded-xl border border-line bg-paper-2 p-6">
         <h2 className="text-[1rem] font-semibold text-ink">Members</h2>
         <p className="mt-1 text-[0.83rem] text-steel">
