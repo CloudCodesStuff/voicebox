@@ -365,6 +365,21 @@
       // 16px is the smallest size iOS will render without zooming the whole
       // page on focus, which on a fixed panel leaves it scrolled off-screen.
       ".panel textarea,.panel input[type=email]{font-size:16px;}" +
+      "}" +
+      // Short screens: a laptop with the console open, a phone in landscape.
+      // The body already scrolls, but a panel that needs scrolling to reach its
+      // own Send button feels broken. Tighten the vertical spending so the whole
+      // form fits without scrolling down to about 560px of height: a shorter
+      // text box (it still grows as you type), less padding, tighter gaps. The
+      // 100dvh max-height and the scroll are the backstop below that.
+      "@media(max-height:560px){" +
+      ".head{padding-top:12px;}" +
+      ".sub{margin-top:3px;}" +
+      ".body{padding-top:10px;padding-bottom:8px;}" +
+      "textarea{min-height:52px;}" +
+      ".rate{margin-bottom:8px;min-height:24px;}" +
+      ".types{margin-bottom:8px;}" +
+      ".foot{padding:6px 16px;}" +
       "}"
     );
   }
@@ -547,7 +562,12 @@
     requestAnimationFrame(function () {
       panel.classList.add("in");
       var ta = panel.querySelector("textarea");
-      if (ta) ta.focus();
+      // preventScroll matters on short screens. Focusing the textarea scrolls
+      // it into view inside the scrolling .body, and since the textarea sits
+      // below the type grid that scroll pushes the types up out of sight, so
+      // the panel opens looking like its top was cut off. Keep the cursor in
+      // the box without moving the body; the type grid stays visible.
+      if (ta) ta.focus({ preventScroll: true });
     });
 
     bind(panel);
@@ -603,7 +623,7 @@
         state.type = btn.getAttribute("data-type");
         var meta = TYPE_META[state.type];
         if (meta) ta.setAttribute("placeholder", meta.ph);
-        ta.focus();
+        ta.focus({ preventScroll: true });
       });
     });
 
