@@ -70,7 +70,7 @@ affected rather than keyword frequency.
 Technical bits that were actually interesting to build:
 
 - The widget renders entirely in a Shadow DOM root with `all: initial`, so host
-  CSS cannot reach in and nothing leaks out. It is under 6KB over the wire,
+  CSS cannot reach in and nothing leaks out. It is around 11KB over the wire,
   zero dependencies, and mounts on requestIdleCallback so it never blocks the
   host page. If our API is unreachable it renders nothing rather than throwing
   into someone else's error tracking.
@@ -126,7 +126,7 @@ messages describing the same problem into a single theme with a count. Five
 different wordings of "your export is broken" become one item, ranked against
 everything else by how many people, how unhappy, and how recently.
 
-It is under 6KB, renders in a Shadow DOM root so it cannot collide with your
+It is around 11KB, renders in a Shadow DOM root so it cannot collide with your
 CSS, and takes about four minutes to install.
 
 Free tier is 50 pieces of feedback a month with the AI on. No customers yet,
@@ -238,7 +238,7 @@ by how many people are affected and how unhappy they were.
 You get a list of six things to fix instead of four hundred messages you keep
 meaning to read.
 
-- One line to install. No package, no build step, under 6KB.
+- One line to install. No package, no build step, around 11KB.
 - Renders in a Shadow DOM root, so it cannot collide with your styles.
 - Every submission scored for tone and intent within seconds.
 - Priced on feedback volume, not tracked users and not per seat.
@@ -281,7 +281,7 @@ Post the 30-second clip as the first tweet. The clip does the work.
 I built a widget that groups replies by the problem underneath, so you get a
 ranked list of what to fix instead of an inbox.
 
-One script tag. Under 6KB. Four minutes.
+One script tag. Around 11KB. Four minutes.
 
 [clip]
 

@@ -288,7 +288,7 @@ Voicebox("open")`}
       </p>
 
       <Callout type="note" title="Weight and timing">
-        Under 6KB over the wire, no dependencies, and nothing renders until the browser is
+        Around 11KB over the wire, no dependencies, and nothing renders until the browser is
         idle. It never blocks your page, and if our server is unreachable the
         script fails quietly rather than throwing into your error tracking.
       </Callout>

@@ -37,7 +37,7 @@ problem into ranked themes.
 ## What it does
 
 - Collects written feedback through a widget rendered in a Shadow DOM root, so
-  host page CSS cannot affect it and its styles cannot leak out. Under 6KB
+  host page CSS cannot affect it and its styles cannot leak out. Around 11KB
   over the wire, no dependencies, loaded on browser idle.
 - Scores each submission for sentiment and intent, writes a one-line summary,
   and assigns a category.
