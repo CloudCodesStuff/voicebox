@@ -224,6 +224,37 @@ export default function ProjectSettings() {
             </div>
           </div>
 
+          {/* Directly under the key, because the key is the thing at risk.
+              This is the default state of every new project, so it has to be
+              impossible to skim past: full amber panel, not a tinted line of
+              small print. */}
+          {p.allowedDomains.length === 0 && (
+            <div className="mt-4 rounded-xl border-2 border-mixed/50 bg-mixed-wash p-4 sm:p-5">
+              <div className="flex gap-3">
+                <TriangleAlert className="mt-0.5 size-5 shrink-0 text-mixed" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[0.98rem] font-bold tracking-tight text-ink">
+                    Anyone can use this key on their own site
+                  </p>
+                  <p className="mt-1.5 text-[0.87rem] leading-relaxed text-steel">
+                    You haven&apos;t set any allowed domains, so this project
+                    accepts feedback from{" "}
+                    <strong className="font-semibold text-ink">
+                      any website in the world
+                    </strong>
+                    . The key above is visible in your page source. Anyone who
+                    views it can paste your widget onto their site, and whatever
+                    their visitors send lands in your inbox and counts against
+                    your monthly limit.
+                  </p>
+                  <p className="mt-2 text-[0.87rem] font-medium text-ink">
+                    Add your domains below to stop that.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <DomainAllowlist
             projectId={p.id}
             domains={p.allowedDomains}
@@ -295,36 +326,6 @@ function DomainAllowlist({
         <code className="font-mono">app.acme.com</code>.
       </p>
 
-      {/* An empty list is the dangerous state, and it is also the default, so
-          it cannot be a grey footnote under the field. Your project key is
-          published in your page source by design, and with no allowlist that
-          key is all anyone needs to post into your inbox from their own site.
-          Spelled out in full because the consequence is not obvious from the
-          words "allowed domains". */}
-      {domains.length === 0 && (
-        <div className="mt-2.5 rounded-lg border border-mixed/40 bg-mixed-wash p-3.5">
-          <div className="flex gap-2.5">
-            <TriangleAlert className="mt-0.5 size-4 shrink-0 text-mixed" />
-            <div className="min-w-0 flex-1 text-[0.8rem] leading-relaxed">
-              <p className="font-semibold text-ink">
-                Anyone can send feedback to this project
-              </p>
-              <p className="mt-1 text-steel">
-                With no domains listed, this project accepts submissions from{" "}
-                <strong className="font-semibold text-ink">any website</strong>.
-                Your project key is visible in your page source, so anyone who
-                views it can paste your widget onto their own site and their
-                visitors&apos; feedback, or anything they choose to send, lands
-                in your inbox and counts against your monthly limit.
-              </p>
-              <p className="mt-1.5 text-steel">
-                Add your domains below to shut that off. Takes a few seconds and
-                you only do it once.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
       <textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}

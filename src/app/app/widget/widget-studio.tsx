@@ -204,7 +204,8 @@ function StudioEditor({
     <div className="mx-auto max-w-6xl px-4 py-8 pb-28 sm:px-6">
       <PageHeader
         title="Widget"
-        subtitle="Changes go live on your site within a minute"
+        description="Design the feedback form your visitors see, and get the one line of code that puts it on your site. Everything here updates live in the preview."
+        subtitle="Changes save to your live widget within a minute, with no redeploy"
         actions={
           <a
             href="#install"
@@ -216,8 +217,12 @@ function StudioEditor({
         }
       />
 
+      {/* min-w-0 on both columns. Grid items default to min-width:auto, which
+          means they refuse to shrink below their widest content, so the code
+          snippet and the preview card were forcing the whole page 200px wider
+          than a phone and the studio scrolled sideways. */}
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_400px]">
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <Panel
             title="Colour"
             hint="Buttons, chips and stars all take this colour."
@@ -619,7 +624,13 @@ function StudioEditor({
         </div>
 
         {/* Live preview */}
-        <div className="lg:sticky lg:top-8 lg:self-start">
+        {/* First on mobile, second on desktop. Stacked in source order the
+            preview landed below every control, so on a phone you changed a
+            colour and had to scroll a page and a half to see what it did,
+            which is the one thing a live preview exists for. On desktop it
+            sits beside the controls and sticks, so the order there is right
+            already. */}
+        <div className="order-first min-w-0 lg:order-none lg:sticky lg:top-8 lg:self-start">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-[0.9rem] font-semibold text-ink">Preview</h2>
             <div

@@ -62,6 +62,7 @@ export function ThemesView() {
     <div className="mx-auto max-w-5xl px-4 py-8 pb-24 sm:px-6">
       <PageHeader
         title="Themes"
+        description={`A theme is one problem, however many different ways people described it. "Export is slow" and "the download keeps failing" end up in the same place, so the count is the number of people affected, not how often a word appeared. Ranked by volume, unhappiness and recency, so start at the top.`}
         subtitle={`${list.length} ${status.toLowerCase()}, sorted by ${sort.toLowerCase()}`}
         actions={
           <WorkingButton
@@ -75,14 +76,6 @@ export function ThemesView() {
           />
         }
       />
-
-      <p className="mt-3 max-w-[68ch] text-[0.88rem] leading-relaxed text-steel">
-        A theme is one problem, however many different ways people described it.
-        &ldquo;Export is slow&rdquo; and &ldquo;the download keeps
-        failing&rdquo; end up in the same place, so the count next to it is the
-        number of people affected rather than the number of times a word
-        appeared.
-      </p>
 
       <div className="mt-6 flex flex-wrap items-center gap-2">
         <div className="flex gap-1 rounded-lg border border-line p-0.5">

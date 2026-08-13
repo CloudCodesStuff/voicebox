@@ -73,6 +73,7 @@ export function TrendsView() {
     <div className="mx-auto max-w-5xl px-4 py-8 pb-24 sm:px-6">
       <PageHeader
         title="Trends"
+        description="Whether things are getting better or worse. Volume and sentiment over time, so you can tell a bad week from a bad direction."
         subtitle={activeProject ? `${activeProject.name} · ${days} days` : undefined}
         actions={
           <div className="flex items-center gap-2">

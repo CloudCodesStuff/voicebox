@@ -125,21 +125,40 @@ export function TypeIcon({
   return <Icon className={cn("size-3.5", className)} strokeWidth={1.9} />;
 }
 
+/**
+ * Page title, what the page is for, and what you're currently looking at.
+ *
+ * `description` and `subtitle` answer different questions and both are worth
+ * the line. A page that only says "5 open, sorted by priority" tells someone
+ * who already knows what a theme is how many there are, and tells everyone
+ * else nothing. The description is written for the person seeing the screen
+ * for the first time; the subtitle is the live state for the person who uses
+ * it daily.
+ */
 export function PageHeader({
   title,
+  description,
   subtitle,
   actions,
 }: {
   title: string;
+  /** One plain sentence: what this page is for. */
+  description?: string;
+  /** Current state: counts, filters, which project. */
   subtitle?: ReactNode;
   actions?: ReactNode;
 }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
-      <div>
+      <div className="min-w-0">
         <h1 className="text-[1.55rem] font-bold tracking-tight text-ink">
           {title}
         </h1>
+        {description && (
+          <p className="mt-1.5 max-w-[62ch] text-[0.88rem] leading-relaxed text-steel">
+            {description}
+          </p>
+        )}
         {subtitle && <div className="label mt-1.5">{subtitle}</div>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}

@@ -105,7 +105,12 @@ export function AppShell({
 
       {/* Mobile header */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-16 items-center justify-between border-b border-line bg-paper-2 px-4 lg:hidden">
+        {/* Sticky, because the pages under it are long. The desktop sidebar is
+            always on screen; on mobile this bar was the only way to navigate
+            and it scrolled away with the content, so getting to another page
+            from halfway down the overview meant scrolling back to the top
+            first. z-40 keeps it over page content but under the widget. */}
+        <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-line bg-paper-2 px-4 lg:hidden">
           <Link href="/app" aria-label="Voicebox">
             <Wordmark />
           </Link>
@@ -119,8 +124,12 @@ export function AppShell({
           </button>
         </header>
 
+        {/* Sticky under the bar it drops from, and never taller than what is
+            left of the screen. On a short screen, or in landscape, the account
+            row at the bottom used to sit below the fold of a panel that gave
+            no sign it could scroll. */}
         {mobileOpen && (
-          <div className="border-b border-line bg-paper-2 px-3 pb-4 lg:hidden">
+          <div className="sticky top-16 z-40 max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-line bg-paper-2 px-3 pb-4 lg:hidden">
             <div className="pt-3">
               <ProjectSwitcher />
             </div>

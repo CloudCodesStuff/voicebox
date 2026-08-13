@@ -80,6 +80,7 @@ export function Overview() {
     <div className="mx-auto max-w-5xl px-4 py-8 pb-24 sm:px-6">
       <PageHeader
         title="Overview"
+        description="What your users are telling you, and what to do about it first."
         subtitle={
           activeProject
             ? `${activeProject.name} · last ${days} days`

@@ -107,6 +107,7 @@ export function InboxView({ initialId }: { initialId?: string }) {
     <div className="mx-auto max-w-5xl px-4 py-8 pb-24 sm:px-6">
       <PageHeader
         title="Inbox"
+        description="Every individual piece of feedback, newest first. Each one is scored for tone and given a one-line summary as it arrives. Read, reply by email, and archive what you've dealt with."
         subtitle={
           list.data ? `${items.length} shown` : activeProject?.name ?? undefined
         }
