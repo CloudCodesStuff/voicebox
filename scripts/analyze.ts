@@ -27,13 +27,26 @@ if (!process.env.DEEPSEEK_API_KEY) {
 
 const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 
+/**
+ * Optional project ids, which matter more than they look. Without them this
+ * sweeps every project in the database, and against a production connection
+ * that means re-clustering other people's workspaces and rewriting their themes
+ * to backfill one of your own. Pass ids whenever the target is known.
+ */
+const only = process.argv.slice(2).filter((a) => !a.startsWith("-"));
+
 async function main() {
   const projects = await db.project.findMany({
+    where: only.length > 0 ? { id: { in: only } } : undefined,
     select: { id: true, name: true, _count: { select: { feedback: true } } },
   });
 
   if (projects.length === 0) {
-    console.log("\nNo projects found. Run `npm run db:seed` first.\n");
+    console.log(
+      only.length > 0
+        ? `\nNo project matched ${only.join(", ")}.\n`
+        : "\nNo projects found. Run `npm run db:seed` first.\n",
+    );
     return;
   }
 
