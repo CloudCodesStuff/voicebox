@@ -11,6 +11,7 @@ import {
   Layers,
   LogOut,
   Menu,
+  Plug,
   Plus,
   Settings,
   Sparkles,
@@ -39,6 +40,7 @@ const nav = [
   { href: "/app/themes", label: "Themes", icon: Layers, tour: "nav-themes" },
   { href: "/app/trends", label: "Trends", icon: BarChart3, tour: "nav-trends" },
   { href: "/app/widget", label: "Widget", icon: LayoutGrid, tour: "nav-widget" },
+  { href: "/app/mcp", label: "MCP", icon: Plug, tour: undefined },
   { href: "/app/settings", label: "Settings", icon: Settings, tour: undefined },
 ];
 

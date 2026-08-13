@@ -24,7 +24,6 @@ import {
   WEBHOOK_EVENT_LABELS,
   type WebhookEvent,
 } from "@/lib/webhook-events";
-import { site } from "@/lib/site";
 import { api } from "@/trpc/client";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "../section-header";
@@ -196,28 +195,21 @@ function ApiKeys({ restGated }: { restGated: boolean }) {
         </p>
       )}
 
-      {/* The same key drives the MCP server, so this is where an agent user
-          picks it up. Read-only, one line to wire in. */}
-      <div className="mt-6 rounded-lg border border-line bg-paper p-4">
-        <div className="text-[0.83rem] font-medium text-ink">
-          Use it from a coding agent
-        </div>
-        <p className="mt-1 text-[0.8rem] leading-relaxed text-steel">
-          The same key connects Voicebox as an MCP server, so Claude Code or
-          Cursor can read your ranked themes while you work.
+      {/* Connecting an agent lives on its own tab now; this key is what it
+          uses, so point there rather than duplicating the setup. */}
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-paper p-4">
+        <p className="text-[0.8rem] leading-relaxed text-steel">
+          Connecting Claude, Cursor or Codex to this key lives on the{" "}
+          <Link href="/app/mcp" className="font-medium text-mint-deep hover:underline">
+            MCP
+          </Link>{" "}
+          tab, with per-agent steps.
         </p>
-        <pre className="mt-2.5 overflow-x-auto rounded-md bg-slab p-3 font-mono text-[0.72rem] leading-relaxed text-slab-fg">
-          <code>
-            {`claude mcp add --transport http voicebox \\
-  ${site.url}/api/mcp \\
-  --header "Authorization: Bearer sk_…"`}
-          </code>
-        </pre>
         <Link
-          href="/docs/api#model-context-protocol"
-          className="mt-2 inline-block text-[0.8rem] text-mint-deep hover:underline"
+          href="/app/mcp"
+          className="inline-flex min-h-9 items-center rounded-lg border border-line bg-paper-2 px-3 text-[0.8rem] font-medium text-ink hover:bg-sunken"
         >
-          MCP setup and tools
+          Open MCP
         </Link>
       </div>
     </section>
