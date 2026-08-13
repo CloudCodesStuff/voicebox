@@ -4,12 +4,13 @@ import { ArrowRight } from "lucide-react";
 
 import { Callout, CodeBlock } from "@/components/marketing/docs";
 import { site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Documentation",
   description: `Install the ${site.name} widget, customize it, and pull your feedback out via the API.`,
-  alternates: { canonical: "/docs" },
-};
+  path: "/docs",
+});
 
 const stages = [
   {

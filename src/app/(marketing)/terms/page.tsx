@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 
 import { Clause, LegalPage } from "@/components/marketing/legal";
 import { site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Terms of Service",
   description: `The agreement between your team and ${site.name}, what the service does, what it costs, and what happens to your data.`,
-  alternates: { canonical: "/terms" },
-};
+  path: "/terms",
+});
 
 const UPDATED = "August 12, 2026";
 

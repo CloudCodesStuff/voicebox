@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 
 import { Clause, LegalPage } from "@/components/marketing/legal";
 import { site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Privacy Policy",
   description: `How ${site.name} collects, uses, stores, and shares information, including exactly what does and doesn't get sent to a language model.`,
-  alternates: { canonical: "/privacy" },
-};
+  path: "/privacy",
+});
 
 const UPDATED = "August 12, 2026";
 

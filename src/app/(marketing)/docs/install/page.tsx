@@ -3,13 +3,13 @@ import Link from "next/link";
 
 import { Callout, CodeBlock, CodeTabs, H2 } from "@/components/marketing/docs";
 import { site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Install the widget",
-  description:
-    "Add the Voicebox feedback widget to any site: plain HTML, Next.js, React, Vue, Nuxt, Svelte, Astro, WordPress, Shopify, Webflow, or Google Tag Manager.",
-  alternates: { canonical: "/docs/install" },
-};
+  description: "Add the Voicebox feedback widget to any site: plain HTML, Next.js, React, Vue, Nuxt, Svelte, Astro, WordPress, Shopify, Webflow, or Google Tag Manager.",
+  path: "/docs/install",
+});
 
 const SRC = `${site.url}/widget.js`;
 const KEY = "pk_live_your_key";

@@ -1,0 +1,13 @@
+# How to report a security problem with Voicebox.
+#
+# Cheap to publish, and the difference between a researcher emailing you and a
+# researcher posting. Expires because a stale contact is worse than none: RFC
+# 9116 requires the field, and browsers and scanners will flag it once passed.
+
+Contact: mailto:support@usevoicebox.dev
+Expires: 2027-08-13T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://www.usevoicebox.dev/.well-known/security.txt
+
+# We have no bug bounty. We will confirm receipt, credit you if you want it,
+# and tell you when it is fixed.

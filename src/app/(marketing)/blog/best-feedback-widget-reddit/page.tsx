@@ -17,23 +17,19 @@ import {
   UL,
 } from "@/components/marketing/article";
 import { getPost } from "@/lib/blog";
-import { site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
 const post = getPost("best-feedback-widget-reddit")!;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: post.title,
   description: post.description,
-  alternates: { canonical: `/blog/${post.slug}` },
-  openGraph: {
-    type: "article",
-    title: post.title,
-    description: post.description,
-    url: `${site.url}/blog/${post.slug}`,
-    publishedTime: post.published,
-    modifiedTime: post.updated,
-  },
-};
+  path: `/blog/${post.slug}`,
+  type: "article",
+  published: post.published,
+  modified: post.updated,
+  ogSlug: post.slug,
+});
 
 const faqs = [
   {

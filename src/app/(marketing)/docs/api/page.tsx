@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 
 import { CodeBlock } from "@/components/marketing/docs";
 import { WEBHOOK_EVENTS, WEBHOOK_EVENT_LABELS } from "@/lib/webhook-events";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "API & webhooks",
-  description:
-    "Submit feedback programmatically, read your themes back out, and get signed webhooks when things change.",
-  alternates: { canonical: "/docs/api" },
-};
+  description: "Submit feedback programmatically, read your themes back out, and get signed webhooks when things change.",
+  path: "/docs/api",
+});
 
 const endpoints = [
   {

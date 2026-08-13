@@ -5,13 +5,13 @@ import { ArrowRight } from "lucide-react";
 import { comparisons } from "@/lib/comparisons";
 import { postsByDate } from "@/lib/blog";
 import { site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Blog",
-  description:
-    "Practical writing on collecting user feedback, choosing a feedback tool, and turning a pile of replies into a list of things to fix.",
-  alternates: { canonical: "/blog" },
-};
+  description: "Practical writing on collecting user feedback, choosing a feedback tool, and turning a pile of replies into a list of things to fix.",
+  path: "/blog",
+});
 
 export default function BlogIndex() {
   return (

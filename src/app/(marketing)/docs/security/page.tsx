@@ -3,12 +3,13 @@ import Link from "next/link";
 
 import { Callout, CodeBlock, H2 } from "@/components/marketing/docs";
 import { site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Security & privacy",
   description: `How ${site.name} keys work, how to lock the widget to your domains, what to put in your Content Security Policy, and exactly what data leaves your page.`,
-  alternates: { canonical: "/docs/security" },
-};
+  path: "/docs/security",
+});
 
 const WIDGET_ORIGIN = new URL(site.url).origin;
 

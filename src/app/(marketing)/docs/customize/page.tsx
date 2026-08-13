@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 
 import { CodeBlock } from "@/components/marketing/docs";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Customization",
   description:
-    "Every option on the {site.name} widget: colors, position, theme, copy, feedback types, rating, and branding.",
-  alternates: { canonical: "/docs/customize" },
-};
+    "Every option on the Voicebox widget: colors, position, theme, copy, feedback types, rating, and branding.",
+  path: "/docs/customize",
+});
 
 const options: Array<[string, string, string]> = [
   ["accentColor", "#00C48C", "Trigger, focus rings, and the submit button."],

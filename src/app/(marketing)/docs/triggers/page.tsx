@@ -3,12 +3,13 @@ import Link from "next/link";
 
 import { Callout, CodeBlock, H2 } from "@/components/marketing/docs";
 import { site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Triggers & JavaScript API",
   description: `Open the ${site.name} widget from your own button, attach who the user is, and hook it into your app's own flows.`,
-  alternates: { canonical: "/docs/triggers" },
-};
+  path: "/docs/triggers",
+});
 
 export default function TriggersDocs() {
   return (

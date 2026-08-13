@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 
 import { Clause, LegalPage } from "@/components/marketing/legal";
 import { site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Data Processing Agreement",
   description: `The Article 28 processor terms between you and ${site.name}, covering the feedback your users submit.`,
-  alternates: { canonical: "/dpa" },
-};
+  path: "/dpa",
+});
 
 const UPDATED = "August 12, 2026";
 

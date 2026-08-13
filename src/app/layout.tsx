@@ -23,6 +23,10 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
+  // Feed discovery. Without this a reader has to guess the URL.
+  alternates: {
+    types: { "application/rss+xml": `${site.url}/blog/rss.xml` },
+  },
   title: {
     default: `${site.name}, ${site.tagline}`,
     template: `%s · ${site.name}`,

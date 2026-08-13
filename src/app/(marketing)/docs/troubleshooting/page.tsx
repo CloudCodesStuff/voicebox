@@ -3,12 +3,13 @@ import Link from "next/link";
 
 import { Callout, CodeBlock, H2 } from "@/components/marketing/docs";
 import { site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Troubleshooting",
   description: `Why the ${site.name} widget isn't appearing, why submissions are rejected, and how to diagnose both in under a minute.`,
-  alternates: { canonical: "/docs/troubleshooting" },
-};
+  path: "/docs/troubleshooting",
+});
 
 export default function TroubleshootingDocs() {
   return (

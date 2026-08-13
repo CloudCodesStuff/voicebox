@@ -4,12 +4,13 @@ import { ArrowRight } from "lucide-react";
 
 import { comparisons } from "@/lib/comparisons";
 import { site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: `Compare ${site.name}`,
   description: `How ${site.name} compares with Canny, Featurebase, Hotjar and Usersnap, including what each of them is genuinely better at. Pricing verified August 2026.`,
-  alternates: { canonical: "/vs" },
-};
+  path: "/vs",
+});
 
 export default function CompareIndex() {
   return (

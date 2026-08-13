@@ -16,6 +16,7 @@ import {
 } from "@/components/marketing/article";
 import { comparisons, getComparison } from "@/lib/comparisons";
 import { plans, site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
   return comparisons.map((c) => ({ slug: c.slug }));
@@ -29,17 +30,13 @@ export async function generateMetadata({
   const c = getComparison((await params).slug);
   if (!c) return {};
 
-  return {
+  return pageMetadata({
     title: c.title,
     description: c.description,
-    alternates: { canonical: `/vs/${c.slug}` },
-    openGraph: {
-      type: "article",
-      title: c.title,
-      description: c.description,
-      url: `${site.url}/vs/${c.slug}`,
-    },
-  };
+    path: `/vs/${c.slug}`,
+    type: "article",
+    ogSlug: c.slug,
+  });
 }
 
 export default async function ComparisonPage({

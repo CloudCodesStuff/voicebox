@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { Reveal } from "@/components/marketing/motion";
 import { Eyebrow, SectionHeading } from "@/components/marketing/primitives";
 import { site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Changelog",
   description: `What's new in ${site.name}.`,
-  alternates: { canonical: "/changelog" },
-};
+  path: "/changelog",
+});
 
 const entries = [
   {

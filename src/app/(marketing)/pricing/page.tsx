@@ -17,14 +17,15 @@ import {
 import { plans, site } from "@/lib/site";
 
 import { PricingTable } from "./pricing-table";
+import { pageMetadata } from "@/lib/seo";
 
 const [, pro, scale] = plans;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Pricing",
   description: `Free for 50 pieces of feedback a month, then $${pro.priceMonthly} or $${scale.priceMonthly}. The AI is on every plan. Cancel any time.`,
-  alternates: { canonical: "/pricing" },
-};
+  path: "/pricing",
+});
 
 const billingFaqs = [
   {
