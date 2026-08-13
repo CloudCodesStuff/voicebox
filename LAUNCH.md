@@ -1,162 +1,177 @@
 # Launch checklist
 
-What's built, what's genuinely missing, and what someone taking this over has to
-do before real users arrive. Written to be honest rather than reassuring: the
-things in **Blockers** will bite on day one if skipped.
+Written to be honest rather than reassuring. Everything below was verified on
+**13 August 2026** against the running app, the live database, the live Stripe
+account and the deployed site, not from memory.
 
-Verified state at time of writing: `tsc` clean, `eslint` clean, `next build`
-passes 31/31 pages, AI pipeline confirmed working against the live provider
-(61/61 rows analyzed, zero failed runs).
+**Verified state:** `tsc` clean, `eslint` clean, `next build` passes with 61
+routes. Analysis pipeline running in production (last CLUSTER run completed
+13 Aug). Security headers confirmed live: HSTS with preload, CSP, COOP,
+`X-Content-Type-Options`, `Referrer-Policy`.
 
 ---
 
-## Blockers — do not put this in front of users until these are done
+## Answer to "are we ready?"
 
-### 1. Fill in the legal identity
+**Ready to take signups: yes.** People are already signing up and the product
+works end to end for them.
 
-`npm run env:check` fails while these are placeholders, on purpose.
+**Ready to take money: not proven.** See blocker 1. Everything else below is
+smaller.
 
+---
+
+## Blockers
+
+### 1. Nobody has ever successfully paid
+
+Live Stripe, checked 13 Aug 2026:
+
+- **5 checkout sessions created. All `open` / `unpaid`. 0 subscriptions.**
+- Sessions came from your own address, `vasubhatt60@gmail.com`, and one genuine
+  third party, `gardentcg@gmail.com`, who reached checkout on 12 Aug and did not
+  finish.
+- Two organizations (`guhg`, `My team`) have a `stripeCustomerId` but are still
+  on FREE, which is the shape you would expect from an abandoned checkout.
+
+The wiring itself checks out. The webhook endpoint at
+`https://www.usevoicebox.dev/api/webhooks/stripe` is enabled and subscribed to
+exactly the four events the handler implements (`checkout.session.completed`,
+`customer.subscription.updated`, `customer.subscription.deleted`,
+`invoice.payment_failed`), with no drift in either direction.
+
+So this is **untested, not known-broken**. That distinction matters, and it is
+not a distinction you want to discover on a paying customer.
+
+**Do this:** put a real card through the live Pro checkout yourself, confirm the
+workspace flips to PRO, confirm the Billing page shows it, then refund
+yourself in Stripe. Half an hour, and it converts the single largest unknown
+into a fact.
+
+### 2. Every project is open to any domain
+
+All 8 projects in production have an empty allowed-domains list. That is the
+default, and it means anyone who reads a project key out of a page source can
+post feedback into that workspace from their own site.
+
+This is not hypothetical here. Submissions have already arrived from
+`fiddle.jshell.net` and `seleniumbase.io`, which are not customer domains.
+
+The large amber warning now shipping under each project key exists for exactly
+this. Set the domains on your own projects, and treat the warning as the thing
+that protects new customers who will otherwise never think about it.
+
+### 3. Confirm `EMAIL_FROM` in Vercel
+
+Local is correct (`Voicebox <hello@mail.usevoicebox.dev>`, domain verified in
+Resend). I could not verify the Vercel environment from here. If it is still
+Resend's shared `onboarding@resend.dev`, every invite and digest to anyone who
+is not the Resend account owner fails with a 403, which is what caused the
+digest 500 on 12 Aug.
+
+`npm run env:check` probes Resend live and will say.
+
+### 4. Two commits are unpushed
+
+`main` is 2 ahead of `origin/main`. The blog, the comparison pages and
+`llms.txt` are not deployed (`/blog` returns 404 in production), nor are the
+settings headers and the landing-page hero changes.
+
+```bash
+git push
 ```
-NEXT_PUBLIC_LEGAL_ENTITY="Arc Labs LLC"
-NEXT_PUBLIC_GOVERNING_LAW="the State of New Jersey"
-NEXT_PUBLIC_VENUE="the state and federal courts of New Jersey"
-```
-
-These are interpolated into the Terms, Privacy Policy, DPA, and the footer of
-every email. A contract naming a brand rather than a registered company binds
-nobody, and Terms with no governing law are hard to enforce.
-
-There is no postal-address setting, by design: nothing renders one, and the
-Terms name email as the channel for formal notice instead. CAN-SPAM's
-physical-address rule covers *commercial* email only, and everything sent from
-here is transactional or relationship mail. Start sending marketing email and
-that mail needs a real mailing address, which must not be a home address.
-
-### 2. Replace the placeholder testimonials
-
-`src/components/marketing/social-proof.tsx` ships with three invented quotes,
-attributed to roles rather than names, with initials instead of faces, and
-`attributed = false`.
-
-**They are placeholders and must be replaced with real, permissioned quotes.**
-Publishing invented testimonials as though they were real customers is
-prohibited by the FTC Rule on Consumer Reviews and Testimonials (16 CFR Part
-465) and the UK CAP Code, and the liability falls on whoever runs the site. Get
-three real users, ask in writing, then set `attributed = true` and use their
-names.
-
-Until then the section is honest: it describes the kind of team the product is
-for, without claiming a specific person said it.
-
-### 3. Wire Stripe, or remove the paid plans
-
-Nothing in `src/` imports Stripe. `billingConfigured = false` in
-`src/app/app/settings/billing/page.tsx`, every upgrade button is disabled, and
-there is no `/api/webhooks/stripe`. Pricing pages and the Terms describe billing
-that cannot currently happen, which is fine while nobody can reach checkout and
-not fine the moment they can.
-
-Needed: checkout session creation, a webhook handler that moves
-`Subscription.plan` and `status`, a customer portal link, and the
-`STRIPE_PRICE_*` ids. The plan gate itself (`src/server/lib/plan.ts`,
-`assertFeature`) is already enforced server-side and needs no changes.
-
-### 4. Verify a sending domain in Resend
-
-`EMAIL_FROM` currently uses a shared test sender, which Resend only delivers to
-the account owner. Every invite and digest to anyone else fails with a 403.
-Verify a domain at resend.com/domains, set `EMAIL_FROM` to it, add SPF/DKIM, and
-re-run `npm run env:check` (it probes Resend live and will tell you).
 
 ### 5. Have a lawyer read the legal pages
 
-The Terms, Privacy Policy, and DPA are written to match what the code actually
-does, clause by clause, and every factual claim in them was verified against the
-implementation. That is the engineering half. It is not legal advice, and the
-governing-law, liability, and indemnity clauses in particular deserve a
-professional read for your jurisdiction and risk appetite.
+Unchanged and still true. The Terms, Privacy Policy and DPA were written to
+match what the code does, clause by clause, and every factual claim in them was
+verified against the implementation. That is the engineering half. The
+governing-law, liability and indemnity clauses deserve a professional read for
+your jurisdiction.
 
 ---
 
-## Before real traffic
+## Before you push on growth
 
-- **Custom domain + `NEXT_PUBLIC_APP_URL`.** It is baked into the widget install
-  snippet, so it must be the URL customers will actually load from.
-- **`CRON_SECRET` in production.** Both cron routes fail closed (503) without
-  it, so digests and the analysis sweep silently never run.
+- **Error monitoring. There is still none.** A swallowed failure in the
+  analysis pipeline or in webhook delivery is invisible right now. This is the
+  gap most likely to hurt you once strangers are using it, because you will
+  find out from a customer rather than from a dashboard. Sentry, before volume.
 - **Google OAuth verification.** An unverified consent screen caps you at 100
-  users and shows a scary warning. Submitting takes days, so start early.
-- **Error monitoring.** There is none. A caught-and-swallowed failure in the
-  analysis pipeline or webhook delivery is currently invisible. Sentry or
-  similar, before you have users rather than after.
-- **Uptime check** against `/api/health` (already cache-friendly and cheap).
-- **Confirm Neon backups** and, once, actually restore one somewhere else. An
+  users and shows a warning. You have 8 workspaces; the cap is closer than it
+  looks and verification takes days.
+- **Uptime check** against `/api/health`.
+- **Confirm Neon backups**, and once, actually restore one somewhere else. An
   untested backup is a hypothesis.
 - **Monitor `support@`.** The privacy policy promises a 30-day response to data
-  subject requests and points several flows at that inbox.
+  subject requests and several flows point there.
+- **Re-check competitor pricing** on `/vs/*` pages. Each renders the month it
+  was verified (August 2026) and `src/lib/comparisons.ts` holds the rules. Stale
+  figures about another company are a real liability, not a tidiness issue.
+
+---
+
+## If you are selling this
+
+- **The Stripe account is shared.** It also serves `withlanci.com` and
+  `trystaged.com`. A buyer cannot take it over, so the handover involves them
+  creating their own account, their own products and prices, and swapping six
+  environment variables. Worth saying up front rather than at diligence.
+- **Legal identity is Arc Labs LLC**, defaulted in `src/lib/site.ts` rather than
+  set per environment. A buyer changes it in one file or overrides three env
+  vars.
+- **No customer revenue exists.** Signups yes, payments no. Price accordingly
+  and do not imply otherwise.
 
 ---
 
 ## Known gaps, deliberately left
 
-- **CSP has no `script-src`.** The current policy covers `frame-ancestors`,
-  `base-uri`, `object-src`, and `form-action`. A full script policy needs
-  per-request nonces via middleware; shipping a half-done one white-screens the
-  app (it did, during this work, and was caught in the browser). Worth doing,
-  not worth guessing at.
-- **Rate limits are per-instance.** The durable limits that matter (widget
-  ingest, reclustering) are backed by the database and are exact. The cheap
-  in-memory layer on top of the tRPC endpoints resets on cold start and is
-  per-serverless-instance. Fine at launch scale; move to Redis/Upstash if
-  abuse becomes real.
+- **CSP has no `script-src`.** Current policy covers `frame-ancestors`,
+  `base-uri`, `object-src`, `form-action` and `upgrade-insecure-requests`. A
+  full script policy needs per-request nonces via middleware; a half-done one
+  white-screens the app, which happened once during this work and was caught in
+  the browser.
+- **Rate limits are partly per-instance.** The ones that matter (widget ingest,
+  reclustering) are database-backed and exact. The in-memory layer on the tRPC
+  endpoints resets on cold start. Fine at this scale; Redis if abuse becomes
+  real.
 - **No analytics of any kind.** Deliberate, and the reason the site needs no
-  cookie banner. If you add any, you will need one, plus a cookie-consent gate
-  before the script loads, and the Cookies clause in the privacy policy must be
-  updated to match.
-- **Single-org accounts.** A user belongs to one organization in practice; the
-  context resolves the earliest membership. Accepting a second invite consumes
-  it without granting reachable access. Fine for the current product, a real
-  fix before selling to agencies.
-- **No soft delete anywhere.** Project deletion and organization deletion are
-  immediate and cascade. Deliberate for the erasure right, worth an undo window
-  if support load ever justifies it.
+  cookie banner. Adding any means adding a consent gate before the script loads
+  and updating the Cookies clause.
+- **No soft delete.** Project and workspace deletion are immediate and cascade.
+  Deliberate for the erasure right; worth an undo window if support load ever
+  justifies it.
+- **Free-workspace cap is 2.** Enforced server-side and verified with a direct
+  API call that bypassed the UI (403 `FREE_WORKSPACE_LIMIT:2`). The overall cap
+  is 10.
 
 ---
 
-## What is already done
+## What is done and needs no further work
 
-Because it is as easy to over-build as to under-ship, these need no further
-work:
+**Product.** Widget with shadow-DOM isolation and a queued trigger that survives
+being clicked before boot; customization studio with live preview, responsive on
+phones; AI sentiment and theme clustering with priority ranking; inbox with
+filters and search; trends; weekly digest; read API with cursor paging; signed
+webhooks with auto-disable; multi-workspace membership with switching, roles,
+ownership transfer and self-service leaving; onboarding with a live connection
+check and one-click test submission; first-run tour.
 
-**Product.** Widget with shadow-DOM isolation, live customization studio,
-AI sentiment and theme clustering with priority ranking, inbox with filters and
-search, trends, weekly digest, public read API with cursor paging, signed
-webhooks with auto-disable, team invites with expiry, onboarding with a live
-connection check and a one-click test submission, and a four-stop first-run tour.
+**Security.** Tenant isolation with `orgId` never client-supplied; SSRF guard
+that resolves DNS and re-checks every redirect hop; ingest origin allowlist that
+refuses a missing `Origin`; rate limits keyed on the proxy-set IP; CSV
+formula-injection escaping; open-redirect fix; webhook secrets masked from
+non-admins; constant-time cron auth; internal errors masked; oversized metadata
+trimmed rather than rejecting the submission.
 
-**Security** (three parallel audits, findings verified and fixed): tenant
-isolation with `orgId` never client-supplied; SSRF guard resolving DNS and
-re-checking every redirect hop for both outbound fetchers; ingest origin
-allowlist that refuses missing `Origin`; rate limits keyed on the proxy-set IP
-rather than a spoofable header; CSV formula-injection escaping; open-redirect
-fix; members genuinely read-only; webhook secrets masked from non-admins;
-constant-time cron auth; internal error messages masked; HSTS, COOP, and partial
-CSP.
+**Compliance.** Legal claims verified against the implementation; self-serve
+export and deletion; per-person digest opt-out with RFC 8058 one-click
+unsubscribe; AI opt-out that genuinely stops the transfer; submitter IPs purged
+after 7 days; `_ip` stripped from every response; DPA published; no postal
+address rendered anywhere by design.
 
-**Compliance** (three more audits): every factual claim in the legal pages
-verified against the implementation; self-serve full export and organization
-deletion; per-person digest opt-out with RFC 8058 one-click unsubscribe; AI
-processing opt-out that actually stops the transfer; submitter IPs auto-purged
-after seven days; `_ip` stripped from every response including tRPC; end-user
-email searchable so an erasure request can be located; cookie disclosure
-matching the real four-cookie inventory; DPA published; China transfer named
-explicitly with a mechanism and an opt-out.
-
----
-
-## Growth, once it's live
-
-Not required to launch, listed so they aren't rediscovered later: per-page OG
-images, a real changelog cadence, docs for the identify API, a public roadmap
-fed by Sift's own widget (the product dogfoods well), and an onboarding email
-sequence. The digest is the natural retention hook and it already exists.
+**Content and SEO.** Seven docs pages covering eleven install targets, CSP and
+troubleshooting; six blog articles; four comparison pages with sourced,
+dated competitor figures; `llms.txt`; JSON-LD (`BlogPosting`, `FAQPage`,
+`BreadcrumbList`); sitemap generated from the content registries.
