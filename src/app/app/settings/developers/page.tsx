@@ -24,6 +24,7 @@ import {
   WEBHOOK_EVENT_LABELS,
   type WebhookEvent,
 } from "@/lib/webhook-events";
+import { site } from "@/lib/site";
 import { api } from "@/trpc/client";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "../section-header";
@@ -208,7 +209,7 @@ function ApiKeys({ restGated }: { restGated: boolean }) {
         <pre className="mt-2.5 overflow-x-auto rounded-md bg-slab p-3 font-mono text-[0.72rem] leading-relaxed text-slab-fg">
           <code>
             {`claude mcp add --transport http voicebox \\
-  https://usevoicebox.dev/api/mcp \\
+  ${site.url}/api/mcp \\
   --header "Authorization: Bearer sk_…"`}
           </code>
         </pre>

@@ -293,7 +293,7 @@ export default function LandingPage() {
                 <span className="text-slab-fg/40"># one line, then it&apos;s in every session</span>
                 {"\n"}
                 <span className="text-mint">claude mcp add</span> --transport http voicebox \{"\n"}
-                {"  "}https://usevoicebox.dev/api/mcp \{"\n"}
+                {"  "}{site.url}/api/mcp \{"\n"}
                 {"  "}--header <span className="text-slab-fg">&quot;Authorization: Bearer sk_…&quot;</span>
                 {"\n\n"}
                 <span className="text-slab-fg/40"># then, mid-task, just ask</span>

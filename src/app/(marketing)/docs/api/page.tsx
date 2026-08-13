@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { CodeBlock } from "@/components/marketing/docs";
 import { WEBHOOK_EVENTS, WEBHOOK_EVENT_LABELS } from "@/lib/webhook-events";
 import { pageMetadata } from "@/lib/seo";
+import { site } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
   title: "API & webhooks",
@@ -57,7 +58,7 @@ export default function ApiDocs() {
       <CodeBlock
         className="mt-4"
         filename="POST /api/ingest"
-        code={`curl -X POST https://usevoicebox.dev/api/ingest \\
+        code={`curl -X POST ${site.url}/api/ingest \\
   -H "Content-Type: application/json" \\
   -d '{
     "key": "pk_your_project_key",
@@ -129,7 +130,7 @@ export default function ApiDocs() {
       <CodeBlock
         className="mt-5"
         filename="GET /api/v1/themes"
-        code={`curl "https://usevoicebox.dev/api/v1/themes?limit=2" \\
+        code={`curl "${site.url}/api/v1/themes?limit=2" \\
   -H "Authorization: Bearer sk_your_secret_key"
 
 {
@@ -198,7 +199,7 @@ export default function ApiDocs() {
         className="mt-4"
         filename="Add it to Claude Code"
         code={`claude mcp add --transport http voicebox \\
-  https://usevoicebox.dev/api/mcp \\
+  ${site.url}/api/mcp \\
   --header "Authorization: Bearer sk_your_secret_key"`}
       />
 
