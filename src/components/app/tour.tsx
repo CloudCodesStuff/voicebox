@@ -40,7 +40,7 @@ const STOPS: Stop[] = [
   },
   {
     target: "nav-themes",
-    title: "The part that saves you the reading",
+    title: "Grouped into themes",
     body: "One problem, however many ways people described it. “Export is slow” and “the download keeps failing” end up in the same theme, so the count is people affected, not words counted.",
     placement: "right",
   },

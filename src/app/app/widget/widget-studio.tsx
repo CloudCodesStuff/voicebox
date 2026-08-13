@@ -482,7 +482,7 @@ function StudioEditor({
 
           <Panel
             title="What you ask for"
-            hint="Fewer questions means more answers. Every field here is a choice."
+            hint="Turn off any field you don't need. Shorter forms get more responses."
           >
             <div className="space-y-5">
               <div role="group" aria-label="Feedback types">
