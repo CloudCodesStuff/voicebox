@@ -12,7 +12,8 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { relativeTime } from "@/components/app/ui";
+import { actionClass, relativeTime } from "@/components/app/ui";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -101,7 +102,7 @@ export default function ProjectSettings() {
         <button
           type="button"
           onClick={() => setCreating((v) => !v)}
-          className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-[0.85rem] font-semibold text-paper"
+          className={actionClass("primary", "md")}
         >
           <Plus className="size-4" />
           New project
@@ -140,7 +141,7 @@ export default function ProjectSettings() {
               onClick={() =>
                 create.mutate({ name: newName.trim(), url: newUrl.trim() })
               }
-              className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-mint px-4 text-[0.85rem] font-semibold text-mint-ink disabled:opacity-40"
+              className={actionClass("primary", "md")}
             >
               {create.isPending && <Loader2 className="size-3.5 animate-spin" />}
               Create
@@ -355,7 +356,7 @@ function DomainAllowlist({
             setValue(cleaned.join("\n"));
             onSave(cleaned);
           }}
-          className="mt-2 inline-flex min-h-9 items-center gap-2 rounded-lg bg-ink px-3.5 text-[0.82rem] font-semibold text-paper disabled:opacity-40"
+          className={cn("mt-2", actionClass("primary", "sm"))}
         >
           {pending && <Loader2 className="size-3.5 animate-spin" />}
           Save domains

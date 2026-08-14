@@ -12,7 +12,7 @@ import {
   CursorLogo,
   WindsurfLogo,
 } from "@/components/app/agent-logos";
-import { PageHeader } from "@/components/app/ui";
+import { actionClass, PageHeader } from "@/components/app/ui";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/client";
@@ -223,7 +223,7 @@ export function McpConnect() {
                 type="button"
                 disabled={create.isPending}
                 onClick={() => create.mutate({ name: "MCP" })}
-                className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-ink px-4 text-[0.83rem] font-semibold text-paper transition-opacity hover:opacity-90 disabled:opacity-40"
+                className={actionClass("primary", "sm")}
               >
                 {create.isPending ? (
                   <Loader2 className="size-3.5 animate-spin" />

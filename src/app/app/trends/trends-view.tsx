@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useProject } from "@/components/app/project-context";
 import { SentimentLegend, TrendChart } from "@/components/app/trend-chart";
 import {
+  actionClass,
   EmptyState,
   PageHeader,
   SectionHeading,
@@ -148,7 +149,7 @@ export function TrendsView() {
           action={
             <Link
               href="/app/widget"
-              className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-[0.85rem] font-semibold text-paper"
+              className={actionClass("primary", "md")}
             >
               Set up the widget
               <ArrowRight className="size-3.5" />

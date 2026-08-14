@@ -14,7 +14,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { relativeTime } from "@/components/app/ui";
+import { actionClass, relativeTime } from "@/components/app/ui";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -66,7 +66,7 @@ function UpgradeNotice() {
       </p>
       <Link
         href="/app/settings/billing"
-        className="mt-4 inline-flex min-h-9 items-center rounded-lg bg-mint px-4 text-[0.83rem] font-semibold text-mint-ink"
+        className={cn("mt-4", actionClass("primary", "sm"))}
       >
         See plans
       </Link>
@@ -150,7 +150,7 @@ function ApiKeys({ restGated }: { restGated: boolean }) {
           type="button"
           disabled={name.trim().length === 0 || create.isPending}
           onClick={() => create.mutate({ name: name.trim() })}
-          className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-[0.85rem] font-semibold text-paper disabled:opacity-40"
+          className={actionClass("primary", "md")}
         >
           {create.isPending ? (
             <Loader2 className="size-3.5 animate-spin" />
@@ -249,7 +249,7 @@ function RevealedKey({
             toast.success("Copied.");
             setTimeout(() => setCopied(false), 2000);
           }}
-          className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg bg-mint px-4 text-[0.83rem] font-semibold text-mint-ink"
+          className={actionClass("primary", "md")}
         >
           {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
           {copied ? "Copied" : "Copy"}
@@ -384,7 +384,7 @@ function Webhooks({ locked }: { locked: boolean }) {
           type="button"
           disabled={locked || url.trim().length === 0 || events.length === 0 || create.isPending}
           onClick={() => create.mutate({ url: url.trim(), events })}
-          className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-[0.85rem] font-semibold text-paper disabled:opacity-40"
+          className={actionClass("primary", "md")}
         >
           {create.isPending ? (
             <Loader2 className="size-3.5 animate-spin" />

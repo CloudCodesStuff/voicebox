@@ -5,11 +5,13 @@ import { Download, Loader2, Send, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { actionClass } from "@/components/app/ui";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/trpc/client";
+import { cn } from "@/lib/utils";
 import { SectionHeader } from "../section-header";
 
 export default function GeneralSettings() {
@@ -137,7 +139,7 @@ function GeneralForm({
           type="button"
           disabled={!dirty || update.isPending}
           onClick={() => update.mutate({ name, timezone })}
-          className="mt-6 inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-[0.85rem] font-semibold text-paper disabled:opacity-40"
+          className={cn("mt-6", actionClass("primary", "md"))}
         >
           {update.isPending && <Loader2 className="size-3.5 animate-spin" />}
           Save changes

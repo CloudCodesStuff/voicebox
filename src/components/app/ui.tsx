@@ -167,6 +167,30 @@ export function PageHeader({
 }
 
 /**
+ * One treatment per kind of action, for buttons and for links that act as
+ * buttons.
+ *
+ * Two things had drifted. Primary actions were written five different ways
+ * (px-4/px-3.5, four different text sizes), and six of them were `bg-mint`,
+ * which contradicts the rule this design system states out loud in globals.css:
+ * mint is deliberately not the primary button, because an accent used on every
+ * control stops reading as an accent. Primary is near-black; mint stays for the
+ * live thing.
+ */
+export function actionClass(
+  variant: "primary" | "secondary" = "primary",
+  size: "sm" | "md" = "md",
+): string {
+  return cn(
+    "inline-flex shrink-0 items-center justify-center gap-2 rounded-lg font-semibold transition-colors disabled:opacity-40",
+    size === "sm" ? "min-h-9 px-3.5 text-[0.83rem]" : "min-h-10 px-4 text-[0.85rem]",
+    variant === "primary"
+      ? "bg-ink text-paper hover:opacity-90"
+      : "border border-line bg-paper-2 text-ink hover:bg-sunken",
+  );
+}
+
+/**
  * One heading for the sections inside a page ("What to work on", "By type").
  *
  * It exists because the same rank was being set seven different ways across the

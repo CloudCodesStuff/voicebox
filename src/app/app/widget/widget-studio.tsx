@@ -21,7 +21,7 @@ import {
   PositionPreview,
   WidgetLivePreview,
 } from "@/components/app/widget-live-preview";
-import { PageHeader } from "@/components/app/ui";
+import { actionClass, PageHeader } from "@/components/app/ui";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -710,7 +710,7 @@ function StudioEditor({
             type="button"
             disabled={save.isPending}
             onClick={() => save.mutate({ id: projectId, config })}
-            className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-mint px-4 text-[0.85rem] font-semibold text-mint-ink transition-all hover:brightness-105 disabled:opacity-60"
+            className={actionClass("primary", "sm")}
           >
             {save.isPending && <Loader2 className="size-3.5 animate-spin" />}
             {save.isPending ? "Saving…" : "Save changes"}
@@ -822,7 +822,7 @@ function AutoColor({
           type="button"
           disabled={!url.trim() || suggest.isPending}
           onClick={() => suggest.mutate({ url })}
-          className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-ink px-3.5 text-[0.84rem] font-semibold text-paper disabled:opacity-40"
+          className={actionClass("primary", "md")}
         >
           {suggest.isPending ? (
             <Loader2 className="size-4 animate-spin" />

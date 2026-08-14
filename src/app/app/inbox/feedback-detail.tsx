@@ -15,11 +15,13 @@ import { toast } from "sonner";
 
 import { useProject } from "@/components/app/project-context";
 import {
+  actionClass,
   SectionHeading,
   SentimentBadge,
   TypeIcon,
   relativeTime,
 } from "@/components/app/ui";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -277,7 +279,7 @@ export function FeedbackDetail({
                 })
               }
               disabled={setStatus.isPending}
-              className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-ink px-4 text-[0.84rem] font-semibold text-paper disabled:opacity-50"
+              className={cn("flex-1", actionClass("primary", "md"))}
             >
               <Check className="size-3.5" />
               {f.status === "REVIEWED" ? "Mark unread" : "Mark reviewed"}

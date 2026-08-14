@@ -15,6 +15,7 @@ import { toast } from "sonner";
 
 import { useProject } from "@/components/app/project-context";
 import {
+  actionClass,
   EmptyState,
   PageHeader,
   SentimentBadge,
@@ -228,7 +229,7 @@ export function InboxView({ initialId }: { initialId?: string }) {
               search || activeFilters ? undefined : (
                 <Link
                   href="/app/widget"
-                  className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-[0.85rem] font-semibold text-paper"
+                  className={actionClass("primary", "md")}
                 >
                   Set up the widget
                   <ArrowRight className="size-3.5" />

@@ -15,7 +15,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/app/avatar";
-import { relativeTime } from "@/components/app/ui";
+import { actionClass, relativeTime } from "@/components/app/ui";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -243,7 +243,7 @@ export default function TeamSettings() {
                 onClick={() =>
                   transfer.mutate({ membershipId: pendingTransfer.id })
                 }
-                className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-ink px-3.5 text-[0.82rem] font-semibold text-paper disabled:opacity-40"
+                className={actionClass("primary", "sm")}
               >
                 {transfer.isPending && (
                   <Loader2 className="size-3.5 animate-spin" />
@@ -311,7 +311,7 @@ export default function TeamSettings() {
             type="button"
             disabled={emails.length === 0 || invite.isPending}
             onClick={() => invite.mutate({ emails, role })}
-            className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-[0.85rem] font-semibold text-paper disabled:opacity-40"
+            className={actionClass("primary", "md")}
           >
             {invite.isPending ? (
               <Loader2 className="size-3.5 animate-spin" />
