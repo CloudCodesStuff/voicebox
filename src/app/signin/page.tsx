@@ -4,6 +4,11 @@ import { redirect } from "next/navigation";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 
 import { Wordmark } from "@/components/marketing/brand";
+import {
+  ActivityCard,
+  ThemeCard,
+  WidgetPreview,
+} from "@/components/marketing/product-visuals";
 import { auth, signIn } from "@/server/auth";
 import { site } from "@/lib/site";
 
@@ -65,78 +70,150 @@ export default async function SignInPage({
   }
 
   return (
-    <div className="flex min-h-dvh flex-col bg-paper">
-      <header className="px-6 py-6">
-        <Link href="/" className="inline-flex items-center gap-2">
-          <Wordmark />
-        </Link>
-      </header>
+    <div className="grid min-h-dvh bg-paper lg:grid-cols-[minmax(0,1fr)_minmax(0,50%)]">
+      {/* Sign-in column. Header, form and footer share one column grid so the
+          form centres in the leftover space rather than in the viewport,
+          which is what keeps it from riding up under the wordmark. */}
+      <div className="flex min-h-dvh flex-col">
+        <header className="px-6 py-6 sm:px-10">
+          <Link href="/" className="inline-flex items-center gap-2">
+            <Wordmark />
+          </Link>
+        </header>
 
-      <main className="flex flex-1 items-center justify-center px-6 pb-24">
-        <div className="w-full max-w-[400px]">
-          <h1 className="text-[2rem] font-bold leading-tight tracking-[-0.02em] text-ink">
-            Find out what to build next.
-          </h1>
-          <p className="mt-3 text-[0.97rem] leading-relaxed text-steel">
-            Free up to 25 pieces of feedback a month. No card.
-          </p>
-
-          <div className="mt-9 rounded-2xl border border-line bg-paper-2 p-7">
-            {authConfigured() ? (
-              <form action={signInWithGoogle}>
-                <button
-                  type="submit"
-                  className="flex min-h-12 w-full items-center justify-center gap-3 rounded-lg border-[1.5px] border-line bg-paper-2 px-5 text-[0.94rem] font-semibold text-ink transition-colors hover:border-ink"
-                >
-                  <GoogleMark />
-                  Continue with Google
-                </button>
-              </form>
-            ) : (
-              <div className="flex gap-3 rounded-lg bg-mint-wash p-4">
-                <AlertTriangle
-                  className="mt-0.5 size-4 shrink-0 text-mint-deep"
-                  aria-hidden="true"
-                />
-                <div className="text-[0.86rem] leading-relaxed text-mint-deep">
-                  <strong className="font-semibold">
-                    Google sign-in isn&apos;t configured yet.
-                  </strong>
-                  <p className="mt-1.5">
-                    Add <code className="font-mono text-[0.8rem]">AUTH_SECRET</code>,{" "}
-                    <code className="font-mono text-[0.8rem]">AUTH_GOOGLE_ID</code>, and{" "}
-                    <code className="font-mono text-[0.8rem]">AUTH_GOOGLE_SECRET</code>{" "}
-                    to <code className="font-mono text-[0.8rem]">.env</code>, then
-                    restart the dev server. See{" "}
-                    <code className="font-mono text-[0.8rem]">.env.example</code>{" "}
-                    for where to get each one.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            <p className="mt-6 text-center text-[0.78rem] leading-relaxed text-steel">
-              By continuing you agree to our{" "}
-              <Link href="/terms" className="text-ink underline">
-                Terms
-              </Link>{" "}
-              and{" "}
-              <Link href="/privacy" className="text-ink underline">
-                Privacy Policy
-              </Link>
-              .
+        <main className="flex flex-1 items-center justify-center px-6 pb-16 sm:px-10">
+          <div className="w-full max-w-[400px]">
+            <h1 className="text-[2rem] font-bold leading-tight tracking-[-0.02em] text-ink">
+              Find out what to build next.
+            </h1>
+            <p className="mt-3 text-[0.97rem] leading-relaxed text-steel">
+              Free up to 25 pieces of feedback a month. No card.
             </p>
+
+            <div className="mt-9">
+              {authConfigured() ? (
+                <form action={signInWithGoogle}>
+                  <button
+                    type="submit"
+                    className="flex min-h-12 w-full items-center justify-center gap-3 rounded-lg border-[1.5px] border-line bg-paper-2 px-5 text-[0.94rem] font-semibold text-ink shadow-[0_1px_2px_rgba(9,9,11,0.04)] transition-colors hover:border-ink"
+                  >
+                    <GoogleMark />
+                    Continue with Google
+                  </button>
+                </form>
+              ) : (
+                <div className="flex gap-3 rounded-lg bg-mint-wash p-4">
+                  <AlertTriangle
+                    className="mt-0.5 size-4 shrink-0 text-mint-deep"
+                    aria-hidden="true"
+                  />
+                  <div className="text-[0.86rem] leading-relaxed text-mint-deep">
+                    <strong className="font-semibold">
+                      Google sign-in isn&apos;t configured yet.
+                    </strong>
+                    <p className="mt-1.5">
+                      Add <code className="font-mono text-[0.8rem]">AUTH_SECRET</code>,{" "}
+                      <code className="font-mono text-[0.8rem]">AUTH_GOOGLE_ID</code>, and{" "}
+                      <code className="font-mono text-[0.8rem]">AUTH_GOOGLE_SECRET</code>{" "}
+                      to <code className="font-mono text-[0.8rem]">.env</code>, then
+                      restart the dev server. See{" "}
+                      <code className="font-mono text-[0.8rem]">.env.example</code>{" "}
+                      for where to get each one.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <p className="mt-5 text-[0.78rem] leading-relaxed text-steel">
+                By continuing you agree to our{" "}
+                <Link href="/terms" className="text-ink underline">
+                  Terms
+                </Link>{" "}
+                and{" "}
+                <Link href="/privacy" className="text-ink underline">
+                  Privacy Policy
+                </Link>
+                . One Google account, no password to remember.
+              </p>
+            </div>
+
+            <div className="mt-12 border-t border-line pt-6">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 text-[0.86rem] font-medium text-steel transition-colors hover:text-ink"
+              >
+                <ArrowLeft className="size-4" />
+                Back to site
+              </Link>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      {/* Product column: one story told by the product's own components.
+          A visitor leaves the widget with four stars in, that comment shows
+          up as a raw inbox row, and the row is already one of thirty-four in
+          the theme ranked #1. Decorative end to end: one aria-hidden block,
+          nothing in the tab order. */}
+      <aside
+        aria-hidden="true"
+        // The hairline is what separates the halves at all: paper and slab
+        // are within a few points of each other in the dark theme.
+        className="relative hidden overflow-hidden border-l border-line bg-slab lg:block"
+      >
+        {/* Atmosphere: a dot grid that fades out from the centre of the
+            scene, and one mint glow behind the tagline. The cards carry all
+            the remaining colour, so the slab itself stays near-monochrome. */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, rgba(228,234,232,0.10) 1px, transparent 1px)",
+            backgroundSize: "26px 26px",
+            maskImage:
+              "radial-gradient(ellipse 75% 65% at 55% 52%, black 25%, transparent 75%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse 75% 65% at 55% 52%, black 25%, transparent 75%)",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(640px 460px at 20% 0%, rgba(0,196,140,0.16), transparent 70%)," +
+              "radial-gradient(520px 420px at 95% 100%, rgba(0,196,140,0.06), transparent 70%)",
+          }}
+        />
+
+        <div className="relative flex h-full flex-col p-10 xl:p-14">
+          <h2 className="text-[2.1rem] leading-[1.12] font-bold tracking-[-0.025em] text-slab-fg xl:text-[2.4rem]">
+            Feedback in.
+            <br />
+            <span className="text-mint">Fix list out.</span>
+          </h2>
+
+          {/* The scene. Absolute placement inside a fixed-ratio canvas so
+              the three cards genuinely overlap, each with its own slight
+              rotation and its own shadow, which is what makes it read as
+              objects on a surface instead of screenshots in a column. */}
+          <div className="relative mx-auto my-auto h-[520px] w-full max-w-[520px]">
+            <div className="absolute top-0 left-0 w-[330px] -rotate-2 drop-shadow-[0_24px_48px_rgba(0,0,0,0.55)]">
+              <WidgetPreview rating={4} />
+            </div>
+
+            <ActivityCard className="absolute top-[46%] right-0 z-10 rotate-[2.5deg] shadow-[0_20px_44px_-12px_rgba(0,0,0,0.65)]" />
+
+            {/* The payoff card sits highest, front and slightly left, so the
+                eye lands on it last: raw words in, ranked theme out. */}
+            <ThemeCard className="absolute bottom-0 left-[8%] z-20 rotate-[-1.5deg] shadow-[0_28px_56px_-12px_rgba(0,0,0,0.7)]" />
           </div>
 
-          <Link
-            href="/"
-            className="mt-8 inline-flex items-center gap-2 text-[0.86rem] font-medium text-steel transition-colors hover:text-ink"
-          >
-            <ArrowLeft className="size-4" />
-            Back to site
-          </Link>
+          <p className="text-[0.84rem] text-slab-fg/60">
+            One line of code on your site. Every reply scored, grouped and
+            ranked before you read it.
+          </p>
         </div>
-      </main>
+      </aside>
     </div>
   );
 }
