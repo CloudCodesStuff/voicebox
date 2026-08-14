@@ -10,7 +10,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 import { useProject } from "@/components/app/project-context";
@@ -82,13 +82,53 @@ export function FeedbackDetail({
     onError: (e) => toast.error(e.message),
   });
 
-  // A drawer you can open with the keyboard has to close with it too.
+  const panelRef = useRef<HTMLElement>(null);
+
+  /**
+   * Dialog behaviour, not just dialog markup.
+   *
+   * This carried role="dialog" while leaving focus out on the page behind it,
+   * so a keyboard user opened the drawer and then tabbed through the list
+   * underneath without ever reaching its controls, and on close landed at the
+   * top of the document instead of the row they came from. Escape already
+   * worked; the rest of the contract did not.
+   */
   useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
+    panelRef.current?.focus();
+
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      const panel = panelRef.current;
+      if (!panel) return;
+      const focusable = panel.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusable.length === 0) return;
+
+      const first = focusable[0]!;
+      const last = focusable[focusable.length - 1]!;
+      // Wrap at both ends, so Tab can never walk out into the page behind.
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
+
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      // Back to the row that opened it, if it is still on the page.
+      if (opener && document.contains(opener)) opener.focus();
+    };
   }, [onClose]);
 
   const f = item.data;
@@ -105,8 +145,11 @@ export function FeedbackDetail({
       />
 
       <aside
-        className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-line bg-paper-2 shadow-2xl"
+        ref={panelRef}
+        tabIndex={-1}
+        className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-line bg-paper-2 shadow-2xl outline-none"
         role="dialog"
+        aria-modal="true"
         aria-label="Feedback detail"
       >
         <header className="flex items-center justify-between border-b border-line px-5 py-4">
@@ -291,7 +334,7 @@ export function FeedbackDetail({
               disabled={setStatus.isPending}
               aria-label="Archive"
               title="Archive"
-              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-line px-3.5 text-[0.84rem] font-medium text-steel hover:text-ink disabled:opacity-50"
+              className={actionClass("secondary", "md")}
             >
               <Archive className="size-3.5" />
             </button>
@@ -302,7 +345,7 @@ export function FeedbackDetail({
               disabled={reanalyze.isPending}
               aria-label="Re-run AI analysis"
               title="Re-run AI analysis"
-              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-line px-3.5 text-[0.84rem] font-medium text-steel hover:text-ink disabled:opacity-50"
+              className={actionClass("secondary", "md")}
             >
               {reanalyze.isPending ? (
                 <Loader2 className="size-3.5 animate-spin" />

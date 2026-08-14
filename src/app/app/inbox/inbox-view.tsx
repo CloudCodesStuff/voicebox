@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useProject } from "@/components/app/project-context";
 import {
   actionClass,
+  pagePath,
   EmptyState,
   PageHeader,
   SentimentBadge,
@@ -360,24 +361,6 @@ export function InboxView({ initialId }: { initialId?: string }) {
       )}
     </div>
   );
-}
-
-/**
- * Just the path from a stored page URL.
- *
- * The origin is the same for every row in a project, so showing it would spend
- * the width on the one part that never varies. Anything unparseable is dropped
- * rather than printed raw: this value came from a public endpoint.
- */
-function pagePath(url: string | null): string | null {
-  if (!url) return null;
-  try {
-    const { pathname, search } = new URL(url);
-    const path = `${pathname}${search}`;
-    return path === "/" ? "/" : path.replace(/\/$/, "");
-  } catch {
-    return null;
-  }
 }
 
 function FilterChips<T extends string>({

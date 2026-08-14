@@ -289,6 +289,24 @@ export function EmptyState({
 }
 
 /**
+ * Just the path from a stored page URL.
+ *
+ * The origin repeats on every row of a project, so printing it spends width on
+ * the one part that never varies. Anything unparseable is dropped rather than
+ * shown raw: this value arrives from a public endpoint.
+ */
+export function pagePath(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const { pathname, search } = new URL(url);
+    const path = `${pathname}${search}`;
+    return path === "/" ? "/" : path.replace(/\/$/, "");
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Which way a theme is heading, from its own twelve-week trend.
  *
  * Reads the last three buckets against the three before them. A ranked list of

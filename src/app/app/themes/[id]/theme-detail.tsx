@@ -5,19 +5,31 @@ import { ArrowLeft, Check, Copy, Download, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { SentimentLegend } from "@/components/app/trend-chart";
 import {
+  pagePath,
+  actionClass,
   SectionHeading,
   SentimentBadge,
   SentimentBar,
   SentimentDot,
   Sparkline,
+  StatCard,
   TypeIcon,
   relativeTime,
+  trendDirection,
 } from "@/components/app/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import { csvCell, mdInline } from "@/lib/export-safe";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/client";
+
+/** Plain words for the trend, since the sparkline only shows shape. */
+const momentumLabel: Record<"rising" | "cooling" | "steady", string> = {
+  rising: "rising lately",
+  cooling: "cooling off",
+  steady: "steady",
+};
 
 export function ThemeDetail({ themeId }: { themeId: string }) {
   const utils = api.useUtils();
@@ -56,6 +68,9 @@ export function ThemeDetail({ themeId }: { themeId: string }) {
       </div>
     );
   }
+
+  const trend = t.trend as Array<{ week: string; count: number }> | null;
+  const momentum = trendDirection(trend);
 
   const counts = t.feedback.reduce(
     (acc, f) => {
@@ -135,7 +150,7 @@ export function ThemeDetail({ themeId }: { themeId: string }) {
           <button
             type="button"
             onClick={copyQuotes}
-            className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-line px-3.5 text-[0.83rem] font-medium text-steel hover:text-ink"
+            className={actionClass("secondary", "md")}
           >
             {copied ? (
               <Check className="size-3.5 text-positive" />
@@ -147,7 +162,7 @@ export function ThemeDetail({ themeId }: { themeId: string }) {
           <button
             type="button"
             onClick={exportCsv}
-            className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-line px-3.5 text-[0.83rem] font-medium text-steel hover:text-ink"
+            className={actionClass("secondary", "md")}
           >
             <Download className="size-3.5" />
             CSV
@@ -155,43 +170,44 @@ export function ThemeDetail({ themeId }: { themeId: string }) {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="mt-7 grid gap-3 sm:grid-cols-4">
-        <div className="rounded-xl border border-line bg-paper-2 p-4">
-          <div className="label">Items</div>
-          <div className="mt-1.5 text-[1.5rem] font-bold text-ink">
-            {t.itemCount}
-          </div>
-        </div>
-        <div className="rounded-xl border border-line bg-paper-2 p-4">
-          <div className="label">Negative</div>
-          <div className="mt-1.5 text-[1.5rem] font-bold text-ink">
-            {Math.round(t.negativeShare * 100)}%
-          </div>
-        </div>
-        <div className="rounded-xl border border-line bg-paper-2 p-4">
-          <div className="label">Priority</div>
-          <div className="mt-1.5 text-[1.5rem] font-bold text-mint-deep">
-            {Math.round(t.priorityScore)}
-          </div>
-        </div>
-        <div className="rounded-xl border border-line bg-paper-2 p-4">
-          <div className="label">Trend · 12 weeks</div>
-          <div className="mt-2 text-mint-deep">
-            <Sparkline
-              data={t.trend as Array<{ week: string; count: number }> | null}
-            />
-          </div>
-        </div>
+      {/* Four hand-rolled cards used to live here, duplicating StatCard's
+          markup at a different size. Same component as every other stat in the
+          product now, so they cannot drift apart again. */}
+      <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Items" value={t.itemCount} />
+        <StatCard
+          label="Negative"
+          value={`${Math.round(t.negativeShare * 100)}%`}
+          tone={t.negativeShare > 0.4 ? "negative" : "default"}
+        />
+        {/* Not mint. A priority score is a magnitude, not good news. */}
+        <StatCard label="Priority" value={Math.round(t.priorityScore)} />
+        <StatCard
+          label="Trend · 12 weeks"
+          value={
+            <span className="block text-steel">
+              <Sparkline data={trend} />
+            </span>
+          }
+          hint={momentum ? momentumLabel[momentum] : "not enough history"}
+        />
       </div>
 
-      <SentimentBar
-        className="mt-4"
-        positive={counts.POSITIVE ?? 0}
-        neutral={counts.NEUTRAL ?? 0}
-        mixed={counts.MIXED ?? 0}
-        negative={counts.NEGATIVE ?? 0}
-      />
+      {/* The bar used to float here unlabelled, which made a four-colour
+          graphic that nothing on the page explained. */}
+      <section className="mt-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="label">Sentiment across {t.feedback.length} pieces</div>
+          <SentimentLegend />
+        </div>
+        <SentimentBar
+          className="mt-2"
+          positive={counts.POSITIVE ?? 0}
+          neutral={counts.NEUTRAL ?? 0}
+          mixed={counts.MIXED ?? 0}
+          negative={counts.NEGATIVE ?? 0}
+        />
+      </section>
 
       {/* Status actions */}
       <div className="mt-6 flex flex-wrap gap-2">
@@ -243,9 +259,9 @@ export function ThemeDetail({ themeId }: { themeId: string }) {
                         {f.rating}/5
                       </span>
                     )}
-                    {f.pageUrl && (
-                      <span className="tnum truncate text-[0.72rem] text-steel">
-                        {f.pageUrl.replace(/^https?:\/\//, "").slice(0, 48)}
+                    {pagePath(f.pageUrl) && (
+                      <span className="truncate font-mono text-[0.7rem] text-faint">
+                        {pagePath(f.pageUrl)}
                       </span>
                     )}
                   </div>
