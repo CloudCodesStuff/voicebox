@@ -25,7 +25,7 @@ export default function BillingSettings() {
     <div className="space-y-6">
       <SectionHeader
         title="Billing"
-        description="Your plan, how much of this month's feedback allowance you've used, and where to change either. Plans are priced on how much feedback you collect; the AI analysis is included on every one."
+        description="Your plan, and how much of this month's allowance you've used."
       />
       <section className="rounded-xl border border-line bg-paper-2 p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -89,9 +89,8 @@ export default function BillingSettings() {
           </div>
           {usage.overLimit && (
             <p className="mt-3 rounded-lg bg-mixed-wash px-3.5 py-2.5 text-[0.82rem] leading-relaxed text-mixed">
-              You&apos;re over your monthly limit. Feedback is still being
-              collected, we won&apos;t throw away your users&apos; words, but
-              new submissions aren&apos;t being analyzed until you upgrade or the
+              You&apos;re over your monthly limit. Feedback is still collected,
+              but new submissions aren&apos;t analyzed until you upgrade or the
               period resets.
             </p>
           )}

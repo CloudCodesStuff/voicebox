@@ -109,7 +109,7 @@ export function InboxView({ initialId }: { initialId?: string }) {
     <div className="mx-auto max-w-5xl px-4 py-8 pb-24 sm:px-6">
       <PageHeader
         title="Inbox"
-        description="Every individual piece of feedback, newest first. Each one is scored for tone and given a one-line summary as it arrives. Read, reply by email, and archive what you've dealt with."
+        description="Every piece of feedback, newest first, scored as it arrives."
         subtitle={
           list.data ? `${items.length} shown` : activeProject?.name ?? undefined
         }
@@ -221,7 +221,7 @@ export function InboxView({ initialId }: { initialId?: string }) {
             body={
               search || activeFilters
                 ? "Try a different filter or search term."
-                : "Feedback from your widget lands here the moment it's submitted. If you haven't installed it yet, that's the next step."
+                : "Feedback lands here the moment it's submitted."
             }
             // Only on a genuinely empty inbox. Offering "set up the widget" to
             // someone who has simply filtered their existing feedback down to

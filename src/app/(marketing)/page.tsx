@@ -265,9 +265,8 @@ export default function LandingPage() {
             </h2>
             <p className="mt-6 max-w-lg text-base text-steel lg:text-lg">
               Voicebox runs as an MCP server. Point Claude Code or Cursor at it
-              and your ranked feedback themes land right where you write code, so
-              &ldquo;what should I fix?&rdquo; is answered from what your users
-              actually said. Read-only, and on every plan, including free.
+              and your ranked feedback themes land right where you write code.
+              Read-only, and on every plan, including free.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <CtaButton href="/docs/api#model-context-protocol" variant="accent">

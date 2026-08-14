@@ -130,7 +130,7 @@ export default function TeamSettings() {
     <div className="space-y-6">
       <SectionHeader
         title="Team"
-        description="Who can see this workspace and what they can change. Admins invite people and manage projects; members read feedback and act on it. Everyone can leave on their own."
+        description="Who can see this workspace and what they can change."
       />
       <section className="rounded-xl border border-line bg-paper-2 p-6">
         <h2 className="text-[1rem] font-semibold text-ink">Members</h2>
@@ -233,8 +233,8 @@ export default function TeamSettings() {
               owner?
             </p>
             <p className="mt-1 text-[0.8rem] leading-relaxed text-steel">
-              They take over billing and the ability to delete this workspace.
-              You stay on as an admin, and only they can hand it back.
+              They take over billing and can delete the workspace. Only they
+              can hand it back.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
@@ -427,9 +427,8 @@ function LeaveWorkspace({
       ) : (
         <>
           <p className="mt-1.5 max-w-prose text-[0.83rem] leading-relaxed text-steel">
-            Removes your access to {orgName || "this workspace"} and everything
-            in it. Nothing here is deleted, and an admin can invite you back.
-            Your own workspaces aren&apos;t affected.
+            Removes your access to {orgName || "this workspace"}. Nothing is
+            deleted, and an admin can invite you back.
           </p>
 
           {confirming ? (

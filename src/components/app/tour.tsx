@@ -35,13 +35,13 @@ const STOPS: Stop[] = [
   {
     target: "nav-inbox",
     title: "Everything lands here",
-    body: "Every submission, newest first, with sentiment already scored. Filter by type, or search, including by the email someone left.",
+    body: "Every submission, newest first, sentiment already scored.",
     placement: "right",
   },
   {
     target: "nav-themes",
     title: "Grouped into themes",
-    body: "One problem, however many ways people described it. “Export is slow” and “the download keeps failing” end up in the same theme, so the count is people affected, not words counted.",
+    body: "One problem, however many ways people described it. The count is people affected, not words counted.",
     placement: "right",
   },
   {
@@ -53,7 +53,7 @@ const STOPS: Stop[] = [
   {
     target: "nav-widget",
     title: "Make it yours",
-    body: "Colour, copy, corners, and where it sits. Every change previews live, and saved changes reach your site within a minute.",
+    body: "Colour, copy, corners, and where it sits. Every change previews live.",
     placement: "right",
   },
 ];

@@ -94,7 +94,7 @@ function GeneralForm({
     <div className="space-y-6">
       <SectionHeader
         title="General"
-        description="Your workspace name and timezone, the weekly digest email, whether feedback is sent for AI analysis, and the controls for exporting or deleting everything you hold here."
+        description="Workspace name, digest email, AI analysis, and your data."
       />
       <section className="rounded-xl border border-line bg-paper-2 p-6">
         <h2 className="text-[1rem] font-semibold text-ink">Organization</h2>
@@ -123,7 +123,7 @@ function GeneralForm({
               Timezone
             </Label>
             <p className="mt-0.5 text-[0.76rem] text-steel">
-              Used for daily buckets on charts and when digests are sent.
+              Sets the day boundary on charts, and when digests send.
             </p>
             <Input
               id="timezone"
@@ -153,9 +153,8 @@ function GeneralForm({
               Weekly digest
             </h2>
             <p className="mt-1 text-[0.85rem] leading-relaxed text-steel">
-              Monday morning, everyone on the team gets the three themes worth
-              acting on, how the volume moved, and a few quotes worth reading.
-              Quiet weeks send nothing.
+              Monday morning: the three themes worth acting on, how volume
+              moved, and a few quotes. Quiet weeks send nothing.
             </p>
             {digestLastSentAt && (
               <p className="mt-2 text-[0.78rem] text-steel">
@@ -217,13 +216,11 @@ function GeneralForm({
             <p className="mt-1 text-[0.85rem] leading-relaxed text-steel">
               Feedback text is sent to DeepSeek, in China, for sentiment and
               theme analysis. Email addresses and identify traits are never
-              included in a prompt, that&apos;s enforced in the code, not just
-              policy.
+              included in a prompt.
             </p>
             <p className="mt-2 text-[0.85rem] leading-relaxed text-steel">
-              Turn it off and nothing leaves for the model. Feedback is still
-              collected, stored, and shown to you; it just arrives without
-              sentiment or themes.
+              Off, nothing leaves for the model. Feedback still arrives, just
+              without sentiment or themes.
             </p>
           </div>
 
@@ -278,7 +275,7 @@ function MyDigestPreference() {
       <div>
         <div className="text-[0.85rem] font-medium text-ink">Send it to me</div>
         <p className="mt-0.5 text-[0.78rem] text-steel">
-          Your own copy. Turning this off doesn&apos;t affect anyone else.
+          Your own copy. Nobody else is affected.
         </p>
       </div>
       <Switch
@@ -344,8 +341,8 @@ function PrivacySection({
       <section className="rounded-xl border border-line bg-paper-2 p-6">
         <h2 className="text-[1rem] font-semibold text-ink">Your data</h2>
         <p className="mt-1 max-w-[62ch] text-[0.85rem] leading-relaxed text-steel">
-          One JSON file with every project, every piece of feedback, every
-          theme, and your settings. Available on every plan, to every member.
+          One JSON file: projects, feedback, themes and settings. Every plan,
+          every member.
         </p>
 
         <button
@@ -369,10 +366,9 @@ function PrivacySection({
             Delete this workspace
           </h2>
           <p className="mt-1 max-w-[62ch] text-[0.85rem] leading-relaxed text-steel">
-            Removes every project, every piece of feedback your users sent, and
-            every theme. It happens immediately and cannot be undone. Export
-            first. Everyone here loses access; their accounts and any other
-            workspaces they belong to are untouched.
+            Removes every project, every piece of feedback and every theme,
+            immediately and permanently. Export first. Everyone here loses
+            access.
           </p>
 
           {confirming ? (

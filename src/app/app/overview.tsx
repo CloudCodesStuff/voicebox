@@ -177,9 +177,8 @@ export function Overview() {
                     operator finds the cause in `npm run env:check`. */}
                 <p className="text-[0.85rem] leading-relaxed text-ink">
                   <strong className="font-semibold">Analysis is paused.</strong>{" "}
-                  Sentiment scoring and themes are unavailable right now.
-                  Feedback is still being collected and stored, and everything
-                  is scored automatically once analysis is back.
+                  Feedback is still being collected, and everything is scored
+                  once it is back.
                 </p>
               </div>
             )}
@@ -241,8 +240,8 @@ export function Overview() {
                 title="No themes yet."
                 body={
                   aiReady.data?.ok
-                    ? "Themes appear once there are enough analyzed pieces to find a pattern, usually around twenty. Hit Regroup now to try anyway."
-                    : "Theme grouping is paused right now. Nothing is lost."
+                    ? "Themes appear once about twenty pieces have been analyzed."
+                    : "Theme grouping is paused. Nothing is lost."
                 }
               />
             )}

@@ -44,7 +44,7 @@ export default function DeveloperSettings() {
     <div className="space-y-6">
       <SectionHeader
         title="Developers"
-        description="Connect a coding agent over MCP on any plan, or on Pro, read the REST API and push webhooks the moment feedback arrives."
+        description="MCP on every plan. REST API and webhooks on Pro."
       />
       <ApiKeys restGated={restGated} />
       {restGated && <UpgradeNotice />}
@@ -60,9 +60,8 @@ function UpgradeNotice() {
         The REST API and webhooks are on Pro.
       </h2>
       <p className="mt-1.5 max-w-[60ch] text-[0.85rem] leading-relaxed text-steel">
-        Your key already works with the MCP server on this plan. Upgrading adds
-        the REST endpoints under <code className="font-mono text-[0.8rem]">/api/v1</code>{" "}
-        and lets you point webhooks at your own URLs.
+        Your key already works with MCP. Upgrading adds REST under{" "}
+        <code className="font-mono text-[0.8rem]">/api/v1</code> and webhooks.
       </p>
       <Link
         href="/app/settings/billing"
@@ -111,13 +110,13 @@ function ApiKeys({ restGated }: { restGated: boolean }) {
         <div>
           <h2 className="text-[1rem] font-semibold text-ink">API keys</h2>
           <p className="mt-1 max-w-[62ch] text-[0.83rem] leading-relaxed text-steel">
-            One key, two uses. Connect a coding agent over MCP on any plan,
-            including this one; {restGated ? "on Pro it also unlocks" : "and use"} the
-            REST API to read feedback from your own code. Send it as{" "}
+            One key, two uses: MCP on any plan,{" "}
+            {restGated ? "and REST on Pro" : "and REST"} to read feedback from
+            your own code. Send it as{" "}
             <code className="rounded bg-sunken px-1 py-0.5 font-mono text-[0.78rem]">
               Authorization: Bearer sk_…
             </code>
-            . Keys are stored hashed, so we show a new one exactly once.{" "}
+            .{" "}
             <Link href="/docs/api" className="text-mint-deep hover:underline">
               Read the docs
             </Link>
@@ -234,7 +233,7 @@ function RevealedKey({
         Copy {name} now
       </h3>
       <p className="mt-1 text-[0.82rem] leading-relaxed text-steel">
-        Only a hash is stored. You won&apos;t be able to see this key again.
+        Only a hash is stored. You won&apos;t see this key again.
       </p>
 
       <div className="mt-3 flex items-center gap-2">
@@ -324,12 +323,12 @@ function Webhooks({ locked }: { locked: boolean }) {
         <div>
           <h2 className="text-[1rem] font-semibold text-ink">Webhooks</h2>
           <p className="mt-1 max-w-[62ch] text-[0.83rem] leading-relaxed text-steel">
-            We POST signed JSON to your endpoint as things happen. Verify the{" "}
+            We POST signed JSON as things happen. Verify the{" "}
             <code className="rounded bg-sunken px-1 py-0.5 font-mono text-[0.78rem]">
               Voicebox-Signature
             </code>{" "}
-            header before trusting the body. An endpoint that keeps failing gets
-            switched off rather than hammered.
+            header before trusting the body. Endpoints that keep failing get
+            switched off.
           </p>
         </div>
       </div>

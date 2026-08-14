@@ -192,7 +192,7 @@ export function McpConnect() {
     <div className="mx-auto max-w-3xl px-4 py-8 pb-24 sm:px-6">
       <PageHeader
         title="Connect your agent"
-        description="Read your ranked feedback themes from your coding agent, so “what should I build next” is answered from what your users actually said."
+        description="Read your ranked feedback themes from your coding agent."
       />
 
       <ol className="mt-9">
@@ -207,8 +207,8 @@ export function McpConnect() {
                 <CopyButton value={freshKey} label="Copy" />
               </div>
               <p className="mt-2 text-[0.78rem] text-steel">
-                Save it somewhere. You won&apos;t be able to see it again, and
-                it&apos;s already filled into the config below.
+                Save it somewhere. You won&apos;t see it again. It is already
+                in the config below.
               </p>
             </div>
           ) : (

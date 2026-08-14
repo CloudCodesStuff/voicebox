@@ -104,7 +104,7 @@ export function TrendsView() {
     <div className="mx-auto max-w-5xl px-4 py-8 pb-24 sm:px-6">
       <PageHeader
         title="Trends"
-        description="Whether things are getting better or worse. Volume and sentiment over time, so you can tell a bad week from a bad direction."
+        description="Whether things are getting better or worse."
         subtitle={activeProject ? `${activeProject.name} · ${days} days` : undefined}
         actions={
           <div className="flex items-center gap-2">
@@ -145,7 +145,7 @@ export function TrendsView() {
         <EmptyState
           className="mt-8"
           title="Nothing to chart yet."
-          body="Volume and sentiment over time appear here once feedback starts arriving. A chart needs a few days of data before it says anything useful."
+          body="A chart needs a few days of feedback before it says anything."
           action={
             <Link
               href="/app/widget"

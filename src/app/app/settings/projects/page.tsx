@@ -93,7 +93,7 @@ export default function ProjectSettings() {
     <div className="space-y-4">
       <SectionHeader
         title="Projects"
-        description="One project per site or app you collect from, each with its own widget, its own feedback and its own themes. This is also where you get a project's key and lock it to your domains."
+        description="One project per site you collect from, each with its own widget and key."
       />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-[0.85rem] text-steel">
@@ -216,7 +216,7 @@ export default function ProjectSettings() {
                 onClick={() => {
                   if (
                     confirm(
-                      "Issue a new key? The old one stops working immediately and you'll need to update your install snippet.",
+                      "The old key stops working immediately. You'll need to update your snippet.",
                     )
                   ) {
                     regenerate.mutate({ id: p.id });
@@ -248,10 +248,9 @@ export default function ProjectSettings() {
                     <strong className="font-semibold text-ink">
                       any website in the world
                     </strong>
-                    . The key above is visible in your page source. Anyone who
-                    views it can paste your widget onto their site, and whatever
-                    their visitors send lands in your inbox and counts against
-                    your monthly limit.
+                    . The key above is in your page source, so anyone can paste
+                    your widget onto their site and have whatever their visitors
+                    send land in your inbox, against your limit.
                   </p>
                   <p className="mt-2 text-[0.87rem] font-medium text-ink">
                     Add your domains below to stop that.
@@ -327,8 +326,8 @@ function DomainAllowlist({
         Allowed domains
       </Label>
       <p className="mt-0.5 text-[0.76rem] leading-relaxed text-steel">
-        One per line. Submissions from any other site are rejected. Subdomains
-        are covered, so <code className="font-mono">acme.com</code> also allows{" "}
+        One per line. Everything else is rejected. Subdomains are covered, so{" "}
+        <code className="font-mono">acme.com</code> also allows{" "}
         <code className="font-mono">app.acme.com</code>.
       </p>
 

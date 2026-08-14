@@ -91,7 +91,7 @@ export function ThemesView() {
     <div className="mx-auto max-w-5xl px-4 py-8 pb-24 sm:px-6">
       <PageHeader
         title="Themes"
-        description={`A theme is one problem, however many different ways people described it. "Export is slow" and "the download keeps failing" end up in the same place, so the count is the number of people affected, not how often a word appeared. Ranked by volume, unhappiness and recency, so start at the top.`}
+        description="One problem, however many ways people described it. Ranked by volume, unhappiness and recency, so start at the top."
         subtitle={`${list.length} ${status.toLowerCase()}, sorted by ${sort.toLowerCase()}`}
         actions={
           <WorkingButton
@@ -156,8 +156,8 @@ export function ThemesView() {
             title="No themes yet."
             body={
               aiReady.data?.ok
-                ? "Themes form once there are enough analyzed pieces to see a pattern, usually around twenty. Hit Regroup now to try anyway."
-                : "Theme grouping is paused right now. Your feedback is still arriving and nothing is lost, it gets grouped as soon as analysis is back."
+                ? "Themes form once about twenty pieces have been analyzed."
+                : "Theme grouping is paused. Feedback is still arriving, and nothing is lost."
             }
           />
         ) : (

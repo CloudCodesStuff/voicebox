@@ -141,17 +141,17 @@ export function FirstRun() {
             {
               icon: Sparkles,
               title: "Everything gets scored",
-              body: "Tone, intent, a category and a summary, within seconds. All of it lands in the Inbox.",
+              body: "Tone, intent, category and summary, within seconds.",
             },
             {
               icon: Layers,
               title: "Themes appear around twenty pieces",
-              body: "When several people describe the same problem differently, it becomes one theme with a count and the quotes behind it.",
+              body: "The same problem, however people worded it, becomes one theme.",
             },
             {
               icon: Palette,
               title: "Restyle it any time",
-              body: "Colour, copy, typeface and position live in the Widget studio. Changes go live without touching your site again.",
+              body: "Colour, copy, typeface and position, without touching your site again.",
             },
           ].map((step) => (
             <li key={step.title} className="flex gap-4">
