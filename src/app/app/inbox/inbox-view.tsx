@@ -267,20 +267,8 @@ export function InboxView({ initialId }: { initialId?: string }) {
                 return (
                   <li
                     key={f.id}
-                    className={cn(
-                      "relative flex items-start gap-3 py-3.5 pr-4 pl-4",
-                      isNew && "bg-mint-wash/25",
-                    )}
+                    className="flex items-start gap-3 px-4 py-3.5"
                   >
-                    {/* Unread was a small word competing with three other
-                        chips. A rail reads before any of them. */}
-                    {isNew && (
-                      <span
-                        aria-hidden="true"
-                        className="absolute inset-y-0 left-0 w-[3px] bg-mint"
-                      />
-                    )}
-
                     <Checkbox
                       checked={checked.has(f.id)}
                       onCheckedChange={() => toggle(f.id)}
@@ -301,17 +289,21 @@ export function InboxView({ initialId }: { initialId?: string }) {
                             type={f.type}
                             className="shrink-0 text-steel"
                           />
+                          {/* Unread carries on weight and contrast, not
+                              colour. Read rows recede instead of unread rows
+                              shouting, which keeps the accent meaning
+                              something on a list where most rows are unread. */}
                           <p
                             className={cn(
-                              "min-w-0 flex-1 truncate text-[0.875rem] text-ink",
-                              isNew ? "font-semibold" : "font-medium",
+                              "min-w-0 flex-1 truncate text-[0.875rem]",
+                              isNew
+                                ? "font-semibold text-ink"
+                                : "font-normal text-steel",
                             )}
                           >
                             {f.summary ?? f.body}
                           </p>
-                          {isNew && (
-                            <span className="sr-only">Unread</span>
-                          )}
+                          {isNew && <span className="sr-only">Unread</span>}
                         </div>
 
                         {preview && (
@@ -321,8 +313,11 @@ export function InboxView({ initialId }: { initialId?: string }) {
                         )}
 
                         <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.72rem] text-steel">
+                          {/* Neutral, not mint. This chip is on nearly every
+                              row, and an accent that appears everywhere stops
+                              reading as one. */}
                           {f.theme && (
-                            <span className="rounded-full bg-mint-wash px-2 py-0.5 font-medium text-mint-deep">
+                            <span className="max-w-[24ch] truncate rounded-full bg-sunken px-2 py-0.5 font-medium text-steel">
                               {f.theme.title}
                             </span>
                           )}

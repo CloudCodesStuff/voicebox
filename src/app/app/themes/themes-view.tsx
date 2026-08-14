@@ -10,9 +10,7 @@ import { CLUSTER_STAGES, WorkingButton } from "@/components/app/working-label";
 import {
   EmptyState,
   PageHeader,
-  SentimentBadge,
   SentimentBar,
-  Sparkline,
   relativeTime,
   trendDirection,
 } from "@/components/app/ui";
@@ -183,7 +181,7 @@ export function ThemesView() {
                     <span
                       className={cn(
                         "absolute top-4 left-0 w-12 text-center text-[0.95rem] leading-none font-bold tabular-nums",
-                        i === 0 ? "text-mint-deep" : "text-faint",
+                        i === 0 ? "text-ink" : "text-faint",
                       )}
                     >
                       {i + 1}
@@ -192,10 +190,12 @@ export function ThemesView() {
                     <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
+                          {/* No sentiment badge here. The share bar and the
+                              percentage below already carry sentiment, and more
+                              precisely than a one-word label does. */}
                           <h3 className="text-[1rem] font-semibold text-ink">
                             {theme.title}
                           </h3>
-                          <SentimentBadge sentiment={theme.sentiment} />
                           {theme.status !== "ACTIVE" && (
                             <span className="rounded-full bg-sunken px-2 py-0.5 text-[0.75rem] font-medium text-steel capitalize">
                               {theme.status.toLowerCase()}
@@ -211,21 +211,21 @@ export function ThemesView() {
                           used to order the page, and then never shown, which
                           left "ranked by priority" as something to take on
                           trust rather than something to read. */}
-                      <div className="flex shrink-0 items-center gap-4">
-                        <div className="hidden text-steel sm:block">
-                          <Sparkline data={trend} />
+                      {/* No sparkline either: the momentum tag below says which
+                          way this is going in a word, and a 56px chart next to
+                          it was a second answer to a question already
+                          answered. It stays on the theme page, where it has the
+                          room to show shape rather than just direction. */}
+                      <div className="shrink-0 text-right">
+                        <div
+                          className={cn(
+                            "text-[1.15rem] leading-none font-bold tabular-nums",
+                            sort === "priority" ? "text-ink" : "text-steel",
+                          )}
+                        >
+                          {Math.round(theme.priorityScore)}
                         </div>
-                        <div className="text-right">
-                          <div
-                            className={cn(
-                              "text-[1.15rem] leading-none font-bold tabular-nums",
-                              sort === "priority" ? "text-ink" : "text-steel",
-                            )}
-                          >
-                            {Math.round(theme.priorityScore)}
-                          </div>
-                          <div className="label mt-1">priority</div>
-                        </div>
+                        <div className="label mt-1">priority</div>
                       </div>
                     </div>
 
@@ -234,8 +234,10 @@ export function ThemesView() {
                           items and two items stop looking alike. */}
                       <span className="flex items-center gap-2">
                         <span className="h-1.5 w-20 overflow-hidden rounded-full bg-sunken">
+                          {/* Neutral: this is a magnitude, not good news. Mint
+                              on every row made the accent meaningless. */}
                           <span
-                            className="block h-full rounded-full bg-mint"
+                            className="block h-full rounded-full bg-steel"
                             style={{
                               width: `${Math.max(4, (theme.itemCount / maxCount) * 100)}%`,
                             }}
