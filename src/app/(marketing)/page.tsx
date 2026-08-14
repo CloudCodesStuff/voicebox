@@ -52,15 +52,15 @@ const faqGroups: FaqGroup[] = [
     items: [
       {
         q: "How long does setup take?",
-        a: "About four minutes. One script tag in your layout, the same as any analytics snippet. The setup screen watches for your first submission and tells you the moment it arrives.",
+        a: "About four minutes: one script tag in your layout. The setup screen confirms the moment your first submission arrives.",
       },
       {
         q: "Will it wreck my styling?",
-        a: "No. Everything renders inside a Shadow DOM root, so your CSS can't reach in and ours can't leak out. We test it against a page that forces red backgrounds and lime borders onto every button.",
+        a: "No. The widget renders inside a Shadow DOM root, so your CSS can't reach in and ours can't leak out.",
       },
       {
         q: "How much feedback before it's useful?",
-        a: "Sentiment and summaries start on the first submission. Themes need a pattern, so they appear once there are around twenty analyzed pieces, which the free plan's twenty-five a month is enough to reach.",
+        a: "Sentiment and summaries start with the first submission. Themes appear once around twenty pieces have been analyzed.",
       },
       {
         q: "Can I run it on more than one product?",
@@ -81,7 +81,7 @@ const faqGroups: FaqGroup[] = [
       },
       {
         q: "What if the AI is wrong?",
-        a: "Every theme is editable and every piece of feedback keeps its original text. The ranking is arithmetic you can check, not a black box: volume, times negative share, times recency decay.",
+        a: "Every theme is editable and every piece of feedback keeps its original text. The ranking is plain arithmetic: volume, negative share, recency.",
       },
     ],
   },
@@ -160,25 +160,22 @@ export default function LandingPage() {
       </div>
 
       {/* -------------------------------------------------------- PLATFORMS */}
-      <section className="py-10 md:py-20 lg:py-28">
-        <h2 className="mx-auto max-w-xl px-4 text-center text-[1.05rem] font-medium text-steel">
-          Runs anywhere you ship.{" "}
-          <br className="hidden sm:block" />
-          <span className="text-faint">
-            No package to install, no framework to match.
-          </span>
-        </h2>
-
-        <RevealGroup className="mx-auto mt-10 grid max-w-5xl grid-cols-3 gap-x-4 gap-y-6 px-4 sm:grid-cols-4 md:grid-cols-6">
-          {PLATFORMS.map((p) => (
-            <div
-              key={p}
-              className="text-center text-[0.9rem] font-medium text-faint transition-colors hover:text-ink"
-            >
-              {p}
-            </div>
-          ))}
-        </RevealGroup>
+      {/* One quiet strip, not a 3x4 grid of hover-words. A grid at that size
+          apes a logo wall without having logos, which reads as the absence of
+          the thing it imitates. A single confident line reads as a fact. */}
+      <section className="border-y border-line/60 py-9 md:py-12">
+        <div className="mx-auto max-w-5xl px-4 text-center">
+          <p className="text-[0.78rem] font-medium tracking-[0.08em] text-faint uppercase">
+            Runs anywhere you ship
+          </p>
+          <RevealGroup className="mt-4 flex flex-wrap items-baseline justify-center gap-x-7 gap-y-2">
+            {PLATFORMS.map((p) => (
+              <span key={p} className="text-[0.92rem] font-medium text-steel">
+                {p}
+              </span>
+            ))}
+          </RevealGroup>
+        </div>
       </section>
 
       {/* ----------------------------------------------------------- BENTO */}
@@ -193,8 +190,7 @@ export default function LandingPage() {
         </Reveal>
         <Reveal delay={0.05}>
           <p className="mt-3 text-sm text-steel md:text-base lg:text-lg">
-            Everything between someone typing and you shipping the fix. You
-            do the last part.
+            Everything between someone typing and you shipping the fix.
           </p>
         </Reveal>
 
@@ -202,8 +198,8 @@ export default function LandingPage() {
           <BentoCard
             className="md:row-span-2"
             eyebrow="Drop-in"
-            title="A widget you'd actually ship"
-            body="One script tag. Your colour, your words, your typeface, any corner. Around 11KB over the wire."
+            title="A widget that gets replies"
+            body="Type chips, an optional rating, one message box. About 11KB, isolated from your CSS, loaded after your page is idle."
           >
             <WidgetSkeleton />
           </BentoCard>
@@ -244,8 +240,8 @@ export default function LandingPage() {
           </BentoCard>
 
           <BentoCard
-            eyebrow="Monday"
-            title="The weekly email"
+            eyebrow="Weekly digest"
+            title="Monday morning, summarized"
             body="Three themes worth acting on, how volume moved, quotes worth reading. Quiet weeks send nothing."
           >
             <DigestSkeleton />
@@ -316,8 +312,8 @@ export default function LandingPage() {
           </Reveal>
           <Reveal delay={0.05}>
             <p className="mx-auto mt-4 max-w-md text-center text-base text-steel md:text-lg">
-              You pay for how much feedback you collect. The AI is on every
-              plan, including free.
+              Every plan gets the full product, analysis included. Paid plans
+              buy volume.
             </p>
           </Reveal>
 
@@ -331,9 +327,25 @@ export default function LandingPage() {
             <p className="mt-8 text-center text-[0.84rem] text-steel">
               Annual is two months cheaper.{" "}
               <Link href="/pricing" className="text-ink underline">
-                Compare every line
+                See full pricing
               </Link>
             </p>
+          </Reveal>
+
+          {/* Each of these is a page or a feature that exists, not a badge:
+              the DPA is at /dpa, export lives in settings on every plan, and
+              cancellation is self-serve from billing. */}
+          <Reveal delay={0.1}>
+            <div className="mx-auto mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 border-t border-line/60 pt-8 text-[0.8rem] text-faint">
+              <Link href="/dpa" className="transition-colors hover:text-ink">
+                GDPR DPA included
+              </Link>
+              <span>Export everything, any time</span>
+              <span>Cancel from the billing page</span>
+              <Link href="/docs/security" className="transition-colors hover:text-ink">
+                Security &amp; privacy
+              </Link>
+            </div>
           </Reveal>
         </div>
       </section>
@@ -343,11 +355,8 @@ export default function LandingPage() {
         <Reveal>
           <div className="text-center">
             <h2 className="text-2xl font-bold tracking-tight text-balance text-ink md:text-4xl lg:text-5xl">
-              Questions people ask
+              Frequently asked questions
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-sm text-steel md:text-base lg:text-lg">
-              Everything worth knowing before you paste the line in.
-            </p>
           </div>
         </Reveal>
 
@@ -362,9 +371,8 @@ export default function LandingPage() {
               Know what to fix by tomorrow.
             </h2>
             <p className="mt-6 max-w-lg text-base text-steel lg:text-lg">
-              Paste one line today. Your users are already telling you what to
-              build. By morning it is six things to fix, not four hundred
-              messages you keep meaning to read.
+              Your users are already telling you what to build. By tomorrow
+              it&apos;s a ranked list, not four hundred unread messages.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <CtaButton href="/signin" variant="accent">
