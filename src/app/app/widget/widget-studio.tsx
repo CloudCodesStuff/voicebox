@@ -5,11 +5,17 @@ import {
   Check,
   Code2,
   Copy,
+  Heart,
+  HelpCircle,
   ImageDown,
+  Lightbulb,
   Link2,
   Loader2,
   Lock,
+  type LucideIcon,
+  MessageSquare,
   Sparkles,
+  Star,
   Wand2,
 } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
@@ -18,7 +24,7 @@ import { toast } from "sonner";
 import { ColorPicker } from "@/components/app/color-picker";
 import { useProject } from "@/components/app/project-context";
 import {
-  PositionPreview,
+  TriggerStage,
   WidgetLivePreview,
 } from "@/components/app/widget-live-preview";
 import { actionClass, PageHeader } from "@/components/app/ui";
@@ -33,8 +39,16 @@ import {
   feedbackTypes,
   fontKeys,
   fontStacks,
+  triggerIconKeys,
+  triggerIcons,
+  triggerSizeKeys,
+  triggerSizes,
+  triggerStyleKeys,
+  triggerStyles,
   typeCopy,
+  type TriggerIcon,
   type WidgetConfig,
+  type WidgetPosition,
 } from "@/lib/widget-config";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/client";
@@ -46,12 +60,21 @@ function joinWithAnd(items: string[]): string {
   return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
 }
 
-const POSITIONS = [
-  { key: "top-left", label: "Top left" },
-  { key: "top-right", label: "Top right" },
-  { key: "bottom-left", label: "Bottom left" },
-  { key: "bottom-right", label: "Bottom right" },
-] as const;
+const POSITION_LABELS: Record<WidgetPosition, string> = {
+  "top-left": "Top left",
+  "top-right": "Top right",
+  "bottom-left": "Bottom left",
+  "bottom-right": "Bottom right",
+};
+
+/** Same five the runtime can draw, same order. */
+const TRIGGER_ICON_COMPONENTS: Record<TriggerIcon, LucideIcon> = {
+  message: MessageSquare,
+  star: Star,
+  lightbulb: Lightbulb,
+  heart: Heart,
+  help: HelpCircle,
+};
 
 const PRESET_COLORS = [
   "#00C48C",
@@ -197,8 +220,17 @@ function StudioEditor({
       : ([{ key: "trigger", label: "Button" }] as const)),
   ] as const;
 
-  const currentPosition =
-    POSITIONS.find((p) => p.key === config.position)?.label ?? "";
+  const currentPosition = POSITION_LABELS[config.position];
+
+  /**
+   * Anything that changes the launcher pulls the preview onto the Button tab.
+   * Otherwise you drag the size slider on the left while the panel, which the
+   * slider does not touch, sits unchanged on the right.
+   */
+  function setTrigger<K extends keyof WidgetConfig>(key: K, value: WidgetConfig[K]) {
+    set(key, value);
+    setPreviewState("trigger");
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 pb-28 sm:px-6">
@@ -351,81 +383,47 @@ function StudioEditor({
           </Panel>
 
           <Panel
-            title="Placement"
-            hint="Where the button sits, how round everything is, light or dark."
+            title="Corners and theme"
+            hint="How round everything is, and whether the panel is light or dark."
             current={
-              <span className="rounded-full border border-line px-2.5 py-1 text-[0.78rem] text-steel">
-                {currentPosition}
+              <span className="tnum rounded-full border border-line px-2.5 py-1 text-[0.78rem] text-steel capitalize">
+                {config.radius === 0 ? "Sharp" : `${config.radius}px`} ·{" "}
+                {config.theme}
               </span>
             }
           >
-            <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
+            <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                {/* A corner is a spatial choice, so the picker is spatial: a
-                    little page with four corner targets, not four labels that
-                    make you translate words into places. */}
+                <div className="flex items-baseline justify-between">
+                  <span className="text-[0.84rem] font-medium text-ink">
+                    Corner radius
+                  </span>
+                  <span className="tnum text-[0.78rem] text-steel">
+                    {config.radius === 0 ? "Sharp" : `${config.radius}px`}
+                  </span>
+                </div>
+                <Slider
+                  aria-label="Corner radius"
+                  min={0}
+                  max={24}
+                  step={1}
+                  value={[config.radius]}
+                  onValueChange={([v]) => set("radius", v ?? 0)}
+                  className="mt-3"
+                />
+                <p className="mt-2.5 text-[0.8rem] leading-relaxed text-steel">
+                  Zero is genuinely sharp. At the top of the range an icon-only
+                  button becomes a circle.
+                </p>
+              </div>
+
+              <div>
+                <span className="text-[0.84rem] font-medium text-ink">Theme</span>
                 <div
+                  className="mt-2 flex gap-2"
                   role="group"
-                  aria-label="Widget position"
-                  className="relative h-[120px] rounded-lg border border-line bg-sunken"
+                  aria-label="Widget theme"
                 >
-                  <div className="absolute inset-x-0 top-0 flex h-5 items-center gap-1 rounded-t-lg border-b border-line bg-paper-2 px-2">
-                    <span className="size-1.5 rounded-full bg-line-strong" />
-                    <span className="size-1.5 rounded-full bg-line-strong" />
-                    <span className="size-1.5 rounded-full bg-line-strong" />
-                  </div>
-                  {POSITIONS.map((p) => {
-                    const on = config.position === p.key;
-                    const [v, h] = p.key.split("-");
-                    return (
-                      <button
-                        key={p.key}
-                        type="button"
-                        aria-pressed={on}
-                        aria-label={p.label}
-                        title={p.label}
-                        onClick={() => set("position", p.key)}
-                        className={cn(
-                          "absolute grid size-10 place-items-center rounded-lg transition-colors",
-                          v === "top" ? "top-6" : "bottom-2",
-                          h === "left" ? "left-2" : "right-2",
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            "size-[18px] rounded-md border-2 transition-all",
-                            on
-                              ? "scale-110 border-mint bg-mint"
-                              : "border-line-strong bg-paper-2 hover:border-steel",
-                          )}
-                        />
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="mt-2 text-[0.8rem] text-steel">{currentPosition}</p>
-
-                <div className="mt-5">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-[0.84rem] font-medium text-ink">
-                      Corner radius
-                    </span>
-                    <span className="tnum text-[0.78rem] text-steel">
-                      {config.radius === 0 ? "Sharp" : `${config.radius}px`}
-                    </span>
-                  </div>
-                  <Slider
-                    aria-label="Corner radius"
-                    min={0}
-                    max={24}
-                    step={1}
-                    value={[config.radius]}
-                    onValueChange={([v]) => set("radius", v ?? 0)}
-                    className="mt-3"
-                  />
-                </div>
-
-                <div className="mt-5 flex gap-2" role="group" aria-label="Widget theme">
                   {(["light", "dark", "auto"] as const).map((t) => (
                     <button
                       key={t}
@@ -441,25 +439,242 @@ function StudioEditor({
                     </button>
                   ))}
                 </div>
-                <p className="mt-2 text-[0.8rem] text-steel">
+                <p className="mt-2.5 text-[0.8rem] leading-relaxed text-steel">
                   Auto follows each visitor&apos;s own system setting.
                 </p>
               </div>
+            </div>
+          </Panel>
 
-              <PositionPreview config={config} className="h-full min-h-[120px]" />
+          {/* The launcher used to be spread across three panels: its label was
+              filed under Words, its corner under Placement, and switching it
+              off lived among the form fields. It is one object on somebody
+              else's page, so it gets one place to design it. */}
+          <Panel
+            title="The button"
+            hint="The floating launcher on your site. Everything about how it looks and where it sits."
+            current={
+              <span className="rounded-full border border-line px-2.5 py-1 text-[0.78rem] text-steel">
+                {config.triggerHidden ? "Hidden" : currentPosition}
+              </span>
+            }
+          >
+            <Toggle
+              label="Show the floating button"
+              hint={
+                config.triggerHidden
+                  ? "Off. Open the widget from your own UI with Voicebox('open') or a [data-voicebox-trigger] element."
+                  : "The button sits on every page the snippet is on."
+              }
+              checked={!config.triggerHidden}
+              onChange={(v) => {
+                set("triggerHidden", !v);
+                setPreviewState(v ? "trigger" : "form");
+              }}
+            />
+
+            {/* Dimmed rather than unmounted: the settings still exist and come
+                back exactly as they were, and you can see what is waiting. */}
+            <div
+              className={cn(
+                "@container mt-5 border-t border-line pt-5 transition-opacity",
+                config.triggerHidden && "pointer-events-none opacity-40",
+              )}
+              inert={config.triggerHidden}
+            >
+              {/* Container query, not a viewport one. What decides whether
+                  this can be two columns is how wide THIS panel is, and the
+                  page has already spent 400px of the window on the preview by
+                  the time xl hits. Keyed to the viewport it split at 1280 into
+                  a 250px column, which crushed the shape tiles and overflowed
+                  the size row. */}
+              <div className="grid gap-5 @[600px]:grid-cols-[minmax(0,1fr)_minmax(0,300px)]">
+                <div className="space-y-5">
+                  <div role="group" aria-label="Button shape">
+                    <span className="text-[0.84rem] font-medium text-ink">
+                      Shape
+                    </span>
+                    <div className="mt-2 grid grid-cols-3 gap-2">
+                      {triggerStyleKeys.map((key) => {
+                        const on = config.triggerStyle === key;
+                        const Icon =
+                          TRIGGER_ICON_COMPONENTS[config.triggerIcon] ??
+                          MessageSquare;
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            aria-pressed={on}
+                            aria-label={triggerStyles[key].label}
+                            onClick={() => setTrigger("triggerStyle", key)}
+                            className={cn(
+                              "rounded-lg border px-2 py-3 transition-colors",
+                              on ? CHOICE_ON : CHOICE_OFF,
+                            )}
+                          >
+                            {/* Drawn in the real accent, so the choice is a
+                                picture of the outcome rather than three
+                                phrases you have to imagine. */}
+                            <span
+                              className="mx-auto flex h-6 items-center justify-center gap-1"
+                              style={{
+                                width: key === "icon" ? 24 : 58,
+                                background: config.accentColor,
+                                color: readableOn(config.accentColor),
+                                borderRadius: Math.min(config.radius, 12),
+                              }}
+                              aria-hidden="true"
+                            >
+                              {key !== "label" && (
+                                <Icon className="size-3" strokeWidth={2} />
+                              )}
+                              {key !== "icon" && (
+                                <span className="h-[3px] w-6 rounded-full bg-current opacity-80" />
+                              )}
+                            </span>
+                            <span className="mt-2 block text-[0.74rem] font-medium">
+                              {triggerStyles[key].label}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {config.triggerStyle !== "label" && (
+                    <div role="group" aria-label="Button icon">
+                      <span className="text-[0.84rem] font-medium text-ink">
+                        Icon
+                      </span>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {triggerIconKeys.map((key) => {
+                          const Icon = TRIGGER_ICON_COMPONENTS[key];
+                          const on = config.triggerIcon === key;
+                          return (
+                            <button
+                              key={key}
+                              type="button"
+                              aria-pressed={on}
+                              aria-label={triggerIcons[key]}
+                              title={triggerIcons[key]}
+                              onClick={() => setTrigger("triggerIcon", key)}
+                              className={cn(
+                                "grid size-10 place-items-center rounded-lg border transition-colors",
+                                on ? CHOICE_ON : CHOICE_OFF,
+                              )}
+                            >
+                              <Icon className="size-4" strokeWidth={1.9} />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  <div role="group" aria-label="Button size">
+                    <span className="text-[0.84rem] font-medium text-ink">
+                      Size
+                    </span>
+                    <div className="mt-2 flex gap-2">
+                      {triggerSizeKeys.map((key) => {
+                        const on = config.triggerSize === key;
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            aria-pressed={on}
+                            onClick={() => setTrigger("triggerSize", key)}
+                            className={cn(
+                              // The measurement sits under the name rather
+                              // than beside it: side by side, "Large 48px"
+                              // outgrows a third of a narrow column.
+                              "min-h-9 min-w-0 flex-1 rounded-lg border px-2 py-1.5 text-[0.82rem] font-medium transition-colors",
+                              on ? CHOICE_ON : CHOICE_OFF,
+                            )}
+                          >
+                            <span className="block truncate">
+                              {triggerSizes[key].label}
+                            </span>
+                            <span className="tnum block text-[0.72rem] text-steel">
+                              {triggerSizes[key].height}px
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div>
+                    <Field
+                      label="Label"
+                      value={config.triggerLabel}
+                      maxLength={24}
+                      onChange={(v) => setTrigger("triggerLabel", v)}
+                    />
+                    <p className="mt-1.5 text-[0.8rem] leading-relaxed text-steel">
+                      {config.triggerStyle === "icon"
+                        ? "Not shown on an icon-only button, but it is what screen readers announce and what the tooltip says."
+                        : "Two or three words. Anything longer gets cramped on a phone."}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-[0.84rem] font-medium text-ink">
+                    Corner
+                  </span>
+                  <TriggerStage
+                    config={config}
+                    onPick={(p) => setTrigger("position", p)}
+                    offsetScale={0.5}
+                    className="mt-2 h-[186px]"
+                  />
+                  <p className="mt-2 text-[0.8rem] text-steel">
+                    {currentPosition}. Click a corner to move it.
+                  </p>
+
+                  <div className="mt-5">
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-[0.84rem] font-medium text-ink">
+                        Distance from the edge
+                      </span>
+                      <span className="tnum text-[0.78rem] text-steel">
+                        {config.triggerOffset}px
+                      </span>
+                    </div>
+                    <Slider
+                      aria-label="Distance from the edge"
+                      min={0}
+                      max={160}
+                      step={4}
+                      value={[config.triggerOffset]}
+                      onValueChange={([v]) => setTrigger("triggerOffset", v ?? 20)}
+                      className="mt-3"
+                    />
+                    <p className="mt-2.5 text-[0.8rem] leading-relaxed text-steel">
+                      Push it clear of anything already in that corner, like a
+                      chat bubble or a cookie bar. The panel follows it.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 border-t border-line pt-5">
+                <Toggle
+                  label="Hide it on phones"
+                  hint="A phone has one corner worth having. Your own UI can still open the widget there."
+                  checked={config.triggerHideOnMobile}
+                  onChange={(v) => set("triggerHideOnMobile", v)}
+                />
+              </div>
             </div>
           </Panel>
 
           <Panel
             title="Words"
-            hint="Everything your visitors read, in your voice."
+            hint="Everything your visitors read inside the panel, in your voice."
           >
             <div className="space-y-4">
-              <Field
-                label="Button label"
-                value={config.triggerLabel}
-                onChange={(v) => set("triggerLabel", v)}
-              />
               <Field
                 label="Heading"
                 value={config.heading}
@@ -557,15 +772,6 @@ function StudioEditor({
                 onChange={(v) => set("askEmail", v)}
               />
               <Toggle
-                label="Hide the floating button"
-                hint="Open it from your own UI with Voicebox('open') instead."
-                checked={config.triggerHidden}
-                onChange={(v) => {
-                  set("triggerHidden", v);
-                  if (v && previewState === "trigger") setPreviewState("form");
-                }}
-              />
-              <Toggle
                 label={`Remove ${site.name} branding`}
                 hint={
                   canRemoveBranding
@@ -660,18 +866,26 @@ function StudioEditor({
           {/* One frame, fixed height, so switching tabs never makes the page
               jump. The backdrop follows the WIDGET's theme, not the app's:
               you're looking at your site, not at Voicebox. */}
-          <div
-            className={cn(
-              "flex min-h-[440px] items-center justify-center rounded-2xl border border-line p-6 transition-colors",
-              config.theme === "dark" ? "bg-slab" : "bg-[#eef0ef]",
-            )}
-          >
-            <WidgetLivePreview config={config} state={shownPreview} />
-          </div>
+          {shownPreview === "trigger" ? (
+            // The button is judged in place, at its real size, against the
+            // corner of a page. Floating in the middle of an empty card it
+            // could be any size and any distance from anything.
+            <TriggerStage config={config} className="h-[440px]" />
+          ) : (
+            <div
+              className={cn(
+                "flex min-h-[440px] items-center justify-center rounded-2xl border border-line p-6 transition-colors",
+                config.theme === "dark" ? "bg-slab" : "bg-[#eef0ef]",
+              )}
+            >
+              <WidgetLivePreview config={config} state={shownPreview} />
+            </div>
+          )}
 
           <p className="mt-3 text-[0.8rem] leading-relaxed text-steel">
-            This is the live widget, not a picture. Click the chips and the
-            stars.
+            {shownPreview === "trigger"
+              ? "Your button at full size, in the corner you picked, the distance you set from the edge."
+              : "This is the live widget, not a picture. Click the chips and the stars."}
           </p>
         </div>
       </div>
@@ -905,22 +1119,33 @@ function Field({
   onChange,
   onFocus,
   onBlur,
+  maxLength,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
+  /** Mirrors the schema's own cap, so the limit is felt before it is enforced. */
+  maxLength?: number;
 }) {
   const id = useId();
   return (
     <div>
-      <Label htmlFor={id} className="text-[0.84rem] font-medium text-ink">
-        {label}
-      </Label>
+      <div className="flex items-baseline justify-between gap-3">
+        <Label htmlFor={id} className="text-[0.84rem] font-medium text-ink">
+          {label}
+        </Label>
+        {maxLength != null && (
+          <span className="tnum text-[0.74rem] text-faint">
+            {value.length}/{maxLength}
+          </span>
+        )}
+      </div>
       <Input
         id={id}
         value={value}
+        maxLength={maxLength}
         onChange={(e) => onChange(e.target.value)}
         onFocus={onFocus}
         onBlur={onBlur}

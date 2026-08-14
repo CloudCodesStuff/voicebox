@@ -116,9 +116,9 @@ Voicebox("open")                    // renders?`}
       <p className="mt-3 text-[0.9rem] leading-relaxed text-steel">
         If <code className="font-mono">Voicebox(&quot;open&quot;)</code> opens
         the panel, everything works and the floating trigger is simply hidden.
-        Turn it back on under <strong className="text-ink">Widget → Trigger</strong>
-        , or keep it hidden and open the panel from your own button, which is
-        what{" "}
+        Turn it back on under{" "}
+        <strong className="text-ink">Widget → The button</strong>, or keep it
+        hidden and open the panel from your own button, which is what{" "}
         <Link href="/docs/triggers" className="text-ink underline">
           Triggers
         </Link>{" "}
@@ -129,7 +129,14 @@ Voicebox("open")                    // renders?`}
         very high stacking position inside its own root. An element on your page
         with an extreme <code className="font-mono">z-index</code> can still win.
         Check what is overlapping that corner, or move the widget to a different
-        one in the studio.
+        one in the studio. If the two only collide and do not stack, raise{" "}
+        <strong className="text-ink">Distance from the edge</strong> instead and
+        the button steps over whatever is already sitting there.
+      </p>
+      <p className="mt-3 text-[0.9rem] leading-relaxed text-steel">
+        Missing on a phone but present on a desktop is a setting, not a bug:{" "}
+        <strong className="text-ink">Hide it on phones</strong> removes the
+        button below 640px wide. Your own triggers keep working there.
       </p>
 
       <H2 id="rejected">4. Submissions are rejected</H2>

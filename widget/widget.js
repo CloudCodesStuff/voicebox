@@ -118,6 +118,14 @@
     inherit: "inherit",
   };
 
+  // Launcher measurements. Keep in sync with src/lib/widget-config.ts, which is
+  // where the studio and the live preview read the same numbers from.
+  var TRIGGER_SIZES = {
+    sm: { height: 34, icon: 14, font: 12.5, gap: 6, padding: 12 },
+    md: { height: 40, icon: 16, font: 13.5, gap: 7, padding: 15 },
+    lg: { height: 48, icon: 18, font: 15, gap: 8, padding: 19 },
+  };
+
   var TYPE_META = {
     IDEA: { label: "Idea", icon: "lightbulb", ph: "What would you love to see us build?" },
     ISSUE: { label: "Issue", icon: "bug", ph: "What went wrong? What were you trying to do?" },
@@ -169,9 +177,19 @@
     var atTop = c.position.indexOf("top") === 0;
     var atLeft = c.position.indexOf("left") > -1;
 
-    var vertical = atTop ? "top:20px;" : "bottom:20px;";
-    var horizontal = atLeft ? "left:20px;" : "right:20px;";
+    var size = TRIGGER_SIZES[c.triggerSize] || TRIGGER_SIZES.md;
+    var iconOnly = c.triggerStyle === "icon";
+    // Distance from the page edge. Configurable because the corner a site can
+    // spare is rarely the corner a chat bubble has already taken.
+    var edge = typeof c.triggerOffset === "number" ? c.triggerOffset : 20;
+
+    var vertical = (atTop ? "top:" : "bottom:") + edge + "px;";
+    var horizontal = (atLeft ? "left:" : "right:") + edge + "px;";
     var slideFrom = atTop ? "-8px" : "8px";
+
+    // The panel hangs off the trigger, so its offset is the button's own height
+    // plus a gap. Hardcoded at 56px this only lined up at one button size.
+    var panelGap = size.height + 16;
 
     // The panel is absolutely positioned inside `.wrap`, which is already
     // inset from the viewport and shrink-wraps the trigger. Its offset is
@@ -183,9 +201,10 @@
     var panelEdge = atLeft ? "left:0;" : "right:0;";
 
     // Distance from the viewport edge to the panel on mobile, where the panel
-    // is pinned to the viewport rather than to the trigger:
-    // 20px wrap inset + 40px trigger + 16px gap.
-    var MOBILE_CLEAR = 76;
+    // is pinned to the viewport rather than to the trigger: the wrap's own
+    // inset, plus the trigger, plus the gap. Floored so a zero offset with a
+    // hidden button still leaves the panel off the very edge of the screen.
+    var MOBILE_CLEAR = Math.max(edge + panelGap, 24);
 
     var font = FONTS[c.font] || FONTS.sans;
 
@@ -199,20 +218,28 @@
       ":host{all:initial;}" +
       "*{box-sizing:border-box;margin:0;padding:0;font-family:" + font + ";}" +
       ".wrap{position:fixed;z-index:2147483000;" + vertical + horizontal + "}" +
-      // Trigger
-      ".trigger{display:inline-flex;align-items:center;gap:7px;height:40px;padding:0 15px;" +
+      // Trigger. Height, padding and type all come from the size table, and
+      // icon-only becomes a square whose radius the slider takes all the way
+      // from a sharp tile to a round bubble.
+      ".trigger{display:inline-flex;align-items:center;justify-content:center;" +
+      "gap:" + size.gap + "px;height:" + size.height + "px;" +
+      (iconOnly
+        ? "width:" + size.height + "px;padding:0;"
+        : "padding:0 " + size.padding + "px;") +
       "border:none;border-radius:" + r + "px;cursor:pointer;" +
       "background:" + c.accentColor + ";color:" + onAccent + ";" +
-      "font-size:13.5px;font-weight:560;letter-spacing:-.005em;" +
+      "font-size:" + size.font + "px;font-weight:560;letter-spacing:-.005em;" +
       "box-shadow:0 4px 12px -3px rgba(9,9,11,.18),0 1px 3px rgba(9,9,11,.1);" +
       "transition:transform .16s cubic-bezier(.2,.8,.2,1),box-shadow .16s;}" +
+      ".trigger svg{flex:none;}" +
       ".trigger:hover{transform:translateY(-1px);" +
       "box-shadow:0 8px 20px -6px rgba(9,9,11,.22),0 2px 5px rgba(9,9,11,.12);}" +
       ".trigger:active{transform:translateY(0);}" +
       ".trigger:focus-visible{outline:2px solid " + c.accentColor + ";outline-offset:3px;}" +
 
       // Panel
-      ".panel{position:absolute;" + vertical.replace(/(\d+)px/, "56px") + panelEdge +
+      ".panel{position:absolute;" +
+      (atTop ? "top:" : "bottom:") + panelGap + "px;" + panelEdge +
       "width:352px;max-width:calc(100vw - 32px);background:" + bg + ";color:" + fg + ";" +
       "border:1px solid " + border + ";border-radius:" + (r > 0 ? r + 4 : 0) + "px;" +
       "box-shadow:" + shadow + ";overflow:hidden;" +
@@ -380,7 +407,13 @@
       ".rate{margin-bottom:8px;min-height:24px;}" +
       ".types{margin-bottom:8px;}" +
       ".foot{padding:6px 16px;}" +
-      "}"
+      "}" +
+      // Opt-in. A phone has one usable corner and plenty of sites have already
+      // spent it. Hiding only the button leaves Voicebox('open') and any
+      // [data-voicebox-trigger] on the page working exactly as before.
+      (c.triggerHideOnMobile
+        ? "@media(max-width:640px){.trigger{display:none;}}"
+        : "")
     );
   }
 
@@ -474,9 +507,27 @@
     wrap.className = "wrap";
 
     if (!c.triggerHidden) {
+      var size = TRIGGER_SIZES[c.triggerSize] || TRIGGER_SIZES.md;
       var trigger = document.createElement("button");
       trigger.className = "trigger";
-      trigger.innerHTML = icon("message", 16) + "<span>" + esc(c.triggerLabel) + "</span>";
+      trigger.type = "button";
+
+      var markup = "";
+      if (c.triggerStyle !== "label") {
+        markup += icon(ICONS[c.triggerIcon] ? c.triggerIcon : "message", size.icon);
+      }
+      if (c.triggerStyle !== "icon") {
+        markup += "<span>" + esc(c.triggerLabel) + "</span>";
+      }
+      trigger.innerHTML = markup;
+
+      // Only when there is no visible text to read. Naming a button that
+      // already says "Feedback" would just make a screen reader repeat itself.
+      if (c.triggerStyle === "icon") {
+        trigger.setAttribute("aria-label", c.triggerLabel || "Give feedback");
+        trigger.setAttribute("title", c.triggerLabel || "Give feedback");
+      }
+
       trigger.addEventListener("click", toggle);
       wrap.appendChild(trigger);
     }

@@ -41,8 +41,10 @@ export default function TriggersDocs() {
       />
       <p className="mt-3 text-[0.9rem] leading-relaxed text-steel">
         Turn off the floating button under{" "}
-        <strong className="text-ink">Widget → Trigger</strong> when you are
-        supplying your own, otherwise you will have two ways in.
+        <strong className="text-ink">Widget → The button</strong> when you are
+        supplying your own, otherwise you will have two ways in. The same panel
+        can hide it on phones only, which is the usual answer when the button
+        is welcome on desktop and there is no room for it on a small screen.
       </p>
 
       <Callout type="note" title="Clicks during page load are not lost">

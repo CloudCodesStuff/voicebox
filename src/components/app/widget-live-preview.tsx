@@ -6,6 +6,7 @@ import {
   Heart,
   HelpCircle,
   Lightbulb,
+  type LucideIcon,
   MessageSquare,
   Send,
   Star,
@@ -17,8 +18,11 @@ import { readableOn } from "@/lib/image-color";
 import { site } from "@/lib/site";
 import {
   fontStacks,
+  triggerSizes,
   typeCopy,
   type FeedbackTypeKey,
+  type WidgetPosition,
+  type TriggerIcon,
   type WidgetConfig,
 } from "@/lib/widget-config";
 import { cn } from "@/lib/utils";
@@ -41,6 +45,15 @@ const ICONS: Record<FeedbackTypeKey, typeof Lightbulb> = {
   ISSUE: Bug,
   PRAISE: Heart,
   QUESTION: HelpCircle,
+};
+
+/** Matches the runtime's icon table one for one. */
+const TRIGGER_ICONS: Record<TriggerIcon, LucideIcon> = {
+  message: MessageSquare,
+  star: Star,
+  lightbulb: Lightbulb,
+  heart: Heart,
+  help: HelpCircle,
 };
 
 const RATE_WORDS = ["", "Awful", "Poor", "Fine", "Good", "Great"];
@@ -85,10 +98,21 @@ export function WidgetLivePreview({
   const shown = hovered || rating;
 
   if (state === "trigger") {
+    const size = triggerSizes[config.triggerSize] ?? triggerSizes.md;
+    const Icon = TRIGGER_ICONS[config.triggerIcon] ?? MessageSquare;
+    const iconOnly = config.triggerStyle === "icon";
+
     return (
       <div
-        className="inline-flex h-10 items-center gap-[7px] px-[15px] text-[13.5px] font-medium"
+        className="inline-flex items-center justify-center font-medium"
         style={{
+          height: size.height,
+          // A square, so the radius slider runs from a sharp tile all the way
+          // to a round bubble without a second control to explain it.
+          width: iconOnly ? size.height : undefined,
+          padding: iconOnly ? 0 : `0 ${size.padding}px`,
+          gap: size.gap,
+          fontSize: size.font,
           background: accent,
           color: onAccent,
           // No floor: radius 0 means genuinely sharp, everywhere.
@@ -99,8 +123,15 @@ export function WidgetLivePreview({
           fontFamily,
         }}
       >
-        <MessageSquare className="size-[15px]" strokeWidth={1.9} />
-        {config.triggerLabel}
+        {config.triggerStyle !== "label" && (
+          <Icon
+            style={{ width: size.icon, height: size.icon, flex: "none" }}
+            strokeWidth={1.9}
+          />
+        )}
+        {config.triggerStyle !== "icon" && (
+          <span className="truncate">{config.triggerLabel}</span>
+        )}
       </div>
     );
   }
@@ -312,46 +343,129 @@ export function WidgetLivePreview({
   );
 }
 
-/** Frame that shows where the widget sits, so position isn't an abstract word. */
-export function PositionPreview({
+const CORNERS: Array<{ key: WidgetPosition; label: string }> = [
+  { key: "top-left", label: "Top left" },
+  { key: "top-right", label: "Top right" },
+  { key: "bottom-left", label: "Bottom left" },
+  { key: "bottom-right", label: "Bottom right" },
+];
+
+/** Height of the fake browser chrome, so a top-placed button clears it. */
+const CHROME = 26;
+
+/**
+ * The button where it actually lives: on a page, in a corner, at a distance.
+ *
+ * This replaces a picker made of four words. A corner is a place, and the size,
+ * the shape and the gap from the edge are all things you judge by looking, not
+ * by reading "bottom right, 20px". With `onPick` the four corners become the
+ * control itself, so choosing a position and seeing the result are one act.
+ */
+export function TriggerStage({
   config,
   className,
+  onPick,
+  offsetScale = 1,
 }: {
   config: WidgetConfig;
   className?: string;
+  onPick?: (position: WidgetPosition) => void;
+  /** Shrinks the edge gap in the compact frame, where 1:1 would dominate it. */
+  offsetScale?: number;
 }) {
-  const [v, h] = config.position.split("-") as ["top" | "bottom", "left" | "right"];
+  const dark = config.theme === "dark";
+  const off = Math.round(config.triggerOffset * offsetScale);
+
+  function place(key: WidgetPosition) {
+    const [v, h] = key.split("-") as ["top" | "bottom", "left" | "right"];
+    return {
+      [v]: v === "top" ? off + CHROME : off,
+      [h]: off,
+      maxWidth: `calc(100% - ${off * 2 + 8}px)`,
+    } as React.CSSProperties;
+  }
 
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-lg border border-line bg-sunken",
+        "relative overflow-hidden rounded-xl border border-line",
         className,
       )}
-      aria-hidden="true"
+      style={{ background: dark ? "#0e0e11" : "#ffffff" }}
     >
-      <div className="absolute inset-x-0 top-0 flex h-5 items-center gap-1 border-b border-line bg-paper px-2">
-        <span className="size-1.5 rounded-full bg-line-strong" />
-        <span className="size-1.5 rounded-full bg-line-strong" />
-        <span className="size-1.5 rounded-full bg-line-strong" />
+      {/* A page, not an empty box. Without something to sit on top of, a
+          floating button has no scale and no corner to be in. */}
+      <div
+        className="absolute inset-x-0 top-0 flex items-center gap-1.5 px-2.5"
+        style={{
+          height: CHROME,
+          borderBottom: `1px solid ${dark ? "#1f1f24" : "#ebebed"}`,
+          background: dark ? "#141418" : "#f6f6f7",
+        }}
+      >
+        {[0, 1, 2].map((i) => (
+          <span
+            key={i}
+            className="size-1.5 rounded-full"
+            style={{ background: dark ? "#33333b" : "#d4d4d8" }}
+          />
+        ))}
+        <span
+          className="ml-1.5 h-2.5 flex-1 rounded-full"
+          style={{ background: dark ? "#1f1f24" : "#ebebed" }}
+        />
       </div>
 
       <div
-        className={cn(
-          "absolute flex h-6 items-center gap-1 px-2 text-[9px] font-medium",
-          v === "top" ? "top-7" : "bottom-2",
-          h === "left" ? "left-2" : "right-2",
-        )}
-        style={{
-          background: config.accentColor,
-          color: readableOn(config.accentColor),
-          borderRadius:
-            config.radius > 0 ? Math.max(config.radius - 4, 4) : 0,
-        }}
+        className="absolute inset-x-0 space-y-2 px-5"
+        style={{ top: CHROME + 18 }}
+        aria-hidden="true"
       >
-        <MessageSquare className="size-2.5" strokeWidth={2.2} />
-        {config.triggerLabel}
+        {[62, 88, 74, 40].map((w, i) => (
+          <span
+            key={i}
+            className="block rounded-full"
+            style={{
+              width: `${w}%`,
+              height: i === 0 ? 9 : 6,
+              background: dark ? "#1c1c21" : "#f0f0f1",
+            }}
+          />
+        ))}
       </div>
+
+      {onPick
+        ? CORNERS.map((corner) => {
+            const on = config.position === corner.key;
+            return (
+              <button
+                key={corner.key}
+                type="button"
+                aria-pressed={on}
+                aria-label={corner.label}
+                title={corner.label}
+                onClick={() => onPick(corner.key)}
+                className="absolute cursor-pointer"
+                style={place(corner.key)}
+              >
+                {on ? (
+                  <WidgetLivePreview config={config} state="trigger" />
+                ) : (
+                  // A target, not a decoration: same corner, same offset, so
+                  // clicking it puts the button exactly where the ghost is.
+                  <span
+                    className="block size-7 rounded-lg border border-dashed border-line-strong transition-colors hover:border-steel hover:bg-muted"
+                    aria-hidden="true"
+                  />
+                )}
+              </button>
+            );
+          })
+        : !config.triggerHidden && (
+            <div className="absolute" style={place(config.position)}>
+              <WidgetLivePreview config={config} state="trigger" />
+            </div>
+          )}
     </div>
   );
 }
