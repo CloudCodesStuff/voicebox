@@ -193,12 +193,6 @@ export function McpConnect() {
       <PageHeader
         title="Connect your agent"
         description="Read your ranked feedback themes from your coding agent, so “what should I build next” is answered from what your users actually said."
-        actions={
-          <span className="hidden items-center gap-1.5 rounded-full border border-line bg-paper-2 px-2.5 py-1 text-[0.72rem] font-medium text-steel sm:inline-flex">
-            <span className="size-1.5 rounded-full bg-mint" />
-            Read-only · every plan
-          </span>
-        }
       />
 
       <ol className="mt-9">
