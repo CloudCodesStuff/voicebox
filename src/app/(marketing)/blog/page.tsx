@@ -58,8 +58,7 @@ export default function BlogIndex() {
           Compared with other tools
         </h2>
         <p className="mt-2 max-w-[64ch] text-[0.95rem] leading-relaxed text-steel">
-          One page per alternative, each saying what they are genuinely better
-          at. If a comparison page never lets the other tool win, it is an
+          One page per alternative, each saying what they are better at. If a comparison page never lets the other tool win, it is an
           advert.
         </p>
         <ul className="mt-5 grid gap-3 sm:grid-cols-2">

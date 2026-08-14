@@ -115,7 +115,7 @@ export default function Page() {
         </LI>
         <LI>
           It encodes your assumptions. You built the tag list from what you
-          expected to hear, so anything genuinely surprising lands in
+          expected to hear, so anything surprising lands in
           &ldquo;other&rdquo;, which is precisely where the valuable feedback
           goes to die.
         </LI>
@@ -131,7 +131,7 @@ export default function Page() {
       <P>
         What you want is for those two sentences to end up in the same bucket
         without anyone deciding they should. That is a semantic judgement, which
-        is the one thing language models are genuinely reliable at: not writing
+        is the one thing language models are reliable at: not writing
         your roadmap, just recognising that two differently-worded complaints
         describe one underlying thing.
       </P>

@@ -84,7 +84,7 @@ export default function Page() {
         <LI>
           <strong className="text-ink">Measuring one thing over time.</strong>{" "}
           Same question, same scale, quarter after quarter. That comparability
-          is genuinely valuable and a widget cannot give it to you.
+          is valuable and a widget cannot give it to you.
         </LI>
         <LI>
           <strong className="text-ink">Testing a specific change.</strong> You

@@ -121,7 +121,7 @@ export default function Page() {
 
       <P>
         Behavioural tools like Hotjar meter on sessions, from around $32 a month
-        on paid plans. If your question is genuinely behavioural that is
+        on paid plans. If your question is behavioural that is
         reasonable, since sessions are the raw material. It does mean a piece of
         content going unexpectedly viral shows up as a bill.
       </P>

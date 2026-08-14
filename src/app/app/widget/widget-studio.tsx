@@ -236,8 +236,8 @@ function StudioEditor({
     <div className="mx-auto max-w-6xl px-4 py-8 pb-28 sm:px-6">
       <PageHeader
         title="Widget"
-        description="Design the feedback form your visitors see, and get the one line of code that puts it on your site. Everything here updates live in the preview."
-        subtitle="Changes save to your live widget within a minute, with no redeploy"
+        description="Design what your visitors see, and get the snippet that puts it on your site."
+        subtitle="Changes reach your live widget within a minute"
         actions={
           <a
             href="#install"
@@ -316,12 +316,6 @@ function StudioEditor({
                 className="tnum h-9 w-28 border-line text-[0.84rem]"
               />
             </div>
-            <p className="mt-2.5 text-[0.8rem] text-steel">
-              Text on this colour switches to{" "}
-              {readableOn(config.accentColor) === "#FFFFFF" ? "white" : "dark"}{" "}
-              automatically, so it always stays readable.
-            </p>
-
             <AutoColor
               projectUrl={projectUrl}
               onApply={applyBrand}
@@ -331,7 +325,7 @@ function StudioEditor({
 
           <Panel
             title="Typeface"
-            hint="System fonts only, so your site never loads an extra webfont."
+            hint="System fonts only, nothing extra to load."
             current={
               <span className="rounded-full border border-line px-2.5 py-1 text-[0.78rem] text-steel">
                 {fontStacks[config.font].label}
@@ -377,14 +371,12 @@ function StudioEditor({
               })}
             </div>
             <p className="mt-3 text-[0.8rem] leading-relaxed text-steel">
-              &ldquo;Match my site&rdquo; inherits whatever font the host page
-              already uses.
+              &ldquo;Match my site&rdquo; uses the font your page already has.
             </p>
           </Panel>
 
           <Panel
             title="Corners and theme"
-            hint="How round everything is, and whether the panel is light or dark."
             current={
               <span className="tnum rounded-full border border-line px-2.5 py-1 text-[0.78rem] text-steel capitalize">
                 {config.radius === 0 ? "Sharp" : `${config.radius}px`} ·{" "}
@@ -411,10 +403,6 @@ function StudioEditor({
                   onValueChange={([v]) => set("radius", v ?? 0)}
                   className="mt-3"
                 />
-                <p className="mt-2.5 text-[0.8rem] leading-relaxed text-steel">
-                  Zero is genuinely sharp. At the top of the range an icon-only
-                  button becomes a circle.
-                </p>
               </div>
 
               <div>
@@ -440,7 +428,7 @@ function StudioEditor({
                   ))}
                 </div>
                 <p className="mt-2.5 text-[0.8rem] leading-relaxed text-steel">
-                  Auto follows each visitor&apos;s own system setting.
+                  Auto follows the visitor&apos;s system setting.
                 </p>
               </div>
             </div>
@@ -452,7 +440,7 @@ function StudioEditor({
               else's page, so it gets one place to design it. */}
           <Panel
             title="The button"
-            hint="The floating launcher on your site. Everything about how it looks and where it sits."
+            hint="The floating launcher on your site."
             current={
               <span className="rounded-full border border-line px-2.5 py-1 text-[0.78rem] text-steel">
                 {config.triggerHidden ? "Hidden" : currentPosition}
@@ -461,10 +449,12 @@ function StudioEditor({
           >
             <Toggle
               label="Show the floating button"
+              // Nothing to say while it is on. Off, there is: you need to know
+              // what opens the widget instead.
               hint={
                 config.triggerHidden
-                  ? "Off. Open the widget from your own UI with Voicebox('open') or a [data-voicebox-trigger] element."
-                  : "The button sits on every page the snippet is on."
+                  ? "Open it with Voicebox('open') or a [data-voicebox-trigger] element."
+                  : undefined
               }
               checked={!config.triggerHidden}
               onChange={(v) => {
@@ -611,11 +601,13 @@ function StudioEditor({
                       maxLength={24}
                       onChange={(v) => setTrigger("triggerLabel", v)}
                     />
-                    <p className="mt-1.5 text-[0.8rem] leading-relaxed text-steel">
-                      {config.triggerStyle === "icon"
-                        ? "Not shown on an icon-only button, but it is what screen readers announce and what the tooltip says."
-                        : "Two or three words. Anything longer gets cramped on a phone."}
-                    </p>
+                    {/* Only worth a line when the label is invisible and you
+                        would otherwise wonder why you are typing it. */}
+                    {config.triggerStyle === "icon" && (
+                      <p className="mt-1.5 text-[0.8rem] leading-relaxed text-steel">
+                        Not shown. Used by screen readers and the tooltip.
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -630,7 +622,7 @@ function StudioEditor({
                     className="mt-2 h-[186px]"
                   />
                   <p className="mt-2 text-[0.8rem] text-steel">
-                    {currentPosition}. Click a corner to move it.
+                    Click a corner to move it.
                   </p>
 
                   <div className="mt-5">
@@ -652,8 +644,7 @@ function StudioEditor({
                       className="mt-3"
                     />
                     <p className="mt-2.5 text-[0.8rem] leading-relaxed text-steel">
-                      Push it clear of anything already in that corner, like a
-                      chat bubble or a cookie bar. The panel follows it.
+                      Clears a chat bubble or cookie bar already in that corner.
                     </p>
                   </div>
                 </div>
@@ -662,7 +653,7 @@ function StudioEditor({
               <div className="mt-5 border-t border-line pt-5">
                 <Toggle
                   label="Hide it on phones"
-                  hint="A phone has one corner worth having. Your own UI can still open the widget there."
+                  hint="Your own trigger still works there."
                   checked={config.triggerHideOnMobile}
                   onChange={(v) => set("triggerHideOnMobile", v)}
                 />
@@ -670,10 +661,7 @@ function StudioEditor({
             </div>
           </Panel>
 
-          <Panel
-            title="Words"
-            hint="Everything your visitors read inside the panel, in your voice."
-          >
+          <Panel title="Words" hint="What visitors read inside the panel.">
             <div className="space-y-4">
               <Field
                 label="Heading"
@@ -697,7 +685,7 @@ function StudioEditor({
 
           <Panel
             title="What you ask for"
-            hint="Turn off any field you don't need. Shorter forms get more responses."
+            hint="Shorter forms get more responses."
           >
             <div className="space-y-5">
               <div role="group" aria-label="Feedback types">
@@ -737,7 +725,6 @@ function StudioEditor({
 
               <Toggle
                 label="Ask for a rating"
-                hint="A quick score above the message box."
                 checked={config.askRating}
                 onChange={(v) => set("askRating", v)}
               />
@@ -767,17 +754,13 @@ function StudioEditor({
 
               <Toggle
                 label="Ask for an email"
-                hint="Optional for them, but it's the only way you can reply."
+                hint="Optional for them, and the only way you can reply."
                 checked={config.askEmail}
                 onChange={(v) => set("askEmail", v)}
               />
               <Toggle
                 label={`Remove ${site.name} branding`}
-                hint={
-                  canRemoveBranding
-                    ? "Drops the footer link from your widget."
-                    : "Included on Pro and above."
-                }
+                hint={canRemoveBranding ? undefined : "Pro and above."}
                 checked={config.hideBranding}
                 onChange={(v) => set("hideBranding", v)}
                 locked={!canRemoveBranding}
@@ -788,7 +771,7 @@ function StudioEditor({
           <Panel
             id="install"
             title="Install"
-            hint="One tag, pasted once, anywhere before the closing body tag."
+            hint="Paste it once, before the closing body tag."
           >
             <div className="relative overflow-hidden rounded-lg border border-line bg-slab">
               <pre className="overflow-x-auto px-4 py-4 pr-24 font-mono text-[0.78rem] leading-relaxed text-slab-fg/90">
@@ -807,24 +790,18 @@ function StudioEditor({
                 {copied ? "Copied" : "Copy"}
               </button>
             </div>
-            <p className="mt-3 text-[0.8rem] text-steel">
-              Already installed? Everything you save here reaches it within a
-              minute, no redeploy.
-            </p>
-
             {/* Said at the moment the key is copied, which is when it stops
                 being abstract: from here on it is public. */}
-            <p className="mt-2 text-[0.8rem] leading-relaxed text-steel">
-              The key in this snippet is public by design and will be visible in
-              your page source. Lock the project to your domains under{" "}
+            <p className="mt-3 text-[0.8rem] leading-relaxed text-steel">
+              This key is public and visible in your page source. Lock the
+              project to your domains under{" "}
               <Link
                 href="/app/settings/projects"
                 className="font-medium text-ink underline underline-offset-2"
               >
                 Settings → Projects
               </Link>
-              , or anyone who reads it can post feedback into your inbox from
-              their own site.
+              , or anyone can post into your inbox from their own site.
             </p>
           </Panel>
         </div>
@@ -882,11 +859,11 @@ function StudioEditor({
             </div>
           )}
 
-          <p className="mt-3 text-[0.8rem] leading-relaxed text-steel">
-            {shownPreview === "trigger"
-              ? "Your button at full size, in the corner you picked, the distance you set from the edge."
-              : "This is the live widget, not a picture. Click the chips and the stars."}
-          </p>
+          {shownPreview !== "trigger" && (
+            <p className="mt-3 text-[0.8rem] leading-relaxed text-steel">
+              Click the chips and the stars.
+            </p>
+          )}
         </div>
       </div>
 
@@ -1072,9 +1049,6 @@ function AutoColor({
         />
       </div>
 
-      <p className="mt-2.5 text-[0.78rem] leading-relaxed text-steel">
-        Screenshots are read in your browser and never uploaded anywhere.
-      </p>
     </div>
   );
 }
@@ -1163,7 +1137,8 @@ function Toggle({
   locked,
 }: {
   label: string;
-  hint: string;
+  /** Only where the label leaves something real unsaid. */
+  hint?: string;
   checked: boolean;
   onChange: (v: boolean) => void;
   locked?: boolean;
@@ -1176,16 +1151,18 @@ function Toggle({
           {label}
           {locked && <Lock className="size-3.5 text-steel" aria-label="Pro and above" />}
         </div>
-        <p id={hintId} className="mt-0.5 text-[0.8rem] leading-relaxed text-steel">
-          {hint}
-        </p>
+        {hint && (
+          <p id={hintId} className="mt-0.5 text-[0.8rem] leading-relaxed text-steel">
+            {hint}
+          </p>
+        )}
       </div>
       <Switch
         checked={checked && !locked}
         disabled={locked}
         onCheckedChange={onChange}
         aria-label={label}
-        aria-describedby={hintId}
+        aria-describedby={hint ? hintId : undefined}
         className="mt-0.5 shrink-0"
       />
     </div>

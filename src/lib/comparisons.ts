@@ -89,7 +89,7 @@ export const comparisons: Comparison[] = [
     pricingDetail:
       "A permanent Free plan with one seat and no AI, then Growth at $29, Professional at $59 and Enterprise at $99 per seat per month billed yearly, plus $0.29 per AI resolution on paid plans. There is an early-stage startup programme offering a large discount for companies under two years old with fewer than six employees.",
     theyreBetterAt: [
-      "Breadth. Boards, roadmap, changelog, surveys, help centre and a live support inbox in one subscription is genuinely a lot of product.",
+      "Breadth. Boards, roadmap, changelog, surveys, help centre and a live support inbox in one subscription is a lot of product.",
       "Being your support tool as well as your feedback tool, if you would rather not run both.",
       "AI deflection of support conversations, which Voicebox does not attempt at all.",
       "Their startup programme, which is a real discount if you qualify.",

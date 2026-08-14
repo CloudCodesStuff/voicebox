@@ -165,7 +165,7 @@ export default function DpaPage() {
           On reasonable written request, no more than once a year unless a
           regulator requires otherwise, we&apos;ll answer a security
           questionnaire and provide the information needed to show we&apos;re
-          meeting this agreement. Where an on-site audit is genuinely required,
+          meeting this agreement. Where an on-site audit is required,
           we&apos;ll agree scope and timing in advance so it doesn&apos;t
           interfere with other customers.
         </p>

@@ -229,7 +229,7 @@ Voicebox("open")                    // renders?`}
         An unstyled panel, rather than no panel, almost always means a{" "}
         <code className="font-mono">style-src</code> policy blocking the
         stylesheet inside the shadow root. Your page&apos;s own CSS cannot cause
-        this, it genuinely cannot reach inside.
+        this, it cannot reach inside.
       </p>
 
       <H2 id="stuck">Still stuck</H2>

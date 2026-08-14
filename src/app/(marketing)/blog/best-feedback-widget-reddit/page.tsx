@@ -82,7 +82,7 @@ export default function Page() {
       <P>
         This page is the answer written out properly. We make one of the tools
         on this list, which you should factor in, so every section says what
-        the alternatives are genuinely better at and there is a section at the
+        the alternatives are better at and there is a section at the
         end on when to pick none of them.
       </P>
 

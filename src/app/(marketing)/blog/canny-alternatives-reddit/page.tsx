@@ -156,7 +156,7 @@ export default function Page() {
       </P>
 
       <P>
-        A public board buys you transparency, and it is genuinely reassuring for
+        A public board buys you transparency, and it is reassuring for
         a customer to find their complaint already posted with forty votes. It
         also costs you moderation, gives loud users disproportionate weight, and
         publishes a queue of things you have not built, which some teams find

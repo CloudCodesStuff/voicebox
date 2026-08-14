@@ -8,7 +8,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: `Compare ${site.name}`,
-  description: `How ${site.name} compares with Canny, Featurebase, Hotjar and Usersnap, including what each of them is genuinely better at. Pricing verified August 2026.`,
+  description: `How ${site.name} compares with Canny, Featurebase, Hotjar and Usersnap, including what each of them is better at. Pricing verified August 2026.`,
   path: "/vs",
 });
 
@@ -19,8 +19,8 @@ export default function CompareIndex() {
         Compare {site.name}
       </h1>
       <p className="mt-4 max-w-[64ch] text-[1.05rem] leading-relaxed text-steel">
-        One page per alternative. Each says what the other tool is genuinely
-        better at, what it costs and what it meters on, with the date the
+        One page per alternative. Each says what the other tool is better
+        at, what it costs and what it meters on, with the date the
         pricing was checked. We make one of these products, so the pages are
         written to be useful to someone who might reasonably pick the other one.
       </p>

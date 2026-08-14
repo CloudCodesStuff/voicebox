@@ -221,7 +221,7 @@ export default function TermsPage() {
           </li>
           <li>
             <strong>Force majeure.</strong> Neither of us is liable for a failure
-            caused by something genuinely outside our control.
+            caused by something outside our control.
           </li>
           <li>
             <strong>Notices.</strong> To you, by email to your account address.
