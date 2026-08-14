@@ -219,8 +219,28 @@
     var typeColumns = typeCount === 4 ? 2 : Math.max(typeCount, 1);
 
     return (
-      ":host{all:initial;}" +
-      "*{box-sizing:border-box;margin:0;padding:0;font-family:" + font + ";}" +
+      // `all:initial` is what stops the host page's CSS reaching in, and it is
+      // also why "Match my site" never worked. It resets EVERY property on the
+      // host, font-family included, to the browser's initial value, which is a
+      // serif. `*{font-family:inherit}` then faithfully propagated that serif
+      // through the whole widget, so the one option whose entire job is to
+      // borrow the page's typeface rendered Times on every site instead.
+      //
+      // Re-inheriting font-family on :host is the fix and costs nothing for the
+      // other stacks, because the `*` rule below sets an explicit family that
+      // overrides it everywhere inside.
+      ":host{all:initial;font-family:inherit;}" +
+      // The inherited text properties are reset here rather than relying on
+      // :host alone. A host page's `!important` rule matching our host element
+      // beats a :host rule, and inherited values flow in from there: a page
+      // with `*{text-transform:uppercase!important}` rendered THE WHOLE WIDGET
+      // IN CAPS. Declared on `*` inside the shadow tree, nothing outside can
+      // reach them, and every rule below still overrides these because a class
+      // beats a universal selector.
+      "*{box-sizing:border-box;margin:0;padding:0;font-family:" + font + ";" +
+      "font-style:normal;font-weight:normal;font-variant:normal;" +
+      "text-transform:none;text-decoration:none;letter-spacing:normal;" +
+      "word-spacing:normal;text-indent:0;}" +
       ".wrap{position:fixed;z-index:2147483000;" + vertical + horizontal + "}" +
       // Trigger. Height, padding and type all come from the size table, and
       // icon-only becomes a square whose radius the slider takes all the way
