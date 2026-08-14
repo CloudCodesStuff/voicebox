@@ -12,6 +12,8 @@ import {
 import { auth, signIn } from "@/server/auth";
 import { site } from "@/lib/site";
 
+import { GoogleButton } from "./google-button";
+
 export const metadata: Metadata = {
   title: "Sign in",
   description: `Sign in to ${site.name} with Google to see your feedback inbox, themes and trends. No password to remember.`,
@@ -83,7 +85,7 @@ export default async function SignInPage({
 
         <main className="flex flex-1 items-center justify-center px-6 pb-16 sm:px-10">
           <div className="w-full max-w-[400px]">
-            <h1 className="text-[2rem] font-bold leading-tight tracking-[-0.02em] text-ink">
+            <h1 className="text-[2rem] font-bold leading-tight tracking-[-0.02em] text-balance text-ink">
               Find out what to build next.
             </h1>
             <p className="mt-3 text-[0.97rem] leading-relaxed text-steel">
@@ -93,13 +95,7 @@ export default async function SignInPage({
             <div className="mt-9">
               {authConfigured() ? (
                 <form action={signInWithGoogle}>
-                  <button
-                    type="submit"
-                    className="flex min-h-12 w-full items-center justify-center gap-3 rounded-lg border-[1.5px] border-line bg-paper-2 px-5 text-[0.94rem] font-semibold text-ink shadow-[0_1px_2px_rgba(9,9,11,0.04)] transition-colors hover:border-ink"
-                  >
-                    <GoogleMark />
-                    Continue with Google
-                  </button>
+                  <GoogleButton />
                 </form>
               ) : (
                 <div className="flex gap-3 rounded-lg bg-mint-wash p-4">
@@ -133,7 +129,7 @@ export default async function SignInPage({
                 <Link href="/privacy" className="text-ink underline">
                   Privacy Policy
                 </Link>
-                . One Google account, no password to remember.
+                .
               </p>
             </div>
 
@@ -157,6 +153,11 @@ export default async function SignInPage({
           nothing in the tab order. */}
       <aside
         aria-hidden="true"
+        // inert as well as aria-hidden: the widget preview renders real
+        // buttons (type chips, stars), and aria-hidden only mutes them for
+        // screen readers. Without inert, Tab still walks a keyboard user
+        // through five invisible controls between the form and the footer.
+        inert
         // The hairline is what separates the halves at all: paper and slab
         // are within a few points of each other in the dark theme.
         className="relative hidden overflow-hidden border-l border-line bg-slab lg:block"
@@ -206,25 +207,3 @@ export default async function SignInPage({
   );
 }
 
-function GoogleMark() {
-  return (
-    <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="#4285F4"
-        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1Z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84Z"
-      />
-      <path
-        fill="#EA4335"
-        d="M12 4.75c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.46 14.97.5 12 .5A11 11 0 0 0 2.18 7.05l3.66 2.84c.87-2.6 3.3-4.14 6.16-4.14Z"
-      />
-    </svg>
-  );
-}
