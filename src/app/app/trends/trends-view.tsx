@@ -11,7 +11,7 @@ import {
   EmptyState,
   PageHeader,
   SectionHeading,
-  StatCard,
+  StatGroup,
   TypeIcon,
 } from "@/components/app/ui";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -158,29 +158,37 @@ export function TrendsView() {
         />
       ) : (
         <>
-          <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard
-              label="Total"
-              value={overview.data?.current ?? 0}
-              hint={`in ${days} days`}
-            />
-            <StatCard
-              label="Daily average"
-              value={(
-                (overview.data?.current ?? 0) / Math.max(days, 1)
-              ).toFixed(1)}
-            />
-            <StatCard
-              label="Negative share"
-              value={`${Math.round((overview.data?.negativeShare ?? 0) * 100)}%`}
-              tone={(overview.data?.negativeShare ?? 0) > 0.4 ? "negative" : "default"}
-            />
-            <StatCard
-              label="Avg rating"
-              value={avgRating}
-              hint={avgRating ? "out of 5" : "no ratings yet"}
-            />
-          </div>
+          <StatGroup
+            className="mt-7"
+            stats={[
+              {
+                label: "Total",
+                value: overview.data?.current ?? 0,
+                hint: `in ${days} days`,
+              },
+              {
+                label: "Daily average",
+                value: (
+                  (overview.data?.current ?? 0) / Math.max(days, 1)
+                ).toFixed(1),
+                hint: "a day",
+              },
+              {
+                label: "Negative share",
+                value: `${Math.round((overview.data?.negativeShare ?? 0) * 100)}%`,
+                tone:
+                  (overview.data?.negativeShare ?? 0) > 0.4
+                    ? "negative"
+                    : "default",
+                hint: "of analyzed",
+              },
+              {
+                label: "Avg rating",
+                value: avgRating,
+                hint: avgRating ? "out of 5" : "no ratings yet",
+              },
+            ]}
+          />
 
           <section className="mt-9">
             <div className="flex flex-wrap items-center justify-between gap-3">

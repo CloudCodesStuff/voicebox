@@ -16,7 +16,7 @@ import {
   SentimentBar,
   SentimentDot,
   Sparkline,
-  StatCard,
+  StatGroup,
   TypeIcon,
   relativeTime,
 } from "@/components/app/ui";
@@ -108,43 +108,44 @@ export function Overview() {
       />
 
       <>
-          {/* Stat row */}
-          <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard
-              label={`Feedback · ${days}d`}
-              value={data!.current}
-              hint={
-                <span
-                  className={cn(
-                    data!.changePercent > 0 ? "text-positive" : "text-steel",
-                  )}
-                >
-                  {data!.changePercent >= 0 ? "+" : ""}
-                  {data!.changePercent}% vs previous {days}d
-                </span>
-              }
-            />
-            <StatCard
-              label="Negative share"
-              value={`${Math.round(data!.negativeShare * 100)}%`}
-              hint={`${data!.sentiment.NEGATIVE} of ${data!.analyzed} analyzed`}
-              tone={data!.negativeShare > 0.4 ? "negative" : "default"}
-            />
-            <StatCard
-              label="All time"
-              value={data!.total}
-              hint={
-                data!.unanalyzed > 0
-                  ? `${data!.unanalyzed} awaiting analysis`
-                  : "All analyzed"
-              }
-            />
-            <StatCard
-              label="Themes"
-              value={topThemes.data?.length ?? 0}
-              hint="Ranked by priority"
-            />
-          </div>
+          <StatGroup
+            className="mt-7"
+            stats={[
+              {
+                label: `Feedback · ${days}d`,
+                value: data!.current,
+                hint: (
+                  <span
+                    className={cn(
+                      data!.changePercent > 0 ? "text-positive" : "text-steel",
+                    )}
+                  >
+                    {data!.changePercent >= 0 ? "+" : ""}
+                    {data!.changePercent}% vs previous {days}d
+                  </span>
+                ),
+              },
+              {
+                label: "Negative share",
+                value: `${Math.round(data!.negativeShare * 100)}%`,
+                hint: `${data!.sentiment.NEGATIVE} of ${data!.analyzed} analyzed`,
+                tone: data!.negativeShare > 0.4 ? "negative" : "default",
+              },
+              {
+                label: "All time",
+                value: data!.total,
+                hint:
+                  data!.unanalyzed > 0
+                    ? `${data!.unanalyzed} awaiting analysis`
+                    : "All analyzed",
+              },
+              {
+                label: "Themes",
+                value: topThemes.data?.length ?? 0,
+                hint: "Ranked by priority",
+              },
+            ]}
+          />
 
           {/* What to work on */}
           <section className="mt-10">

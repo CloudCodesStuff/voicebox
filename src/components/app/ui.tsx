@@ -226,26 +226,54 @@ export function SectionHeading({
  * negative share above 40% (the worst number on the page) was drawn in the
  * colour this product uses for good news. A stat that is bad should look bad.
  */
-export function StatCard({
-  label,
-  value,
-  hint,
-  tone = "default",
-}: {
+export type Stat = {
   label: string;
   /** null or undefined renders as an em dash rather than an empty box. */
   value: ReactNode;
   hint?: ReactNode;
   tone?: "default" | "positive" | "negative";
+};
+
+/**
+ * A row of headline numbers, as one instrument rather than four floating cards.
+ *
+ * Four separately bordered boxes of identical size is the lazy container: it
+ * spends a border and a gap on every number, and the eye reads four objects
+ * where there is really one summary. Grouping them behind a single frame with
+ * hairline dividers lets the numbers sit closer together, which is what makes
+ * them comparable, and drops three borders' worth of noise off the top of every
+ * page that shows stats.
+ */
+export function StatGroup({
+  stats,
+  className,
+}: {
+  stats: Stat[];
+  className?: string;
 }) {
+  return (
+    <div
+      className={cn(
+        "grid grid-cols-2 divide-line overflow-hidden rounded-xl border border-line bg-paper-2 divide-x divide-y sm:grid-cols-4 sm:divide-y-0",
+        className,
+      )}
+    >
+      {stats.map((s) => (
+        <StatCell key={s.label} {...s} />
+      ))}
+    </div>
+  );
+}
+
+function StatCell({ label, value, hint, tone = "default" }: Stat) {
   const empty = value === null || value === undefined || value === "";
 
   return (
-    <div className="rounded-xl border border-line bg-paper-2 p-5">
-      <div className="label">{label}</div>
+    <div className="min-w-0 px-4 py-3.5">
+      <div className="label truncate">{label}</div>
       <div
         className={cn(
-          "mt-2 text-[1.7rem] leading-none font-bold tracking-tight tabular-nums",
+          "mt-1.5 text-[1.6rem] leading-none font-bold tracking-tight tabular-nums",
           empty && "text-faint",
           !empty && tone === "negative" && "text-negative",
           !empty && tone === "positive" && "text-positive",
@@ -254,7 +282,18 @@ export function StatCard({
       >
         {empty ? "—" : value}
       </div>
-      {hint && <div className="mt-2 text-[0.78rem] text-steel">{hint}</div>}
+      {hint && (
+        <div className="mt-1.5 truncate text-[0.75rem] text-steel">{hint}</div>
+      )}
+    </div>
+  );
+}
+
+/** A single boxed stat, for the places that show one on its own. */
+export function StatCard(props: Stat) {
+  return (
+    <div className="rounded-xl border border-line bg-paper-2">
+      <StatCell {...props} />
     </div>
   );
 }

@@ -206,6 +206,33 @@ function NavLink({
   );
 }
 
+/**
+ * A project's initial in a tinted square.
+ *
+ * The hue comes from the name, so a project keeps the same mark everywhere and
+ * two projects are told apart by colour before anyone reads the label. Fixed
+ * saturation and lightness keep every one of them legible on this ground, which
+ * a free-running random colour would not.
+ */
+function ProjectMark({ name }: { name: string }) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) | 0;
+  const hue = Math.abs(hash) % 360;
+
+  return (
+    <span
+      aria-hidden="true"
+      className="grid size-6 shrink-0 place-items-center rounded-md text-[0.68rem] font-bold"
+      style={{
+        backgroundColor: `oklch(0.42 0.07 ${hue})`,
+        color: `oklch(0.93 0.04 ${hue})`,
+      }}
+    >
+      {name.trim().charAt(0).toUpperCase() || "?"}
+    </span>
+  );
+}
+
 function ProjectSwitcher() {
   const { projects, activeProject, setActiveProjectId } = useProject();
 
@@ -217,30 +244,36 @@ function ProjectSwitcher() {
 
   return (
     <DropdownMenu>
+      {/* The "Project" caption above the name is gone. It stacked two lines of
+          text into a 44px control to say something the menu already says, and
+          made the switcher read like a form field. A mark carries the identity
+          instead, which is also what makes several projects tellable apart at a
+          glance rather than by reading. */}
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="flex h-11 w-full items-center justify-between gap-2 rounded-lg border border-line px-3 text-left transition-colors hover:bg-muted/60"
+          aria-label={`Project: ${activeProject.name}. Switch project`}
+          className="flex h-10 w-full items-center gap-2.5 rounded-lg border border-line px-2 text-left transition-colors hover:border-line-strong hover:bg-muted/60"
         >
-          <div className="min-w-0">
-            <div className="label">Project</div>
-            <div className="truncate text-[0.875rem] font-medium text-ink">
-              {activeProject.name}
-            </div>
-          </div>
-          <ChevronsUpDown className="size-3.5 shrink-0 text-steel" />
+          <ProjectMark name={activeProject.name} />
+          <span className="min-w-0 flex-1 truncate text-[0.875rem] font-medium text-ink">
+            {activeProject.name}
+          </span>
+          <ChevronsUpDown className="size-3.5 shrink-0 text-faint" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-56">
+      <DropdownMenuContent align="start" className="w-60">
+        <div className="label px-2 py-1.5">Projects</div>
         {projects.map((p) => (
           <DropdownMenuItem
             key={p.id}
             onClick={() => setActiveProjectId(p.id)}
-            className="cursor-pointer"
+            className="cursor-pointer gap-2.5"
           >
+            <ProjectMark name={p.name} />
             <span className="flex-1 truncate">{p.name}</span>
             {p.id === activeProject.id && (
-              <Check className="size-3.5 text-mint-deep" />
+              <Check className="size-3.5 shrink-0 text-mint-deep" />
             )}
           </DropdownMenuItem>
         ))}

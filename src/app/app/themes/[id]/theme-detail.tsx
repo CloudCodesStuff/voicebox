@@ -14,7 +14,7 @@ import {
   SentimentBar,
   SentimentDot,
   Sparkline,
-  StatCard,
+  StatGroup,
   TypeIcon,
   relativeTime,
   trendDirection,
@@ -173,25 +173,33 @@ export function ThemeDetail({ themeId }: { themeId: string }) {
       {/* Four hand-rolled cards used to live here, duplicating StatCard's
           markup at a different size. Same component as every other stat in the
           product now, so they cannot drift apart again. */}
-      <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Items" value={t.itemCount} />
-        <StatCard
-          label="Negative"
-          value={`${Math.round(t.negativeShare * 100)}%`}
-          tone={t.negativeShare > 0.4 ? "negative" : "default"}
-        />
-        {/* Not mint. A priority score is a magnitude, not good news. */}
-        <StatCard label="Priority" value={Math.round(t.priorityScore)} />
-        <StatCard
-          label="Trend · 12 weeks"
-          value={
-            <span className="block text-steel">
-              <Sparkline data={trend} />
-            </span>
-          }
-          hint={momentum ? momentumLabel[momentum] : "not enough history"}
-        />
-      </div>
+      <StatGroup
+        className="mt-7"
+        stats={[
+          { label: "Items", value: t.itemCount, hint: "in this theme" },
+          {
+            label: "Negative",
+            value: `${Math.round(t.negativeShare * 100)}%`,
+            tone: t.negativeShare > 0.4 ? "negative" : "default",
+            hint: "of analyzed",
+          },
+          // Not mint. A priority score is a magnitude, not good news.
+          {
+            label: "Priority",
+            value: Math.round(t.priorityScore),
+            hint: "volume × tone × recency",
+          },
+          {
+            label: "Trend · 12 weeks",
+            value: (
+              <span className="block text-steel">
+                <Sparkline data={trend} />
+              </span>
+            ),
+            hint: momentum ? momentumLabel[momentum] : "not enough history",
+          },
+        ]}
+      />
 
       {/* The bar used to float here unlabelled, which made a four-colour
           graphic that nothing on the page explained. */}
