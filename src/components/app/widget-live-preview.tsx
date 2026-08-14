@@ -89,6 +89,8 @@ export function WidgetLivePreview({
   const border = dark ? "#1f1f24" : "#ebebed";
   const field = dark ? "#17171b" : "#fafafa";
   const starOff = dark ? "#2c2c33" : "#dcdce0";
+  /** One radius for everything inside the panel. Mirrors the runtime. */
+  const fieldRadius = Math.max(r - 2, 0);
 
   const fontFamily = font === "inherit" ? undefined : font;
   const activeType = selectedType ?? config.enabledTypes[0] ?? null;
@@ -181,14 +183,14 @@ export function WidgetLivePreview({
               {config.subheading}
             </p>
             <div
-              className="absolute top-3 right-3 grid size-[26px] place-items-center rounded-md"
-              style={{ color: faint }}
+              className="absolute top-3 right-3 grid size-[26px] place-items-center"
+              style={{ color: faint, borderRadius: fieldRadius }}
             >
               <X className="size-[14px]" />
             </div>
           </div>
 
-          <div className="px-4 pt-3.5 pb-4">
+          <div className="px-4 pt-3.5 pb-3.5">
             {config.enabledTypes.length > 0 && (
               // Mirrors the shipped widget: an even grid, never wrapping
               // ragged. Four types become a 2x2 block, fewer sit on one row.
@@ -212,7 +214,7 @@ export function WidgetLivePreview({
                       onClick={() => setSelectedType(t)}
                       className="inline-flex h-[30px] min-w-0 items-center justify-center gap-1.5 px-2 text-[12.5px] font-medium transition-colors"
                       style={{
-                        borderRadius: r > 0 ? 999 : 0,
+                        borderRadius: fieldRadius,
                         border: `1px solid ${on ? "transparent" : border}`,
                         background: on ? accent : "transparent",
                         color: on ? onAccent : muted,
@@ -267,7 +269,7 @@ export function WidgetLivePreview({
                         onClick={() => setRating(n)}
                         className="grid h-7 flex-1 place-items-center text-[12.5px] tabular-nums transition-colors"
                         style={{
-                          borderRadius: r > 0 ? 6 : 0,
+                          borderRadius: fieldRadius,
                           border: `1px solid ${n <= rating ? "transparent" : border}`,
                           background: n <= rating ? accent : "transparent",
                           color: n <= rating ? onAccent : muted,
@@ -302,7 +304,7 @@ export function WidgetLivePreview({
               className="min-h-[82px] px-[11px] py-2.5 text-[13.5px] leading-relaxed"
               style={{
                 border: `1px solid ${border}`,
-                borderRadius: Math.max(r - 2, 0),
+                borderRadius: fieldRadius,
                 background: field,
                 color: faint,
                 letterSpacing: "-0.005em",
@@ -313,10 +315,10 @@ export function WidgetLivePreview({
 
             {config.askEmail && (
               <div
-                className="mt-2 flex h-9 items-center px-[11px] text-[13px]"
+                className="mt-2 flex h-[38px] items-center px-[11px] text-[13.5px]"
                 style={{
                   border: `1px solid ${border}`,
-                  borderRadius: Math.max(r - 2, 0),
+                  borderRadius: fieldRadius,
                   background: field,
                   color: faint,
                 }}
@@ -326,11 +328,11 @@ export function WidgetLivePreview({
             )}
 
             <div
-              className="mt-3 flex h-[38px] items-center justify-center gap-1.5 text-[13.5px] font-medium"
+              className="mt-2 flex h-[38px] items-center justify-center gap-1.5 text-[13.5px] font-medium"
               style={{
                 background: accent,
                 color: onAccent,
-                borderRadius: Math.max(r - 2, 0),
+                borderRadius: fieldRadius,
                 letterSpacing: "-0.005em",
               }}
             >

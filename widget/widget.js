@@ -206,6 +206,10 @@
     // hidden button still leaves the panel off the very edge of the screen.
     var MOBILE_CLEAR = Math.max(edge + panelGap, 24);
 
+    // One radius for everything inside the panel. The panel itself is r+4 and
+    // its contents are r-2, so the shapes stay concentric at any setting.
+    var fieldRadius = Math.max(r - 2, 0);
+
     var font = FONTS[c.font] || FONTS.sans;
 
     // Four types read best as a 2x2 block; three or fewer fit one row at this
@@ -262,22 +266,20 @@
       ".title{font-size:14.5px;font-weight:600;letter-spacing:-.015em;line-height:1.3;padding-right:26px;}" +
       ".sub{margin-top:5px;font-size:12.5px;line-height:1.5;color:" + muted + ";padding-right:26px;}" +
       ".x{position:absolute;top:12px;right:12px;width:26px;height:26px;display:grid;place-items:center;" +
-      "border:none;background:transparent;color:" + faint + ";cursor:pointer;border-radius:" + (r > 0 ? 6 : 0) + "px;" +
+      "border:none;background:transparent;color:" + faint + ";cursor:pointer;border-radius:" + fieldRadius + "px;" +
       "transition:background .12s,color .12s;}" +
       ".x:hover{background:" + field + ";color:" + fg + ";}" +
       // Scrolls inside the panel rather than growing it. The header, the
       // submit bar and the footer stay put, so the close button and the
       // primary action are always reachable.
-      ".body{padding:14px 16px 12px;overflow-y:auto;-webkit-overflow-scrolling:touch;}" +
+      ".body{padding:14px 16px 8px;overflow-y:auto;-webkit-overflow-scrolling:touch;}" +
       // Submit lives outside the scroll area. Inside it, a short window plus
       // four types and a rating pushed "Send feedback" below the fold of the
       // panel's own scroll, so the form looked finished with no way to send it
       // unless you thought to scroll a box that gives no hint it scrolls.
       ".actions{flex:none;padding:0 16px 14px;}" +
 
-      // Type chips: inline pills that wrap. Stacked icon-over-label cards read
-      // as four buttons of unclear weight; a pill row reads as one choice.
-      // A grid, not wrapping flex. Four content-sized pills overflow 320px of
+      // Type chips. A grid, not wrapping flex. Four content-sized chips overflow 320px of
       // panel and drop the last one onto a line of its own, which reads as a
       // layout accident rather than a choice. Equal columns fill the width
       // edge to edge and can never go ragged: four becomes a balanced 2x2,
@@ -288,7 +290,10 @@
       ",minmax(0,1fr));gap:6px;margin-bottom:12px;}" +
       ".type{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:30px;padding:0 8px;" +
       "min-width:0;" +
-      "border:1px solid " + border + ";border-radius:" + (r > 0 ? 999 : 0) + "px;background:transparent;color:" + muted + ";" +
+      // Same radius as the fields below, not a fixed pill. The slider is
+      // meant to set the shape of the whole widget, and chips permanently at
+      // 999px made the one control that ignored it.
+      "border:1px solid " + border + ";border-radius:" + fieldRadius + "px;background:transparent;color:" + muted + ";" +
       "cursor:pointer;font-size:12.5px;font-weight:500;letter-spacing:-.005em;" +
       "transition:border-color .13s,color .13s,background .13s;}" +
       ".type svg{opacity:.75;flex:none;}" +
@@ -300,19 +305,28 @@
       ".type.on svg{opacity:1;}" +
 
       // Fields
-      // No radius floors below: at r=0 the whole widget goes genuinely sharp.
-      "textarea{width:100%;min-height:82px;max-height:220px;resize:none;padding:10px 11px;" +
-      "border:1px solid " + border + ";border-radius:" + Math.max(r - 2, 0) + "px;" +
+      // No radius floors below: at r=0 the whole widget goes properly sharp.
+      // display:block on both fields. As inline-blocks they sit on a text
+      // baseline, and the line box under the textarea added a phantom 3.4px
+      // that nothing declared: the gap above the email field measured 11.4
+      // where the gap below it measured 8, off by just enough to look wrong
+      // and not enough to find by reading the CSS.
+      "textarea{display:block;width:100%;min-height:82px;max-height:220px;resize:none;padding:10px 11px;" +
+      "border:1px solid " + border + ";border-radius:" + fieldRadius + "px;" +
       "background:" + field + ";color:" + fg + ";" +
       "font-size:13.5px;line-height:1.55;letter-spacing:-.005em;outline:none;" +
       "transition:border-color .13s,box-shadow .13s,background .13s;}" +
       "textarea:focus{border-color:" + c.accentColor + ";background:" + bg + ";" +
       "box-shadow:0 0 0 3px " + c.accentColor + "1f;}" +
       "textarea::placeholder{color:" + faint + ";}" +
-      "input[type=email]{width:100%;height:36px;padding:0 11px;margin-top:8px;" +
-      "border:1px solid " + border + ";border-radius:" + Math.max(r - 2, 0) + "px;" +
+      // 38px and 13.5px, the same as the submit button and the textarea it
+      // sits between. At 36px and 13px it was a hair short and a hair small
+      // against both of them, which is the kind of near-miss that reads as
+      // sloppy without being obvious enough to name.
+      "input[type=email]{display:block;width:100%;height:38px;padding:0 11px;margin-top:8px;" +
+      "border:1px solid " + border + ";border-radius:" + fieldRadius + "px;" +
       "background:" + field + ";color:" + fg + ";" +
-      "font-size:13px;letter-spacing:-.005em;outline:none;" +
+      "font-size:13.5px;letter-spacing:-.005em;outline:none;" +
       "transition:border-color .13s,box-shadow .13s,background .13s;}" +
       "input[type=email]:focus{border-color:" + c.accentColor + ";background:" + bg + ";" +
       "box-shadow:0 0 0 3px " + c.accentColor + "1f;}" +
@@ -349,13 +363,13 @@
       ".rate-value{font-size:12px;color:" + faint + ";font-variant-numeric:tabular-nums;" +
       "margin-left:auto;white-space:nowrap;}" +
       ".num{min-width:30px;height:28px;display:grid;place-items:center;border:1px solid " + border + ";" +
-      "border-radius:" + (r > 0 ? 6 : 0) + "px;background:transparent;cursor:pointer;font-size:12.5px;" +
+      "border-radius:" + fieldRadius + "px;background:transparent;cursor:pointer;font-size:12.5px;" +
       "font-variant-numeric:tabular-nums;color:" + muted + ";transition:all .12s;}" +
       ".num.on{border-color:transparent;background:" + c.accentColor + ";color:" + onAccent + ";}" +
 
       // Submit
       ".submit{width:100%;height:38px;display:inline-flex;align-items:center;" +
-      "justify-content:center;gap:6px;border:none;border-radius:" + Math.max(r - 2, 0) + "px;" +
+      "justify-content:center;gap:6px;border:none;border-radius:" + fieldRadius + "px;" +
       "background:" + c.accentColor + ";color:" + onAccent + ";" +
       "font-size:13.5px;font-weight:560;letter-spacing:-.005em;cursor:pointer;" +
       "transition:filter .13s,transform .1s;}" +
