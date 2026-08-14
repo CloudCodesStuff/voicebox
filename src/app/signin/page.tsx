@@ -161,9 +161,9 @@ export default async function SignInPage({
         // are within a few points of each other in the dark theme.
         className="relative hidden overflow-hidden border-l border-line bg-slab lg:block"
       >
-        {/* Atmosphere: a dot grid that fades out from the centre of the
-            scene, and one mint glow behind the tagline. The cards carry all
-            the remaining colour, so the slab itself stays near-monochrome. */}
+        {/* Atmosphere: a dot grid and one mint glow, both centred on the
+            scene, which is now the only thing here. The cards carry all the
+            colour, so the slab itself stays near-monochrome. */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
@@ -171,32 +171,25 @@ export default async function SignInPage({
               "radial-gradient(circle, rgba(228,234,232,0.10) 1px, transparent 1px)",
             backgroundSize: "26px 26px",
             maskImage:
-              "radial-gradient(ellipse 75% 65% at 55% 52%, black 25%, transparent 75%)",
+              "radial-gradient(ellipse 70% 60% at 50% 50%, black 25%, transparent 75%)",
             WebkitMaskImage:
-              "radial-gradient(ellipse 75% 65% at 55% 52%, black 25%, transparent 75%)",
+              "radial-gradient(ellipse 70% 60% at 50% 50%, black 25%, transparent 75%)",
           }}
         />
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(640px 460px at 20% 0%, rgba(0,196,140,0.16), transparent 70%)," +
-              "radial-gradient(520px 420px at 95% 100%, rgba(0,196,140,0.06), transparent 70%)",
+              "radial-gradient(620px 520px at 50% 42%, rgba(0,196,140,0.11), transparent 70%)",
           }}
         />
 
-        <div className="relative flex h-full flex-col p-10 xl:p-14">
-          <h2 className="text-[2.1rem] leading-[1.12] font-bold tracking-[-0.025em] text-slab-fg xl:text-[2.4rem]">
-            Feedback in.
-            <br />
-            <span className="text-mint">Fix list out.</span>
-          </h2>
-
+        <div className="relative flex h-full items-center justify-center p-10 xl:p-14">
           {/* The scene. Absolute placement inside a fixed-ratio canvas so
               the three cards genuinely overlap, each with its own slight
               rotation and its own shadow, which is what makes it read as
               objects on a surface instead of screenshots in a column. */}
-          <div className="relative mx-auto my-auto h-[520px] w-full max-w-[520px]">
+          <div className="relative h-[520px] w-full max-w-[520px]">
             <div className="absolute top-0 left-0 w-[330px] -rotate-2 drop-shadow-[0_24px_48px_rgba(0,0,0,0.55)]">
               <WidgetPreview rating={4} />
             </div>
@@ -207,11 +200,6 @@ export default async function SignInPage({
                 eye lands on it last: raw words in, ranked theme out. */}
             <ThemeCard className="absolute bottom-0 left-[8%] z-20 rotate-[-1.5deg] shadow-[0_28px_56px_-12px_rgba(0,0,0,0.7)]" />
           </div>
-
-          <p className="text-[0.84rem] text-slab-fg/60">
-            One line of code on your site. Every reply scored, grouped and
-            ranked before you read it.
-          </p>
         </div>
       </aside>
     </div>
