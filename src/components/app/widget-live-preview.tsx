@@ -236,11 +236,27 @@ export function WidgetLivePreview({
                 <span className="text-[12.5px]" style={{ color: muted }}>
                   How was it?
                 </span>
+
+                {/* The score word sits BEFORE the stars and carries the
+                    right-pushing auto margin, so it grows leftward into empty
+                    space and the stars hold still. After them, every hover
+                    shoved the whole group 31px left, which is the jank. The
+                    shipped widget has done it this way since the last fix;
+                    this preview was still on the old order. */}
+                {config.ratingStyle !== "numbers" && (
+                  <span
+                    className="ml-auto text-[12px] whitespace-nowrap tabular-nums"
+                    style={{ color: faint }}
+                  >
+                    {RATE_WORDS[shown] ?? ""}
+                  </span>
+                )}
+
                 <div
                   className={
                     config.ratingStyle === "numbers"
                       ? "flex flex-1 gap-1.5"
-                      : "ml-auto flex gap-px"
+                      : "flex gap-px"
                   }
                 >
                   {[1, 2, 3, 4, 5].map((n) =>
@@ -279,12 +295,6 @@ export function WidgetLivePreview({
                     ),
                   )}
                 </div>
-                <span
-                  className="text-[12px] tabular-nums"
-                  style={{ color: faint }}
-                >
-                  {RATE_WORDS[shown] ?? ""}
-                </span>
               </div>
             )}
 
