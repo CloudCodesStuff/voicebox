@@ -25,7 +25,9 @@
        const claim = "Trusted by product teams worldwide";
 --------------------------------------------------------------------------- */
 
-const claim = "Built for product teams drowning in feedback";
+// First real deployment. One named customer stated as a fact beats a
+// borrowed logo wall; extend this line as each new one agrees to be named.
+const claim = "Powering product feedback for Lanci";
 
 /**
  * Flat illustrated avatars, one <Face> per config. Deterministic (fixed order,
