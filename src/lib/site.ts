@@ -74,6 +74,7 @@ export const plans = [
   {
     id: "FREE",
     name: "Free",
+    who: "For trying it on a real project",
     priceMonthly: 0,
     priceAnnual: 0,
     feedbackPerMonth: 25,
@@ -93,6 +94,7 @@ export const plans = [
   {
     id: "PRO",
     name: "Pro",
+    who: "For products with real traffic",
     priceMonthly: 19,
     priceAnnual: 190,
     feedbackPerMonth: 3000,
@@ -111,6 +113,7 @@ export const plans = [
   {
     id: "SCALE",
     name: "Scale",
+    who: "For agencies and multi-product teams",
     priceMonthly: 49,
     priceAnnual: 490,
     feedbackPerMonth: 15000,
