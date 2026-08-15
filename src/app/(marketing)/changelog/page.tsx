@@ -13,6 +13,28 @@ export const metadata: Metadata = pageMetadata({
 
 const entries = [
   {
+    date: "2026-08-14",
+    version: "0.3.0",
+    title: "Control over the launcher, and sharper brand matching",
+    items: [
+      "The floating button is configurable end to end: icon-and-label, icon-only, or label-only, five icons, three sizes, distance from the page edge, and an option to hide it on phones while your own triggers keep working.",
+      "“Match my brand” now reads modern CSS colour (oklch, oklab, lab, lch, hwb, color-mix), so sites built on Tailwind v4 and current design tokens resolve to the right colour with high confidence instead of a guess.",
+      "“Match my site” typeface now genuinely inherits the host page's font.",
+      "Saved widget changes reach live sites within 60 seconds, down from up to six minutes.",
+    ],
+  },
+  {
+    date: "2026-08-13",
+    version: "0.2.0",
+    title: "MCP: your feedback themes, inside your coding agent",
+    items: [
+      "Voicebox now runs as an MCP server. Connect Claude Code, Cursor, Codex, Windsurf or Claude Desktop and ask for your top themes without leaving the editor.",
+      "Five read-only tools: list projects, list themes, theme detail with quotes, recent feedback, and a project overview.",
+      "Available on every plan, including free.",
+      "The free plan is 25 pieces of feedback a month.",
+    ],
+  },
+  {
     date: "2026-08-11",
     version: "0.1.0",
     title: `${site.name} is live`,

@@ -13,6 +13,9 @@ const links = [
   { href: "/#how", label: "How it works" },
   { href: "/pricing", label: "Pricing" },
   { href: "/docs", label: "Docs" },
+  // A visible changelog is the strongest "this product is alive" signal a
+  // young product has, so it earns a top-level slot.
+  { href: "/changelog", label: "Changelog" },
   { href: "/blog", label: "Blog" },
 ];
 

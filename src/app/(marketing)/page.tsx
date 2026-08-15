@@ -144,9 +144,25 @@ export default function LandingPage() {
           </Reveal>
 
           <Reveal delay={0.46}>
-            <p className="mt-4 text-[0.84rem] text-steel">
-              Free up to 25 pieces of feedback a month. No card.
-            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.84rem] text-steel">
+              <span>Free up to 25 pieces of feedback a month. No card.</span>
+              {/* The strongest proof a demo can give: the widget in this
+                  page's corner is the real product, running live on the key
+                  loaded at the bottom of this file. data-voicebox-trigger is
+                  the runtime's own delegated-open hook, and clicks that land
+                  before the script finishes booting are queued, not lost. */}
+              <button
+                type="button"
+                data-voicebox-trigger
+                className="inline-flex cursor-pointer items-center gap-2 font-medium text-ink transition-colors hover:text-mint-deep"
+              >
+                <span className="relative flex size-2" aria-hidden="true">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mint opacity-60" />
+                  <span className="relative inline-flex size-2 rounded-full bg-mint" />
+                </span>
+                Live on this page. Try the widget
+              </button>
+            </div>
           </Reveal>
 
           <Reveal delay={0.54}>
@@ -383,6 +399,12 @@ export default function LandingPage() {
                 Talk to us
               </CtaButton>
             </div>
+            <p className="mt-5 text-[0.84rem] text-steel">
+              Shipping in the open:{" "}
+              <Link href="/changelog" className="text-ink underline">
+                read the changelog
+              </Link>
+            </p>
           </div>
         </Reveal>
 
