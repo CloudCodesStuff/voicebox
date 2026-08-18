@@ -18,6 +18,7 @@ import { FaqGroups, type FaqGroup } from "@/components/marketing/faq-groups";
 import { HeroBadge } from "@/components/marketing/rating-proof";
 import { Reveal, RevealGroup, ScrollPitch, WordReveal } from "@/components/marketing/motion";
 import { PlanCard } from "@/components/marketing/plan-card";
+import { PlatformMark, platformLogos } from "@/components/marketing/platform-logos";
 import { CtaButton } from "@/components/marketing/primitives";
 import { SignupNudge } from "@/components/marketing/signup-nudge";
 import { plans, site } from "@/lib/site";
@@ -27,26 +28,6 @@ export const metadata: Metadata = {
   description: site.description,
   alternates: { canonical: "/" },
 };
-
-/**
- * Where the widget runs. Deliberately platforms, not customer logos: we have
- * no customers yet and a wall of borrowed brands would be a lie a buyer can
- * check in about four seconds.
- */
-const PLATFORMS = [
-  "Next.js",
-  "React",
-  "Vue",
-  "Svelte",
-  "Rails",
-  "Laravel",
-  "Django",
-  "WordPress",
-  "Webflow",
-  "Framer",
-  "Shopify",
-  "Plain HTML",
-];
 
 const faqGroups: FaqGroup[] = [
   {
@@ -181,18 +162,21 @@ export default function LandingPage() {
       </div>
 
       {/* -------------------------------------------------------- PLATFORMS */}
-      {/* One quiet strip, not a 3x4 grid of hover-words. A grid at that size
-          apes a logo wall without having logos, which reads as the absence of
-          the thing it imitates. A single confident line reads as a fact. */}
-      <section className="border-y border-line/60 py-9 md:py-12">
+      {/* A real logo wall, monochrome so twelve brand palettes don't shout
+          over the page. No rules around it; the whitespace is the frame. */}
+      <section className="py-10 md:py-14">
         <div className="mx-auto max-w-5xl px-4 text-center">
           <p className="text-[0.78rem] font-medium tracking-[0.08em] text-faint uppercase">
             Runs anywhere you ship
           </p>
-          <RevealGroup className="mt-4 flex flex-wrap items-baseline justify-center gap-x-7 gap-y-2">
-            {PLATFORMS.map((p) => (
-              <span key={p} className="text-[0.92rem] font-medium text-steel">
-                {p}
+          <RevealGroup className="mt-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+            {platformLogos.map((p) => (
+              <span
+                key={p.name}
+                className="flex items-center gap-2 text-steel transition-colors hover:text-ink"
+              >
+                <PlatformMark d={p.d} className="size-[17px] opacity-80" />
+                <span className="text-[0.9rem] font-medium">{p.name}</span>
               </span>
             ))}
           </RevealGroup>
