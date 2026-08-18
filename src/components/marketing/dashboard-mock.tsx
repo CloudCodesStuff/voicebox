@@ -355,10 +355,13 @@ export function BrowserFrame({
   url = "app.usevoicebox.dev",
   children,
   className,
+  aspect = "aspect-[16/10]",
 }: {
   url?: string;
   children: React.ReactNode;
   className?: string;
+  /** Tailwind aspect class for the viewport; the hero video is 16:9. */
+  aspect?: string;
 }) {
   return (
     <div
@@ -378,7 +381,7 @@ export function BrowserFrame({
         </div>
         <div className="w-12" />
       </div>
-      <div className="relative aspect-[16/10] w-full">{children}</div>
+      <div className={cn("relative w-full", aspect)}>{children}</div>
     </div>
   );
 }

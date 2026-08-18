@@ -12,7 +12,8 @@ import {
   ScoringSkeleton,
   WidgetSkeleton,
 } from "@/components/marketing/bento";
-import { BrowserFrame, DashboardMock } from "@/components/marketing/dashboard-mock";
+import { BrowserFrame } from "@/components/marketing/dashboard-mock";
+import { HeroVideo } from "@/components/marketing/hero-video";
 import { FaqGroups, type FaqGroup } from "@/components/marketing/faq-groups";
 import { HeroBadge } from "@/components/marketing/rating-proof";
 import { Reveal, RevealGroup, ScrollPitch, WordReveal } from "@/components/marketing/motion";
@@ -168,8 +169,11 @@ export default function LandingPage() {
 
           <Reveal delay={0.54}>
             <ScrollPitch className="mt-14 md:mt-20">
-              <BrowserFrame className="mx-auto max-w-full">
-                <DashboardMock className="absolute inset-0" />
+              <BrowserFrame className="mx-auto max-w-full" aspect="aspect-video">
+                <HeroVideo
+                  src="https://zjpcynbgnr460dw9.public.blob.vercel-storage.com/screen_display_0%202-Edited.mp4"
+                  className="absolute inset-0"
+                />
               </BrowserFrame>
             </ScrollPitch>
           </Reveal>
