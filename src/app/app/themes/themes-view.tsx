@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { Minus, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
+import { useJobs } from "@/components/app/jobs";
 import { useProject } from "@/components/app/project-context";
 import { CLUSTER_STAGES, WorkingButton } from "@/components/app/working-label";
 import {
@@ -59,7 +59,6 @@ function Momentum({
 
 export function ThemesView() {
   const { activeProject } = useProject();
-  const utils = api.useUtils();
 
   const [sort, setSort] = useState<Sort>("priority");
   const [status, setStatus] = useState<Status>("ACTIVE");
@@ -73,14 +72,9 @@ export function ThemesView() {
   );
   const aiReady = api.theme.configured.useQuery();
 
-  const recluster = api.theme.recluster.useMutation({
-    onSuccess(r) {
-      toast.success(`Grouped ${r.items} items into ${r.themes} themes.`);
-      void utils.theme.invalidate();
-      void utils.analytics.invalidate();
-    },
-    onError: (e) => toast.error(e.message),
-  });
+  // Owned by JobsProvider so the run and its stage clock survive navigation.
+  const jobs = useJobs();
+  const regroupStartedAt = jobs.runningSince(`regroup:${projectId}`);
 
   const list = themes.data ?? [];
 
@@ -95,9 +89,10 @@ export function ThemesView() {
         subtitle={`${list.length} ${status.toLowerCase()}, sorted by ${sort.toLowerCase()}`}
         actions={
           <WorkingButton
-            working={recluster.isPending}
+            working={regroupStartedAt !== null}
+            startedAt={regroupStartedAt}
             disabled={!aiReady.data?.ok}
-            onClick={() => recluster.mutate({ projectId })}
+            onClick={() => jobs.regroup(projectId)}
             idleIcon={<RefreshCw className="size-3.5" />}
             idleLabel="Regroup now"
             stages={CLUSTER_STAGES}

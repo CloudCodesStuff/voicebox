@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
+import { JobsProvider } from "@/components/app/jobs";
+import { PrefetchPages } from "@/components/app/prefetch";
 import { ProjectProvider } from "@/components/app/project-context";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
@@ -38,6 +40,8 @@ export default async function AppLayout({
 
   return (
     <ProjectProvider>
+      <JobsProvider>
+      <PrefetchPages />
       <AppShell
         orgName={membership.org.name}
         orgId={membership.orgId}
@@ -48,6 +52,7 @@ export default async function AppLayout({
       >
         {children}
       </AppShell>
+      </JobsProvider>
     </ProjectProvider>
   );
 }

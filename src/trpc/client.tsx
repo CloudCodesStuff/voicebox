@@ -23,9 +23,10 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            // The board is glanced at constantly on a phone. A short stale
-            // window keeps it feeling live without hammering the server.
-            staleTime: 15_000,
+            // A minute. Navigation between dashboard pages must paint from
+            // cache instantly; anything genuinely new arrives via the
+            // background refetch or a mutation's invalidate.
+            staleTime: 60_000,
             refetchOnWindowFocus: true,
             retry: (failureCount, error) => {
               // Never retry an auth or tenancy failure, it will never succeed

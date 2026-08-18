@@ -90,6 +90,7 @@ function ApiKeys({ restGated }: { restGated: boolean }) {
     onSuccess(key) {
       setJustCreated({ name: key.name, plaintext: key.plaintext });
       setName("");
+      toast.success("API key created.");
       void utils.developer.keys.invalidate();
     },
     onError: (e) => toast.error(friendly(e.message)),
@@ -285,7 +286,10 @@ function Webhooks({ locked }: { locked: boolean }) {
   });
 
   const update = api.developer.updateWebhook.useMutation({
-    onSuccess: () => utils.developer.webhooks.invalidate(),
+    onSuccess() {
+      toast.success("Webhook saved.");
+      void utils.developer.webhooks.invalidate();
+    },
     onError: (e) => toast.error(e.message),
   });
 

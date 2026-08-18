@@ -27,12 +27,27 @@ export const CLUSTER_STAGES: Stage[] = [
   { at: 120, label: "Almost there, big batch…" },
 ];
 
-export function useStagedLabel(active: boolean, stages: Stage[]): string {
+export function useStagedLabel(
+  active: boolean,
+  stages: Stage[],
+  /**
+   * When the work really began. Without it the clock starts at mount, so
+   * navigating away and back mid-job would reset a minute-old run to
+   * "Reading your feedback…".
+   */
+  startedAt?: number | null,
+): string {
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
     if (!active) return;
-    const started = Date.now();
+    const started = startedAt ?? Date.now();
+    // First tick is scheduled rather than synchronous; a microtask-later
+    // start is invisible at a 1s resolution and keeps the effect pure.
+    const first = window.setTimeout(
+      () => setElapsed((Date.now() - started) / 1000),
+      0,
+    );
     const id = window.setInterval(
       () => setElapsed((Date.now() - started) / 1000),
       1000,
@@ -40,10 +55,11 @@ export function useStagedLabel(active: boolean, stages: Stage[]): string {
     // Reset on cleanup rather than on entry, so the effect body never sets
     // state synchronously and the next run always starts from zero.
     return () => {
+      window.clearTimeout(first);
       window.clearInterval(id);
       setElapsed(0);
     };
-  }, [active]);
+  }, [active, startedAt]);
 
   let label = stages[0]?.label ?? "";
   for (const stage of stages) {
@@ -58,6 +74,7 @@ export function useStagedLabel(active: boolean, stages: Stage[]): string {
  */
 export function WorkingButton({
   working,
+  startedAt,
   idleIcon,
   idleLabel,
   stages,
@@ -66,6 +83,8 @@ export function WorkingButton({
   className,
 }: {
   working: boolean;
+  /** Epoch ms the job began; keeps the stage clock honest across remounts. */
+  startedAt?: number | null;
   idleIcon: React.ReactNode;
   idleLabel: string;
   stages: Stage[];
@@ -73,7 +92,7 @@ export function WorkingButton({
   disabled?: boolean;
   className?: string;
 }) {
-  const label = useStagedLabel(working, stages);
+  const label = useStagedLabel(working, stages, startedAt);
 
   return (
     <button

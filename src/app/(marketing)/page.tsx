@@ -18,6 +18,7 @@ import { HeroBadge } from "@/components/marketing/rating-proof";
 import { Reveal, RevealGroup, ScrollPitch, WordReveal } from "@/components/marketing/motion";
 import { PlanCard } from "@/components/marketing/plan-card";
 import { CtaButton } from "@/components/marketing/primitives";
+import { SignupNudge } from "@/components/marketing/signup-nudge";
 import { plans, site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -458,6 +459,8 @@ export default function LandingPage() {
           }),
         }}
       />
+
+      <SignupNudge />
 
       {/* Dogfooding: the widget on our own landing page. `site.url` resolves
           to the right domain on its own (production, a preview, or

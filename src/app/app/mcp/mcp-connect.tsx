@@ -179,6 +179,7 @@ export function McpConnect() {
   const create = api.developer.createKey.useMutation({
     onSuccess(key) {
       setFreshKey(key.plaintext);
+      toast.success("API key created.");
       void utils.developer.keys.invalidate();
     },
     onError: (e) => toast.error(e.message),

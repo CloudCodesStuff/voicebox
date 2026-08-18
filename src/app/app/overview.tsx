@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { RefreshCw, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
 import { FirstRun } from "@/components/app/first-run";
+import { useJobs } from "@/components/app/jobs";
 import { CLUSTER_STAGES, WorkingButton } from "@/components/app/working-label";
 import { useProject } from "@/components/app/project-context";
 import { SentimentLegend, TrendChart } from "@/components/app/trend-chart";
@@ -29,7 +29,6 @@ const RANGES = [7, 30, 90] as const;
 export function Overview() {
   const { activeProject, isLoading: projectLoading } = useProject();
   const [days, setDays] = useState<(typeof RANGES)[number]>(30);
-  const utils = api.useUtils();
 
   const projectId = activeProject?.id ?? "";
   const enabled = Boolean(projectId);
@@ -45,16 +44,10 @@ export function Overview() {
   );
   const aiReady = api.theme.configured.useQuery();
 
-  const recluster = api.theme.recluster.useMutation({
-    onSuccess(result) {
-      toast.success(
-        `Grouped ${result.items} items into ${result.themes} themes.`,
-      );
-      void utils.analytics.invalidate();
-      void utils.theme.invalidate();
-    },
-    onError: (e) => toast.error(e.message),
-  });
+  // Owned by JobsProvider, not this page, so the in-flight state and its
+  // stage clock survive switching pages mid-run.
+  const jobs = useJobs();
+  const regroupStartedAt = jobs.runningSince(`regroup:${projectId}`);
 
   if (projectLoading || (enabled && overview.isLoading)) {
     return (
@@ -159,9 +152,10 @@ export function Overview() {
                 </p>
               </div>
               <WorkingButton
-                working={recluster.isPending}
+                working={regroupStartedAt !== null}
+                startedAt={regroupStartedAt}
                 disabled={!aiReady.data?.ok}
-                onClick={() => recluster.mutate({ projectId })}
+                onClick={() => jobs.regroup(projectId)}
                 idleIcon={<RefreshCw className="size-3.5" />}
                 idleLabel="Regroup now"
                 stages={CLUSTER_STAGES}

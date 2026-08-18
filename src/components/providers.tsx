@@ -8,9 +8,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <TRPCProvider>
       {children}
       <Toaster
-        position="top-center"
+        // Bottom-right: out of the reading line, next to where the cursor
+        // usually is after clicking the action that caused the toast.
+        position="bottom-right"
         toastOptions={{
-          // Shop staff read this at arm's length while holding something.
           classNames: { toast: "text-[0.92rem]" },
         }}
       />
