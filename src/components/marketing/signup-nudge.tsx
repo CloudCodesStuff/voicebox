@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -55,8 +56,9 @@ export function SignupNudge() {
   return (
     <aside
       aria-label="Sign up"
-      // bottom-24 clears the live widget button that owns this corner.
-      className="fixed right-5 bottom-24 z-40 w-[300px] rounded-xl border border-line bg-paper-2 p-4 shadow-[0_20px_48px_-16px_rgba(0,0,0,0.6)] max-sm:hidden motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3"
+      // Bottom-left: the live widget trigger owns the right corner. Desktop
+      // only; on smaller screens it would sit on top of the content.
+      className="fixed bottom-5 left-5 z-40 hidden w-[300px] rounded-xl border border-line bg-paper-2 p-4 shadow-[0_20px_48px_-16px_rgba(0,0,0,0.6)] lg:block motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3"
     >
       <button
         type="button"
@@ -73,6 +75,13 @@ export function SignupNudge() {
       <p className="mt-1 text-[0.8rem] leading-relaxed text-steel">
         Free for 25 replies a month, AI included. No card.
       </p>
+      <Image
+        src="/hero-poster.jpg"
+        alt="The Voicebox dashboard: themes ranked by priority"
+        width={810}
+        height={416}
+        className="mt-3 rounded-lg border border-line"
+      />
       <Link
         href="/signin"
         className="mt-3 inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-lg bg-ink text-[0.83rem] font-semibold text-paper transition-opacity hover:opacity-90"
