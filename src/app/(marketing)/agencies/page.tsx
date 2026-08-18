@@ -52,7 +52,7 @@ const points = [
 const steps = [
   { n: "1", text: "Add a project and paste the tag on the client's site." },
   { n: "2", text: "The widget matches their brand. Feedback starts arriving." },
-  { n: "3", text: "AI groups it into themes, ranked by priority." },
+  { n: "3", text: "Replies group themselves into themes, ranked by priority." },
   { n: "4", text: "Export the ranked list for the monthly call." },
 ];
 

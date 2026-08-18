@@ -73,7 +73,7 @@ export function SignupNudge() {
         Four minutes to your first feedback.
       </p>
       <p className="mt-1 text-[0.8rem] leading-relaxed text-steel">
-        Free for 25 replies a month, AI included. No card.
+        Free for 25 replies a month, insights included. No card.
       </p>
       <Image
         src="/hero-poster.jpg"

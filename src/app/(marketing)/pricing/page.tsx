@@ -23,7 +23,7 @@ const [free, pro, scale] = plans;
 
 export const metadata: Metadata = pageMetadata({
   title: "Pricing",
-  description: `Free for ${free.feedbackPerMonth} pieces of feedback a month, then $${pro.priceMonthly} or $${scale.priceMonthly}. The AI is on every plan. Cancel any time.`,
+  description: `Free for ${free.feedbackPerMonth} pieces of feedback a month, then $${pro.priceMonthly} or $${scale.priceMonthly}. The insight engine is on every plan. Cancel any time.`,
   path: "/pricing",
 });
 
@@ -33,7 +33,7 @@ const billingFaqs = [
     a: "One submission. Analysis, regrouping, exports and dashboard use are all unmetered.",
   },
   {
-    q: "Why is the AI on the free plan?",
+    q: "Why is the insight engine on the free plan?",
     a: "Because it's the point of the product. A feedback list with no themes is a worse spreadsheet. Free gets sentiment, themes and ranking on all 25 items.",
   },
   {
@@ -64,7 +64,7 @@ export default function PricingPage() {
           </Reveal>
           <Reveal delay={0.05}>
             <SectionHeading as="h1" className="mx-auto mt-5 max-w-[20ch]">
-              The AI is on every plan, including free.
+              The insight engine is on every plan, including free.
             </SectionHeading>
           </Reveal>
           <Reveal delay={0.1}>

@@ -48,7 +48,7 @@ export const comparisons: Comparison[] = [
     what: "a public feedback board with voting, a roadmap and a changelog",
     title: "Voicebox vs Canny",
     description:
-      "Canny is a public voting board priced by tracked users. Voicebox is a widget plus AI analysis priced by feedback volume. Compared honestly, August 2026.",
+      "Canny is a public voting board priced by tracked users. Voicebox is a widget plus an insight engine priced by feedback volume. Compared honestly, August 2026.",
     verifiedOn: "August 2026",
     pricingModel: "Per tracked user",
     pricingDetail:
@@ -62,7 +62,7 @@ export const comparisons: Comparison[] = [
     weDoDifferently: [
       "Priced on how much feedback you collect, not how many people send it. A viral month raises your volume, not your per-user count.",
       "Feedback is private by default. Nothing your users write is published to a board other customers can read.",
-      "Grouping is done by an AI reading the text, so five different wordings of one problem become one theme without anyone tagging or merging by hand.",
+      "Grouping is done by a model reading the text, so five different wordings of one problem become one theme without anyone tagging or merging by hand.",
       "The widget is the product rather than a way onto a board, so it is around 11KB over the wire, styled to your site and takes one script tag.",
     ],
     pickThemIf:
@@ -96,7 +96,7 @@ export const comparisons: Comparison[] = [
     ],
     weDoDifferently: [
       "Seats are not the meter. Voicebox charges for feedback volume, and Scale includes unlimited seats, so adding a teammate to read the inbox never changes the bill.",
-      "AI analysis is included on every plan, including Free, with no per-resolution charge.",
+      "Analysis is included on every plan, including Free, with no per-resolution charge.",
       "One job rather than six. There is no help centre or support inbox here, which is a real limitation and also why it takes four minutes to set up.",
     ],
     pickThemIf:

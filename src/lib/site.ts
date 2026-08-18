@@ -10,7 +10,7 @@ export const site = {
   name: "Voicebox",
   tagline: "Feedback in. Fix list out.",
   description:
-    "A feedback widget for your site, and an AI that groups every reply into a ranked list of what to fix next.",
+    "A feedback widget for your site, and an insight engine that groups every reply into a ranked list of what to fix next.",
   // Read through the validated env module, not process.env directly: a
   // malformed value (someone pastes a markdown link instead of a bare URL,
   // say) then fails fast with the variable's name in the message, rather than
@@ -85,7 +85,7 @@ export const plans = [
     included: [
       "The widget, fully customizable",
       "Sentiment on every submission",
-      "AI themes and priority ranking",
+      "Automatic themes and priority ranking",
       "MCP server for your coding agent",
       "Trends and CSV export",
     ],

@@ -99,7 +99,8 @@ export default async function ComparisonPage({
 
       <P>
         {c.name} is {c.what}. {site.name} is a feedback widget you paste into
-        your site plus an AI that reads every reply and ranks what to fix. Both
+        your site plus an insight engine that reads every reply and ranks what
+        to fix. Both
         collect feedback. What happens next is where they part company, and
         that is the part worth deciding on.
       </P>
@@ -139,7 +140,8 @@ export default async function ComparisonPage({
                 Yes, see detail below
               </td>
               <td className="px-4 py-3 align-top text-[0.84rem] text-steel">
-                {free?.feedbackPerMonth ?? 25} pieces of feedback a month, AI included
+                {free?.feedbackPerMonth ?? 25} pieces of feedback a month,
+                insights included
               </td>
             </tr>
             <tr className="border-b border-line">
@@ -157,7 +159,7 @@ export default async function ComparisonPage({
             </tr>
             <tr>
               <td className="px-4 py-3 text-[0.84rem] font-medium text-ink">
-                AI analysis
+                Automatic analysis
               </td>
               <td className="px-4 py-3 text-[0.84rem] text-steel">
                 {c.slug === "featurebase"

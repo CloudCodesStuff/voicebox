@@ -15,7 +15,7 @@ const comparison: Array<{ label: string; values: Array<string | boolean> }> = [
   { label: "Shadow DOM isolation", values: [true, true, true] },
   { label: "Domain allowlist", values: [true, true, true] },
   { label: "Sentiment on every submission", values: [true, true, true] },
-  { label: "AI themes", values: [true, true, true] },
+  { label: "Automatic themes", values: [true, true, true] },
   { label: "Priority ranking", values: [true, true, true] },
   { label: "Trends and CSV export", values: [true, true, true] },
   { label: "Weekly digest email", values: [false, true, true] },

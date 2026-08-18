@@ -52,7 +52,7 @@ const faqGroups: FaqGroup[] = [
     ],
   },
   {
-    heading: "The AI",
+    heading: "The insight engine",
     items: [
       {
         q: "What does it actually do to my feedback?",
@@ -63,7 +63,7 @@ const faqGroups: FaqGroup[] = [
         a: "The message text does, so it can be scored and grouped. The email address they typed and anything you pass through identify() never reach a prompt. The function that calls the model only accepts three fields, so it isn't a policy, it's the code.",
       },
       {
-        q: "What if the AI is wrong?",
+        q: "What if the grouping is wrong?",
         a: "Every theme is editable and every piece of feedback keeps its original text. The ranking is plain arithmetic: volume, negative share, recency.",
       },
     ],
