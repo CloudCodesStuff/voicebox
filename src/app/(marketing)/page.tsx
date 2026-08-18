@@ -14,7 +14,7 @@ import {
 } from "@/components/marketing/bento";
 import { BrowserFrame, DashboardMock } from "@/components/marketing/dashboard-mock";
 import { FaqGroups, type FaqGroup } from "@/components/marketing/faq-groups";
-import { RatingProof } from "@/components/marketing/rating-proof";
+import { HeroBadge } from "@/components/marketing/rating-proof";
 import { Reveal, RevealGroup, ScrollPitch, WordReveal } from "@/components/marketing/motion";
 import { PlanCard } from "@/components/marketing/plan-card";
 import { CtaButton } from "@/components/marketing/primitives";
@@ -111,7 +111,7 @@ export default function LandingPage() {
       <div className="relative w-full">
         <div className="mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-28">
           <Reveal>
-            <RatingProof />
+            <HeroBadge />
           </Reveal>
 
           <WordReveal
