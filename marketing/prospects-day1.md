@@ -5,9 +5,10 @@ featurebase.app/customers) and their board is live — I verified each one
 today (2026-08-19) at `{name}.featurebase.app`. That's the proof-of-budget
 filter: they already pay for feedback tooling.
 
-Featurebase angle for all of them: it's priced per seat plus $0.29 per AI
-resolution; Voicebox is $19 flat for 3,000 replies, widget lives in-product,
-grouping included. Demo move first (widget matched to their site), always.
+Angle for all of them — complement, never replacement: their board catches
+the vocal few who leave the app to vote; the Voicebox widget catches the
+silent rest in-product, and the analysis ranks what they said. $19 flat for
+3,000 replies. Demo move first (widget matched to their site), always.
 
 ## A-tier — small teams, founder reachable
 

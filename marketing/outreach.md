@@ -5,14 +5,24 @@ Two tracks, one rule. The rule: only message people with **proof they'd pay**.
 admire it and build their own. Everything below is hand-done. No Explee, no
 automation on LinkedIn (that's how accounts get restricted).
 
+Positioning, so the pitch never drifts: Voicebox is NOT a board. It's a
+widget that collects feedback inside their product, plus an analysis layer
+that ranks the raw text into themes. We never ask anyone to replace Canny or
+Featurebase — a board catches the vocal few who leave the app to vote; the
+widget catches the silent rest, in place. Complement, not replacement.
+
 - **Track 1 — SaaS already paying for feedback tooling.** They run Canny or
-  Featurebase today, so the budget is proven. Pitch: theirs is a board users
-  have to leave the product to visit, priced per tracked user (Canny runs
-  ~$275/mo by 1,000 tracked users); Voicebox sits in the product, users reply
-  in place, AI does the grouping, $19 flat for 3,000 replies. All numbers as
-  researched on /vs/canny — quote those, don't improvise.
+  Featurebase today, so the budget and the care are proven. Pitch: "keep the
+  board — it catches the users who go vote. The widget catches everyone who
+  never will, and the analysis ranks what they said. $19 flat for 3,000
+  replies, next to a board that runs per seat or per tracked user."
 - **Track 2 — agencies and studios.** One buyer = 5–20 client-site installs
   and a retainer line item for them.
+
+There's a Track 0 that can't be list-built as easily but is the true core:
+SaaS with real traffic and no feedback tooling at all — feedback today is
+scattered DMs and support email. Every one you stumble on (communities,
+timeline, changelogs with no feedback link) goes to the top of the sheet.
 
 The unfair advantage on both tracks is the demo: the widget brand-matches any
 site automatically. Every first message is a screenshot of the widget already
@@ -113,27 +123,28 @@ Two minutes per prospect. This screenshot is the entire pitch.
 
 **Message 1** (after accept, screenshot attached)
 
-> Noticed [product] runs a Canny board. Ran our widget against your site —
-> it matched your brand on its own, zero config. That's what it'd look like
-> in-product.
+> Noticed [product] runs a [Canny/Featurebase] board. Not pitching a
+> replacement — the board's good at what it does. Ran our widget against your
+> site though: matched your brand on its own, zero config. That's what it'd
+> look like in-product.
 >
-> Difference from the board: users reply where they are instead of leaving to
-> vote, and the AI groups everything into a ranked fix list. Priced on
-> feedback volume, not tracked users — $19 covers 3,000 replies a month, and
-> it never climbs because your user count did.
+> The gap it fills: the board catches users who care enough to leave the app
+> and vote. The widget catches everyone else, where they are, and the
+> analysis groups it all into a ranked fix list. $19 flat for 3,000 replies.
 >
 > Worth 15 minutes?
 
 **Follow-up** (3–4 days later, only if silence)
 
-> One number from our side: most feedback dies because the user has to open a
-> second product to give it. In-place widgets collect multiples of what boards
-> do. Happy to run Voicebox next to your board for a month, free, and let the
-> volume settle it.
+> The users posting on your board are the loud few — the churn risks are the
+> quiet ones who never make it there. Happy to run Voicebox next to your
+> board for a month, free, and let the volume difference settle whether the
+> silent majority has anything to say.
 
 **Breakup** (7 days after that)
 
-> Closing the loop — if the Canny bill ever annoys you, the honest comparison
+> Closing the loop — if you ever wonder what the users who skip your board
+> would tell you, the honest comparison
 > is at usevoicebox.dev/vs/canny. Good luck with [whatever they just shipped].
 
 ### Track 2 — agencies
