@@ -1,61 +1,54 @@
-# Day-one prospect list
+# Day-one prospects — SaaS with users and NO feedback system
 
-Every SaaS company below **currently pays Featurebase** (they're on
-featurebase.app/customers) and their board is live — I verified each one
-today (2026-08-19) at `{name}.featurebase.app`. That's the proof-of-budget
-filter: they already pay for feedback tooling.
+The ICP: small teams with real paying users whose feedback currently
+arrives as DMs, support email, or public app-store reviews. Nothing to
+replace, nothing to migrate. Widget in, ranked fix list out.
 
-Angle for all of them — complement, never replacement: their board catches
-the vocal few who leave the app to vote; the Voicebox widget catches the
-silent rest in-product, and the analysis ranks what they said. $19 flat for
-3,000 replies. Demo move first (widget matched to their site), always.
+Each entry below was checked today (2026-08-20): revenue is founder-stated
+publicly, and their site has no feedback tooling in the HTML (fingerprint
+scan for Canny/Featurebase/Upvoty/Nolt/Frill/Sleekplan/etc).
 
-## A-tier — small teams, founder reachable
+## The list
 
-| Product | Site to brand-match | Board | Contact |
-|---|---|---|---|
-| Senja (testimonials) | senja.io | senja.featurebase.app | Wilson Wilson or Olly Meakings — two-person team, very active on X |
-| Typefully (social scheduling) | typefully.com | typefully.featurebase.app | Fabrizio Rinaldi or Francesco Di Lorenzo |
-| Screen Studio (screen recorder) | screen.studio | screenstudio.featurebase.app | Adam Pietrasiak — builds in public on X |
-| Supademo (interactive demos) | supademo.com | supademo.featurebase.app | find founder on LinkedIn (verify) |
-| Zero (AI email client) | verify domain first | zero.featurebase.app | find founder on LinkedIn (verify) |
-| Creem (payments for SaaS) | creem.io | creem.featurebase.app | find founder on LinkedIn (verify) |
-| Examine (nutrition research) | examine.com | examine.featurebase.app | Sol Orwell founded it; check who runs product now |
-| Indie Hackers (community) | indiehackers.com | indiehackers.featurebase.app | Courtland Allen |
+| Product | Proof of users | Team | Contact | Feedback stack today |
+|---|---|---|---|---|
+| SuperX (superx.so) — X growth tool | $23K MRR, ~650 customers @ $39 | 2 | Rob Hallam; Tibo Louis-Lucas (sold Tweet Hunter/Taplio — very active on X) | none found |
+| Sleek (sleek.design) — AI mobile design | $10K MRR six weeks post-launch | 3 | Mattia Pomelli | none found |
+| Ablestar (ablestar.com) — Shopify bulk editor | 792 public app reviews | small (verify) | founder via site/LinkedIn (verify) | none on site; feedback = public Shopify reviews |
+| MIDA (mida.so) — session replay for Shopify | 493 app reviews | small (verify) | (verify) | Intercom chat only — support, not ranked feedback |
+| SoftwareIdeas.io — validated ideas newsletter | founder posted $4K MRR | solo (verify) | (verify) | none found |
+| NA Bulk Price Editor — Shopify app | 225 app reviews | (verify) | dev listed on apps.shopify.com page | public reviews only |
 
-## B-tier — bigger companies, still proven payers (slower cycle)
+Fast-growing two-to-three-person teams (SuperX, Sleek) are the priority:
+growth means a flood of user messages this exact month, and no system.
 
-| Product | Site | Board |
-|---|---|---|
-| Tiptap (editor toolkit) | tiptap.dev | tiptap.featurebase.app |
-| Hospitable (rental automation) | hospitable.com | hospitable.featurebase.app |
-| Adapty (app subscriptions) | adapty.io | adapty.featurebase.app |
-| Munchi (food ordering) | verify domain | munchi.featurebase.app |
-| BetterCampus (LMS add-on) | verify domain | bettercampus.featurebase.app |
-| FundEasy (nonprofit fundraising) | verify domain | fundeasy.featurebase.app |
-| Donorbox (fundraising) | donorbox.org | donorbox.featurebase.app |
-| Lodgify (vacation rentals) | lodgify.com | lodgify.featurebase.app |
-| Instantly (cold email) | instantly.ai | instantly.featurebase.app |
+## Two pitches, by situation
 
-## Agencies (track 2) — qualify size before inviting
+**No tooling at all** (SuperX, Sleek, SoftwareIdeas):
+> Congrats on [milestone — cite their own post]. At that growth the feedback
+> is arriving as DMs and support emails and dying there. Ran our widget
+> against [their site] — matched your brand on its own [screenshot]. Users
+> reply in-product, the engine groups everything into a ranked fix list.
+> Four-minute install, $19.
 
-From Webflow partner lists; check each has 3+ live client sites and isn't
-a 50-person shop:
+**Shopify app devs** (Ablestar, MIDA, NA):
+> Your only feedback channel is public reviews — by the time it's a 1-star,
+> it's marketing damage. The widget sits inside your embedded app and
+> catches it first, grouped and ranked. [screenshot of it matched to their
+> brand]
 
-- Belka Digital (Italy, boutique)
-- Flowout (Slovenia)
-- Amply (Salt Lake City)
-- Deduxer (remote-first)
-- BX Studio (Los Angeles)
+## How to refill this list (the repeatable part)
 
-Better source when these run out: experts.webflow.com, filtered to small
-studios.
+1. Indie Hackers revenue-milestone posts (google `site:indiehackers.com MRR`
+   + recent) — founder-stated revenue, named product, small team.
+2. Shopify App Store categories — apps with 50–800 reviews are small devs
+   with proven paying users and review-only feedback.
+3. #buildinpublic on X — MRR screenshots, you already scroll it.
+4. Before any invite: 5 seconds on their site — no feedback link, no board
+   subdomain, no widget script. If they have a stack, skip; we don't fight
+   incumbents, we fill vacuums.
 
-## Notes
+Reference customer when asked who uses it: Voicebox runs live on Lanci.
 
-- "(verify)" means I could not confirm the person or domain today — 30
-  seconds on LinkedIn/Google before sending, never guess in a DM.
-- Photo AI (Pieter Levels) is also on Featurebase — famous, solo, builds
-  everything himself. Low odds, but one reply from him is distribution.
-  Stretch target, not day one.
-- Message templates: marketing/outreach.md §5, Track 1.
+Agencies (track 2) unchanged — see outreach.md; source from
+experts.webflow.com when ready.
