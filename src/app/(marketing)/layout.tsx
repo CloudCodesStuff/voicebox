@@ -1,5 +1,33 @@
 import { MarketingFooter } from "@/components/marketing/footer";
 import { MarketingNav } from "@/components/marketing/nav";
+import { site } from "@/lib/site";
+
+/**
+ * Organization JSON-LD, on every marketing page.
+ *
+ * contactPoint carries the email; there is deliberately no PostalAddress —
+ * the only address a one-person company has is a home address, and this
+ * site never publishes one (see the note in src/lib/site.ts).
+ */
+const organizationLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": `${site.url}/#organization`,
+  name: site.name,
+  legalName: site.legalEntity,
+  url: site.url,
+  logo: `${site.url}/icon.svg`,
+  description: site.description,
+  email: site.supportEmail,
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer support",
+    email: site.supportEmail,
+    url: `${site.url}/contact`,
+    availableLanguage: "English",
+  },
+  sameAs: [`https://x.com/${site.twitter.replace(/^@/, "")}`],
+};
 
 /**
  * The top bloom lives here, not in the page.
@@ -25,6 +53,11 @@ export default function MarketingLayout({
       <MarketingNav />
       <main className="flex-1">{children}</main>
       <MarketingFooter />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationLd) }}
+      />
     </div>
   );
 }

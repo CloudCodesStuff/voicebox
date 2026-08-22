@@ -31,6 +31,44 @@ export default function NotFound() {
               Back to the site
             </Link>
           </div>
+
+          {/* Recovery map, for people and for agents that landed here from a
+              dead link. The HTTP status on this page is a real 404. */}
+          <nav aria-label="Where to look instead" className="mt-10">
+            <p className="text-[0.8rem] font-medium text-steel">
+              Where to look instead
+            </p>
+            <ul className="mt-3 space-y-1.5 text-[0.88rem] text-steel">
+              <li>
+                <Link href="/docs" className="text-ink hover:underline">
+                  /docs
+                </Link>{" "}
+                — documentation index
+              </li>
+              <li>
+                <Link href="/pricing" className="text-ink hover:underline">
+                  /pricing
+                </Link>{" "}
+                — plans and limits
+              </li>
+              <li>
+                <a href="/sitemap.xml" className="text-ink hover:underline">
+                  /sitemap.xml
+                </a>{" "}
+                — every page on this site
+              </li>
+              <li>
+                <a href="/llms.txt" className="text-ink hover:underline">
+                  /llms.txt
+                </a>{" "}
+                — orientation for agents ·{" "}
+                <a href="/openapi.json" className="text-ink hover:underline">
+                  /openapi.json
+                </a>{" "}
+                — API spec
+              </li>
+            </ul>
+          </nav>
         </div>
       </main>
     </div>

@@ -35,9 +35,10 @@ const columns = [
   {
     heading: "Company",
     links: [
+      { href: "/about", label: "About" },
       { href: "/blog", label: "Blog" },
       { href: "/changelog", label: "Changelog" },
-      { href: `mailto:${site.supportEmail}`, label: "Contact" },
+      { href: "/contact", label: "Contact" },
     ],
   },
 ];

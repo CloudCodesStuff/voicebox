@@ -13,6 +13,9 @@ export default function robots(): MetadataRoute.Robots {
           "/app/",
           "/admin",
           "/signin",
+          // Markdown renditions for Accept-negotiating agents; the HTML
+          // pages are the canonical, indexable versions.
+          "/agent-md/",
           // Customer status pages are unlisted by design. The token in the URL
           // is unguessable, but they must never end up in a search index.
           "/t/",

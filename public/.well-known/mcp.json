@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.CloudCodesStuff/voicebox",
+  "description": "Ranked user-feedback themes for your coding agent: ask what to fix next, get the answer with real quotes.",
+  "version": "0.3.0",
+  "websiteUrl": "https://www.usevoicebox.dev",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://www.usevoicebox.dev/api/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer token: an API key from Settings → Developers (sk_…)",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}

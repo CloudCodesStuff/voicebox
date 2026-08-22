@@ -25,7 +25,8 @@
     "seed:owner": "tsx --tsconfig tsconfig.scripts.json scripts/seed-owner.ts",
     "inspect": "tsx --tsconfig tsconfig.scripts.json scripts/inspect.ts",
     "refresh:widget": "tsx --tsconfig tsconfig.scripts.json scripts/refresh-widget-copy.ts",
-    "smoke:api": "tsx --tsconfig tsconfig.scripts.json scripts/smoke-api.ts"
+    "smoke:api": "tsx --tsconfig tsconfig.scripts.json scripts/smoke-api.ts",
+    "smoke:agent": "tsx --tsconfig tsconfig.scripts.json scripts/smoke-agent.ts"
   },
   "dependencies": {
     "@ai-sdk/deepseek": "^3.0.27",
