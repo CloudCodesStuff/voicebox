@@ -4,12 +4,14 @@ import Link from "next/link";
 import { AlertTriangle, TriangleAlert } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { refLabel } from "@/lib/attribution";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/client";
 
 export default function AdminOverview() {
   const overview = api.admin.overview.useQuery();
   const trend = api.admin.trend.useQuery();
+  const sources = api.admin.sources.useQuery();
 
   if (overview.isLoading || !overview.data) {
     return (
@@ -132,6 +134,21 @@ export default function AdminOverview() {
         </div>
       </section>
 
+      {/* Where people came from */}
+      <section>
+        <h2 className="label">Acquisition</h2>
+        <p className="mt-1 text-[0.83rem] text-steel">
+          First-touch channel from the <code className="font-mono">?ref=</code>{" "}
+          tag on the link someone arrived on. The paying column is the only
+          number that settles an argument about which post was worth doing.
+        </p>
+        {sources.data ? (
+          <SourceTable data={sources.data} />
+        ) : (
+          <Skeleton className="mt-3 h-32 rounded-xl" />
+        )}
+      </section>
+
       {/* Trend */}
       <section>
         <h2 className="label">Last 30 days</h2>
@@ -210,6 +227,92 @@ function Stat({
         {value}
       </div>
       {hint && <div className="mt-0.5 text-[0.78rem] text-steel">{hint}</div>}
+    </div>
+  );
+}
+
+/**
+ * One row per channel, signups against paying.
+ *
+ * No bars and no percentages of the total. At these counts a bar chart of
+ * "3 versus 1" is decoration that implies a precision the data does not have,
+ * and the useful comparison is between the two columns on a row, not between
+ * rows.
+ */
+function SourceTable({
+  data,
+}: {
+  data: {
+    rows: Array<{ source: string | null; signups: number; paying: number }>;
+    tagged: number;
+    total: number;
+  };
+}) {
+  if (data.total === 0) {
+    return (
+      <div className="mt-3 rounded-xl border border-dashed border-line bg-paper-2 px-6 py-10 text-center">
+        <p className="text-[0.9rem] text-steel">No users yet.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-3 overflow-hidden rounded-xl border border-line bg-paper-2">
+      <table className="w-full text-[0.86rem]">
+        <thead>
+          <tr className="border-b border-line">
+            <th className="label px-4 py-2.5 text-left font-normal">Channel</th>
+            <th className="label px-4 py-2.5 text-right font-normal">Signups</th>
+            <th className="label px-4 py-2.5 text-right font-normal">Paying</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.rows.map((row) => (
+            <tr
+              key={row.source ?? "__untagged"}
+              className="border-b border-line last:border-b-0"
+            >
+              <td className="px-4 py-2.5">
+                {row.source === null ? (
+                  <span className="text-steel">
+                    Untagged
+                    <span className="ml-2 text-[0.78rem] text-faint">
+                      direct, word of mouth, or pre-dates tagging
+                    </span>
+                  </span>
+                ) : (
+                  <>
+                    <span className="font-mono text-[0.82rem] text-ink">
+                      {row.source}
+                    </span>
+                    {refLabel(row.source) !== row.source && (
+                      <span className="ml-2 text-[0.78rem] text-faint">
+                        {refLabel(row.source)}
+                      </span>
+                    )}
+                  </>
+                )}
+              </td>
+              <td className="tnum px-4 py-2.5 text-right text-ink">
+                {row.signups}
+              </td>
+              <td
+                className={cn(
+                  "tnum px-4 py-2.5 text-right font-semibold",
+                  row.paying > 0 ? "text-mint-deep" : "text-faint",
+                )}
+              >
+                {row.paying}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="border-t border-line px-4 py-2.5 text-[0.78rem] text-steel">
+        <strong className="font-semibold text-ink">{data.tagged}</strong> of{" "}
+        {data.total} users arrived on a tagged link.
+      </div>
     </div>
   );
 }

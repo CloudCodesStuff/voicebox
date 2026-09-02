@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import type { Plan } from "@prisma/client";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "@/server/trpc/init";
@@ -179,6 +180,70 @@ export const adminRouter = createTRPCRouter({
   }),
 
   /** Grouped errors, newest activity first. */
+  /**
+   * Signups and paying customers, by the channel they arrived from.
+   *
+   * The question this exists to answer is "which post produced money", which
+   * no other view in the product can answer: MRR knows the total and the
+   * funnel knows the shape, and neither knows where anyone came from.
+   *
+   * Paying counts are tallied in memory rather than by a second groupBy,
+   * because "is paying" lives two relations away (user → membership → org →
+   * subscription) and Prisma cannot group across that. The set being counted
+   * is customers, so it is small by definition; if it ever isn't, that is a
+   * problem worth having.
+   *
+   * `refSource: null` is its own row, labelled rather than hidden. It is the
+   * majority of every early dataset — direct traffic, word of mouth, and
+   * every user who signed up before attribution existed — and dropping it
+   * would make the percentages lie.
+   */
+  sources: adminProcedure.query(async ({ ctx }) => {
+    const PAID: Plan[] = ["PRO", "SCALE", "STARTER"];
+
+    const [signupRows, payingUsers] = await Promise.all([
+      ctx.db.user.groupBy({
+        by: ["refSource"],
+        _count: { _all: true },
+      }),
+      ctx.db.user.findMany({
+        where: {
+          memberships: {
+            some: { org: { subscription: { plan: { in: PAID } } } },
+          },
+        },
+        select: { refSource: true },
+      }),
+    ]);
+
+    const paying = new Map<string | null, number>();
+    for (const user of payingUsers) {
+      paying.set(user.refSource, (paying.get(user.refSource) ?? 0) + 1);
+    }
+
+    const rows = signupRows
+      .map((row) => ({
+        source: row.refSource,
+        signups: row._count._all,
+        paying: paying.get(row.refSource) ?? 0,
+      }))
+      // Most signups first, with untagged last regardless of size: it is
+      // context, not a channel, and it should not head the table it dwarfs.
+      .sort((a, b) => {
+        if (a.source === null) return 1;
+        if (b.source === null) return -1;
+        return b.signups - a.signups;
+      });
+
+    return {
+      rows,
+      tagged: rows
+        .filter((r) => r.source !== null)
+        .reduce((sum, r) => sum + r.signups, 0),
+      total: rows.reduce((sum, r) => sum + r.signups, 0),
+    };
+  }),
+
   errors: adminProcedure
     .input(
       z.object({

@@ -43,3 +43,6 @@ next-env.d.ts
 
 # claude code (machine-local permissions/session state, not shared config)
 .claude/settings.local.json
+
+# marketing plan working doc (root only; docs/brand/index.html stays tracked)
+/index.html

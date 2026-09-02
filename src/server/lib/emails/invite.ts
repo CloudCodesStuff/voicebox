@@ -43,8 +43,8 @@ export function sendInviteEmail(input: {
     </p>
     <p style="margin:0 0 24px;color:${emailStyles.STEEL}">
       ${site.name} collects feedback from your product and groups it into a
-      ranked list of what to fix next. Joining takes one click and a Google
-      sign-in.
+      ranked list of what to fix next. Joining takes one click and a sign-in,
+      with Google or a link sent to this address.
     </p>
     <p style="margin:0 0 24px">${emailButton(url, `Join ${org}`)}</p>
     <p style="margin:0;color:${emailStyles.STEEL};font-size:13px">

@@ -9,14 +9,16 @@ import {
   ThemeCard,
   WidgetPreview,
 } from "@/components/marketing/product-visuals";
+import { features } from "@/env";
 import { auth, signIn } from "@/server/auth";
 import { site } from "@/lib/site";
 
+import { EmailSignInForm, type EmailSignInState } from "./email-form";
 import { GoogleButton } from "./google-button";
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: `Sign in to ${site.name} with Google to see your feedback inbox, themes and trends. No password to remember.`,
+  description: `Sign in to ${site.name} to see your feedback inbox, themes and trends. Google or a link by email, no password to remember.`,
   robots: { index: false, follow: false },
 };
 
@@ -26,6 +28,47 @@ const authConfigured = () =>
       process.env.AUTH_GOOGLE_SECRET &&
       process.env.AUTH_SECRET,
   );
+
+/**
+ * Email sign-in needs a working mailer and the shared Auth.js secret. It is
+ * offered independently of Google, so a deployment missing OAuth credentials
+ * still has a way in.
+ */
+const emailAuthConfigured = () =>
+  Boolean(features.email && process.env.AUTH_SECRET);
+
+/**
+ * Loose on purpose. The address is about to be handed to a mail provider that
+ * will make the real judgement, and a regex that rejects a valid but unusual
+ * address is a worse failure than one that accepts a typo: the typo produces
+ * an email nobody receives, the false rejection produces a person who cannot
+ * sign in and has no idea why.
+ */
+function looksLikeEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@.]+\.[^\s@]+$/.test(value) && value.length <= 254;
+}
+
+/**
+ * Auth.js redirects here with `?error=` when a provider fails, because
+ * `pages.error` points at this page. Codes are mapped to plain sentences; an
+ * unmapped one gets a generic line rather than the raw enum, which tells a
+ * visitor nothing and tells anyone probing us slightly too much.
+ */
+function errorMessage(code: string | undefined): string | null {
+  if (!code) return null;
+  switch (code) {
+    case "EmailSignin":
+      return "That sign-in link couldn't be sent. Try again, or use Google.";
+    case "Verification":
+      return "That link has expired or was already used. Request a new one.";
+    case "OAuthAccountNotLinked":
+      return "That email is already registered with a different sign-in method.";
+    case "AccessDenied":
+      return "Sign-in was declined.";
+    default:
+      return "Something went wrong signing in. Try again.";
+  }
+}
 
 /**
  * Only same-origin paths are allowed through. `next` arrives in a URL anyone
@@ -55,13 +98,15 @@ function safeNext(value: string | undefined): string {
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; error?: string }>;
 }) {
-  const next = safeNext((await searchParams).next);
+  const params = await searchParams;
+  const next = safeNext(params.next);
+  const providerError = errorMessage(params.error);
 
   // Only check the session when auth is actually wired; on a fresh clone with
   // an empty .env this page must still render rather than crash.
-  if (authConfigured()) {
+  if (authConfigured() || emailAuthConfigured()) {
     const session = await auth();
     if (session?.user) redirect(next);
   }
@@ -69,6 +114,24 @@ export default async function SignInPage({
   async function signInWithGoogle() {
     "use server";
     await signIn("google", { redirectTo: next });
+  }
+
+  async function signInWithEmail(
+    _state: EmailSignInState,
+    formData: FormData,
+  ): Promise<EmailSignInState> {
+    "use server";
+
+    const email = String(formData.get("email") ?? "").trim();
+    if (!looksLikeEmail(email)) {
+      return { error: "That doesn't look like an email address." };
+    }
+
+    // Not wrapped in try/catch: a successful call throws the redirect that
+    // takes the browser to /signin/sent, and catching it here would swallow
+    // the navigation and leave the form sitting there looking broken.
+    await signIn("resend", { email, redirectTo: next });
+    return { error: null };
   }
 
   return (
@@ -93,10 +156,45 @@ export default async function SignInPage({
             </p>
 
             <div className="mt-9">
-              {authConfigured() ? (
-                <form action={signInWithGoogle}>
-                  <GoogleButton />
-                </form>
+              {providerError && (
+                <div
+                  role="alert"
+                  className="mb-5 flex gap-3 rounded-lg border border-negative/25 bg-negative-wash p-4"
+                >
+                  <AlertTriangle
+                    className="mt-0.5 size-4 shrink-0 text-negative"
+                    aria-hidden="true"
+                  />
+                  <p className="text-[0.86rem] leading-relaxed text-ink">
+                    {providerError}
+                  </p>
+                </div>
+              )}
+
+              {authConfigured() || emailAuthConfigured() ? (
+                <div className="space-y-4">
+                  {authConfigured() && (
+                    <form action={signInWithGoogle}>
+                      <GoogleButton />
+                    </form>
+                  )}
+
+                  {/* The divider only earns its space when there are in fact
+                      two choices to separate. */}
+                  {authConfigured() && emailAuthConfigured() && (
+                    <div className="flex items-center gap-3">
+                      <span className="h-px flex-1 bg-line" />
+                      <span className="text-[0.74rem] font-medium tracking-wide text-faint uppercase">
+                        or
+                      </span>
+                      <span className="h-px flex-1 bg-line" />
+                    </div>
+                  )}
+
+                  {emailAuthConfigured() && (
+                    <EmailSignInForm action={signInWithEmail} />
+                  )}
+                </div>
               ) : (
                 <div className="flex gap-3 rounded-lg bg-mint-wash p-4">
                   <AlertTriangle
@@ -105,16 +203,20 @@ export default async function SignInPage({
                   />
                   <div className="text-[0.86rem] leading-relaxed text-mint-deep">
                     <strong className="font-semibold">
-                      Google sign-in isn&apos;t configured yet.
+                      Sign-in isn&apos;t configured yet.
                     </strong>
                     <p className="mt-1.5">
-                      Add <code className="font-mono text-[0.8rem]">AUTH_SECRET</code>,{" "}
+                      For Google, add{" "}
+                      <code className="font-mono text-[0.8rem]">AUTH_SECRET</code>,{" "}
                       <code className="font-mono text-[0.8rem]">AUTH_GOOGLE_ID</code>, and{" "}
                       <code className="font-mono text-[0.8rem]">AUTH_GOOGLE_SECRET</code>{" "}
-                      to <code className="font-mono text-[0.8rem]">.env</code>, then
-                      restart the dev server. See{" "}
-                      <code className="font-mono text-[0.8rem]">.env.example</code>{" "}
-                      for where to get each one.
+                      to <code className="font-mono text-[0.8rem]">.env</code>. For
+                      sign-in links by email, add{" "}
+                      <code className="font-mono text-[0.8rem]">RESEND_API_KEY</code>{" "}
+                      and <code className="font-mono text-[0.8rem]">EMAIL_FROM</code>.
+                      Either one is enough. Restart the dev server afterwards, and
+                      see <code className="font-mono text-[0.8rem]">.env.example</code>{" "}
+                      for where to get each value.
                     </p>
                   </div>
                 </div>

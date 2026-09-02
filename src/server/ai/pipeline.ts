@@ -13,6 +13,7 @@ import {
 } from "@/server/ai/analyze";
 import { db as defaultDb } from "@/server/db";
 import { serializeFeedback, serializeTheme } from "@/server/lib/api-shapes";
+import { captureError } from "@/server/lib/errors";
 import { dispatchWebhookInBackground } from "@/server/lib/webhooks";
 
 /* ---------------------------------------------------------------------------
@@ -65,6 +66,24 @@ export async function analyzeOne(
       where: { id: item.id },
       data: { analysisAttempts: { increment: 1 } },
     });
+
+    // The attempt that uses up the last retry is the one worth recording.
+    // Past this point the item is never picked up again by the sweep, so it
+    // sits in the inbox unscored and outside every theme, forever, and
+    // nothing anywhere says so. The provider error itself is captured in
+    // analyze.ts; this is the different fact that a customer's feedback has
+    // been permanently given up on.
+    if (item.analysisAttempts + 1 >= MAX_ANALYSIS_ATTEMPTS) {
+      void captureError({
+        source: "analysis",
+        error: new Error(
+          `Gave up analysing feedback after ${MAX_ANALYSIS_ATTEMPTS} attempts`,
+        ),
+        level: "warn",
+        context: { orgId: item.orgId, feedbackId: item.id },
+      });
+    }
+
     return false;
   }
 
@@ -278,6 +297,18 @@ export async function runClustering(
         finishedAt: new Date(),
       },
     });
+
+    // The AnalysisRun row is the per-run record and the admin overview counts
+    // it, but a count of failures is not a diagnosis: it says how many, never
+    // whether the seven this week are one fault or seven. The error table
+    // groups by fingerprint and emails once, which is the difference between
+    // knowing something is wrong and knowing what.
+    void captureError({
+      source: "analysis",
+      error,
+      context: { stage: "cluster-persist", projectId, runId: run.id },
+    });
+
     return null;
   }
 }

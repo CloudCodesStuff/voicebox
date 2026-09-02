@@ -29,6 +29,17 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
 
+  /// Which post or message brought this person in: a short slug from `?ref=`
+  /// on the link they first arrived on. Written once, when the row is created,
+  /// and never updated, so it stays first-touch. Null for anyone who arrived
+  /// with no tag, which includes every user who signed up before this existed.
+  ///
+  /// This is the only acquisition data the product stores. It is a label on a
+  /// customer record rather than a behavioural profile, which is what keeps
+  /// the "no analytics, no cookie banner" position true. See
+  /// src/lib/attribution.ts.
+  refSource String?
+
   accounts    Account[]
   sessions    Session[]
   memberships Membership[]

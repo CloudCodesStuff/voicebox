@@ -6,7 +6,7 @@ import { isAnalysisConfigured } from "@/server/ai/analyze";
 import { analyzePending, runClustering } from "@/server/ai/pipeline";
 import { db } from "@/server/db";
 import { authorizeCron } from "@/server/lib/cron-auth";
-import { purgeOldErrors } from "@/server/lib/errors";
+import { captureError, purgeOldErrors } from "@/server/lib/errors";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -86,6 +86,22 @@ export async function GET(req: NextRequest) {
   const denied = authorizeCron(req);
   if (denied) return denied;
 
+  try {
+    return await sweep();
+  } catch (error) {
+    // A scheduled job has nobody watching it fail. Without this, the whole
+    // sweep dying on a bad connection or a schema drift is a 500 in a log
+    // nobody reads, and the first sign of trouble is a customer asking why
+    // their themes stopped updating a week ago.
+    await captureError({ source: "cron", error, context: { job: "analyze" } });
+    return NextResponse.json(
+      { ok: false, error: "Analysis sweep failed" },
+      { status: 500 },
+    );
+  }
+}
+
+async function sweep(): Promise<NextResponse> {
   // Runs before the AI check, because retention is not conditional on the model
   // being configured.
   const ipsPurged = await purgeExpiredIps();
@@ -108,26 +124,41 @@ export async function GET(req: NextRequest) {
     clustered: boolean;
   }> = [];
 
+  let failed = 0;
+
   for (const project of projects) {
-    const enriched = await analyzePending(project.id, 25, db);
+    // Per project, so one workspace with bad data cannot end the sweep for
+    // everyone behind it in the list. Before this, an unexpected throw on the
+    // first project meant the other nineteen were silently never analysed,
+    // and the only visible symptom was a growing backlog with no cause.
+    try {
+      const enriched = await analyzePending(project.id, 25, db);
 
-    // Count analyzed items that don't belong to a theme yet. Enough of them
-    // means the existing clusters no longer describe the feedback.
-    const unclustered = await db.feedback.count({
-      where: {
-        projectId: project.id,
-        analyzedAt: { not: null },
-        themeId: null,
-      },
-    });
+      // Count analyzed items that don't belong to a theme yet. Enough of them
+      // means the existing clusters no longer describe the feedback.
+      const unclustered = await db.feedback.count({
+        where: {
+          projectId: project.id,
+          analyzedAt: { not: null },
+          themeId: null,
+        },
+      });
 
-    let clustered = false;
-    if (unclustered >= CLUSTER_THRESHOLD) {
-      clustered = Boolean(await runClustering(project.id, db));
-    }
+      let clustered = false;
+      if (unclustered >= CLUSTER_THRESHOLD) {
+        clustered = Boolean(await runClustering(project.id, db));
+      }
 
-    if (enriched > 0 || clustered) {
-      results.push({ project: project.name, enriched, clustered });
+      if (enriched > 0 || clustered) {
+        results.push({ project: project.name, enriched, clustered });
+      }
+    } catch (error) {
+      failed += 1;
+      await captureError({
+        source: "cron",
+        error,
+        context: { job: "analyze", projectId: project.id },
+      });
     }
   }
 
@@ -135,6 +166,7 @@ export async function GET(req: NextRequest) {
     ok: true,
     projectsChecked: projects.length,
     changed: results,
+    failed,
     ipsPurged,
     ranAt: new Date().toISOString(),
   });

@@ -4,6 +4,8 @@ import { createDeepSeek } from "@ai-sdk/deepseek";
 import { generateObject } from "ai";
 import { z } from "zod";
 
+import { captureError } from "@/server/lib/errors";
+
 /* ---------------------------------------------------------------------------
    The analysis engine
    ---------------------------------------------------------------------------
@@ -106,8 +108,20 @@ export async function enrichFeedback(
     });
 
     return { result: object, tokens: usage?.totalTokens ?? 0 };
-  } catch {
-    // Swallow deliberately: a failed analysis is a retry, not an incident.
+  } catch (error) {
+    // Still swallowed: a failed analysis is a retry, not an incident, and
+    // feedback has to remain usable without it. But it is recorded, because
+    // the reason was previously destroyed here — an expired key, a rate limit
+    // and a schema the provider stopped honouring all looked identical from
+    // the outside, which is to say invisible. Grouped by fingerprint, so a
+    // provider having a bad hour is one row with a count, and `warn` because
+    // one of these is noise; a thousand is an outage.
+    void captureError({
+      source: "analysis",
+      error,
+      level: "warn",
+      context: { stage: "enrich", model: MODEL_ID },
+    });
     return null;
   }
 }
@@ -231,7 +245,14 @@ export async function clusterFeedback(
       .filter((theme) => theme.itemIds.length > 0);
 
     return { themes, tokens: usage?.totalTokens ?? 0 };
-  } catch {
+  } catch (error) {
+    // Clustering is the part customers pay for, so a failure here matters
+    // more than a single enrichment: `error`, not `warn`.
+    void captureError({
+      source: "analysis",
+      error,
+      context: { stage: "cluster", items: items.length, model: MODEL_ID },
+    });
     return null;
   }
 }
