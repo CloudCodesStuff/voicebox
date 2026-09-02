@@ -6,8 +6,16 @@ import {
   emailShell,
   emailStyles,
   sendEmail,
+  type RenderedEmail,
   type SendResult,
 } from "@/server/lib/email";
+
+export type SignInInput = {
+  to: string;
+  url: string;
+  /** Minutes until the token expires, from the provider's own maxAge. */
+  expiresInMinutes: number;
+};
 
 /**
  * The sign-in link.
@@ -20,17 +28,12 @@ import {
  * clone with no Resend key.
  *
  * The URL is a single-use credential, so nothing here is clever: no tracking
- * wrapper, no shortener, no preview text quoting the link. The expiry is
- * stated because a link that has gone stale is the most common support
- * question this flow produces.
+ * wrapper, no shortener, and the preview text does not quote the link. The
+ * expiry is stated because a link that has gone stale is the most common
+ * support question this flow produces.
  */
-export function sendSignInEmail(input: {
-  to: string;
-  url: string;
-  /** Minutes until the token expires, from the provider's own maxAge. */
-  expiresInMinutes: number;
-}): Promise<SendResult> {
-  const { to, url, expiresInMinutes } = input;
+export function renderSignIn(input: SignInInput): RenderedEmail {
+  const { url, expiresInMinutes } = input;
 
   const expiry =
     expiresInMinutes >= 120
@@ -38,20 +41,20 @@ export function sendSignInEmail(input: {
       : `${expiresInMinutes} minutes`;
 
   const body = `
-    <p style="margin:0 0 22px;font-size:16px">
-      Click below to sign in to <strong>${site.name}</strong>.
+    <p class="vb-ink" style="margin:0 0 14px;font-size:19px;line-height:1.35;font-weight:650;letter-spacing:-0.021em;color:${emailStyles.INK}">
+      Here's your sign-in link.
     </p>
-    <p style="margin:0 0 24px">${emailButton(url, "Sign in")}</p>
-    <p style="margin:0 0 18px;color:${emailStyles.STEEL};font-size:13px">
-      The link works once and expires in ${expiry}.
+    <p class="vb-steel" style="margin:0 0 26px;color:${emailStyles.STEEL};font-size:15px;line-height:1.6">
+      It works once, and only for ${expiry}.
     </p>
-    <p style="margin:0;color:${emailStyles.STEEL};font-size:13px">
-      If you didn't ask to sign in, someone typed your address by mistake.
-      Ignore this message and nothing happens, and no account is created.
+    ${emailButton(url, `Sign in to ${site.name}`)}
+    <p class="vb-steel" style="margin:26px 0 0;color:${emailStyles.STEEL};font-size:13px;line-height:1.6">
+      Didn't ask for this? Someone typed your address by mistake. Ignore this
+      message and nothing happens &mdash; no account is created and nobody gets
+      access to anything.
     </p>`;
 
-  return sendEmail({
-    to,
+  return {
     subject: `Sign in to ${site.name}`,
     html: emailShell({
       title: `Sign in to ${site.name}`,
@@ -60,7 +63,7 @@ export function sendSignInEmail(input: {
       // No preference-management footer: this is a transactional message
       // somebody asked for seconds ago, and offering to unsubscribe from
       // sign-in links would be an odd thing to do.
-      footer: `Sent by ${site.name} because someone entered this address on the sign-in page.`,
+      footer: `Sent because someone entered this address on the ${site.name} sign-in page.`,
     }),
     text: [
       `Sign in to ${site.name}:`,
@@ -70,5 +73,10 @@ export function sendSignInEmail(input: {
       `The link works once and expires in ${expiry}.`,
       "If you didn't ask to sign in, ignore this message.",
     ].join("\n"),
-  });
+  };
+}
+
+export function sendSignInEmail(input: SignInInput): Promise<SendResult> {
+  const { subject, html, text } = renderSignIn(input);
+  return sendEmail({ to: input.to, subject, html, text });
 }

@@ -46,3 +46,6 @@ next-env.d.ts
 
 # marketing plan working doc (root only; docs/brand/index.html stays tracked)
 /index.html
+
+# rendered email previews (npm run email:preview)
+.email-preview/

@@ -50,21 +50,37 @@ function looksLikeEmail(value: string): boolean {
 
 /**
  * Auth.js redirects here with `?error=` when a provider fails, because
- * `pages.error` points at this page. Codes are mapped to plain sentences; an
- * unmapped one gets a generic line rather than the raw enum, which tells a
- * visitor nothing and tells anyone probing us slightly too much.
+ * `pages.error` points at this page.
+ *
+ * Only the codes below can actually arrive. Auth.js forwards a fixed
+ * allowlist of error types to the browser (`clientErrors` in
+ * @auth/core/errors) and collapses **everything else** — including a failed
+ * sign-in email, a bad adapter query, and a genuine misconfiguration — into
+ * `Configuration`. So there is deliberately no case here for a send failure:
+ * it is unreachable, and a case for it would be dead code that reads like a
+ * feature.
+ *
+ * That collapsing is why `Configuration` gets the longest message and offers
+ * the other route in. It is the bucket that means "we cannot tell you", and
+ * the useful thing to give someone in that state is an alternative, not an
+ * apology. The real cause lands in /admin/errors instead.
  */
 function errorMessage(code: string | undefined): string | null {
   if (!code) return null;
   switch (code) {
-    case "EmailSignin":
-      return "That sign-in link couldn't be sent. Try again, or use Google.";
     case "Verification":
-      return "That link has expired or was already used. Request a new one.";
+      return "That link has expired or was already used. Request a new one below.";
     case "OAuthAccountNotLinked":
-      return "That email is already registered with a different sign-in method.";
+    case "AccountNotLinked":
+      return "That email is already registered with a different sign-in method. Try the other button.";
     case "AccessDenied":
       return "Sign-in was declined.";
+    case "MissingCSRF":
+      return "That form went stale. Reload the page and try again.";
+    case "OAuthCallbackError":
+      return "Google didn't complete the sign-in. Try again, or use a sign-in link instead.";
+    case "Configuration":
+      return "Sign-in isn't working right now, and it's on our end, not yours. Try the other option below — if both fail, email support and we'll fix it.";
     default:
       return "Something went wrong signing in. Try again.";
   }

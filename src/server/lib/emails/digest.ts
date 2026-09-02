@@ -6,6 +6,8 @@ import { clientEnv } from "@/env";
 import { site } from "@/lib/site";
 import {
   emailButton,
+  emailDivider,
+  emailEyebrow,
   emailShell,
   emailStyles,
   escapeHtml,
@@ -26,7 +28,10 @@ import { unsubscribeUrl } from "@/server/lib/unsubscribe";
    hallucinate a trend.
 --------------------------------------------------------------------------- */
 
-const { INK, STEEL, LINE, MINT, MINT_DEEP } = emailStyles;
+const { INK, STEEL, MINT, MINT_INK, MINT_DEEP, MINT_WASH, FONT } = emailStyles;
+
+/** Mint hairline, used for the theme chips and the quote rules. */
+const MINT_LINE = "#b4ead8";
 
 export type DigestProject = {
   name: string;
@@ -165,67 +170,76 @@ export function renderDigest(
         .map((theme, index) => {
           const share = Math.round(theme.negativeShare * 100);
           return `
-      <tr>
-        <td style="padding:11px 0;border-bottom:1px solid ${LINE}">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td width="22" valign="top" style="color:${STEEL};font-size:13px">${index + 1}</td>
-            <td valign="top">
-              <a href="${appUrl}/app/themes/${theme.id}" style="color:${INK};font-size:14.5px;font-weight:600;text-decoration:none">${escapeHtml(theme.title)}</a>
-              ${theme.isNew ? `<span style="margin-left:7px;background:${MINT};color:#04231b;font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:99px">NEW</span>` : ""}
-              <div style="color:${STEEL};font-size:12.5px;margin-top:3px">
-                ${theme.itemCount} ${theme.itemCount === 1 ? "mention" : "mentions"}${share > 0 ? ` · ${share}% negative` : ""}
-              </div>
-            </td>
-          </tr></table>
-        </td>
-      </tr>`;
+        <tr>
+          <td style="padding:0 0 9px">
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse">
+            <tr>
+              <td width="24" valign="top" style="padding:1px 11px 0 0;line-height:0;font-size:0">
+                <div class="vb-wash vb-chip" style="width:22px;height:22px;background:${MINT_WASH};border:1px solid ${MINT_LINE};border-radius:6px;font-family:${FONT};font-size:11.5px;font-weight:700;color:${MINT_DEEP};text-align:center;line-height:21px">${index + 1}</div>
+              </td>
+              <td valign="top" style="font-family:${FONT}">
+                <a href="${appUrl}/app/themes/${theme.id}" class="vb-ink" style="font-family:${FONT};font-size:14.5px;font-weight:600;line-height:1.4;letter-spacing:-0.012em;color:${INK};text-decoration:none">${escapeHtml(theme.title)}</a>${
+                  theme.isNew
+                    ? `<span style="display:inline-block;margin-left:8px;background:${MINT};color:${MINT_INK};font-family:${FONT};font-size:9.5px;font-weight:700;letter-spacing:0.06em;padding:2px 6px;border-radius:99px;vertical-align:2px">NEW</span>`
+                    : ""
+                }
+                <div class="vb-steel" style="font-family:${FONT};font-size:12.5px;line-height:1.5;color:${STEEL};padding-top:3px">
+                  ${theme.itemCount} ${theme.itemCount === 1 ? "mention" : "mentions"}${share > 0 ? ` &middot; ${share}% negative` : ""}
+                </div>
+              </td>
+            </tr>
+            </table>
+          </td>
+        </tr>`;
         })
         .join("");
 
       const quotes = project.quotes
         .map(
           (quote) => `
-      <tr><td style="padding:8px 0">
-        <div style="border-left:2px solid ${LINE};padding-left:12px;color:${STEEL};font-size:13.5px;line-height:1.6;font-style:italic">
-          ${escapeHtml(quote.body.slice(0, 220))}${quote.body.length > 220 ? "…" : ""}
-        </div>
-      </td></tr>`,
+        <tr>
+          <td class="vb-ink" style="padding:0 0 12px;font-family:${FONT}">
+            <div class="vb-ink vb-quote" style="border-left:3px solid ${MINT_LINE};padding:1px 0 1px 14px;font-family:${FONT};font-size:14px;font-weight:400;line-height:1.62;color:${INK}">
+              ${escapeHtml(quote.body.slice(0, 220))}${quote.body.length > 220 ? "&hellip;" : ""}
+            </div>
+          </td>
+        </tr>`,
         )
         .join("");
 
       return `
-    <div style="margin-top:26px;padding-top:22px;border-top:1px solid ${LINE}">
-      <div style="font-size:15px;font-weight:700;color:${INK}">${escapeHtml(project.name)}</div>
-      <div style="font-size:13px;color:${STEEL};margin-top:3px">
+      ${emailDivider(26, 24)}
+      <div class="vb-ink" style="font-family:${FONT};font-size:17px;font-weight:700;letter-spacing:-0.024em;line-height:1.3;color:${INK}">${escapeHtml(project.name)}</div>
+      <div class="vb-steel" style="font-family:${FONT};font-size:13px;line-height:1.5;color:${STEEL};padding:4px 0 0">
         ${project.total} new ${project.total === 1 ? "piece" : "pieces"}, ${changeLine(project.total, project.previous)}
       </div>
 
       ${
         project.themes.length > 0
-          ? `<div style="font-size:12.5px;font-weight:600;color:${MINT_DEEP};margin-top:18px">What to work on</div>
-             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${themes}</table>`
-          : `<div style="font-size:13px;color:${STEEL};margin-top:14px">Not enough yet for a pattern. Themes appear once the same problem shows up a few times.</div>`
+          ? `<div style="padding-top:20px">${emailEyebrow("What to work on")}</div>
+             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse">${themes}</table>`
+          : `<div class="vb-steel" style="font-family:${FONT};font-size:13px;line-height:1.6;color:${STEEL};padding-top:14px">Not enough yet for a pattern. Themes appear once the same problem shows up a few times.</div>`
       }
 
       ${
         project.quotes.length > 0
-          ? `<div style="font-size:12.5px;font-weight:600;color:${MINT_DEEP};margin-top:20px;margin-bottom:4px">Worth reading</div>
-             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${quotes}</table>`
+          ? `<div style="padding:22px 0 0">${emailEyebrow("Worth reading")}</div>
+             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse">${quotes}</table>`
           : ""
-      }
-    </div>`;
+      }`;
     })
     .join("");
 
   const body = `
-    <p style="margin:0 0 6px;font-size:20px;font-weight:700;letter-spacing:-0.02em">
+    <div class="vb-h1 vb-ink" style="font-family:${FONT};font-size:22px;font-weight:700;letter-spacing:-0.03em;line-height:1.25;color:${INK}">
       ${digest.total} new ${digest.total === 1 ? "piece" : "pieces"} of feedback this week.
-    </p>
-    <p style="margin:0 0 20px;color:${STEEL}">
+    </div>
+    <div class="vb-steel" style="font-family:${FONT};font-size:15px;line-height:1.6;color:${STEEL};padding:9px 0 0">
       Here's what your users have been saying since ${week}.
-    </p>
+    </div>
     ${sections}
-    <p style="margin:28px 0 0">${emailButton(`${appUrl}/app`, "Open the dashboard")}</p>`;
+    ${emailDivider(28, 26)}
+    ${emailButton(`${appUrl}/app`, "Open the dashboard")}`;
 
   const text = [
     `${digest.orgName}: ${digest.total} new ${digest.total === 1 ? "piece" : "pieces"} of feedback this week.`,
@@ -259,9 +273,9 @@ export function renderDigest(
       footer:
         `You're getting this because weekly digests are on for ${escapeHtml(digest.orgName)}. ` +
         (optOutUrl
-          ? `<a href="${optOutUrl}" style="color:${STEEL}">Unsubscribe</a>, or `
+          ? `<a href="${optOutUrl}" class="vb-steel" style="color:${STEEL};text-decoration:underline">Unsubscribe</a>, or `
           : "") +
-        `<a href="${appUrl}/app/settings/general" style="color:${STEEL}">manage preferences</a>.`,
+        `<a href="${appUrl}/app/settings/general" class="vb-steel" style="color:${STEEL};text-decoration:underline">manage preferences</a>.`,
     }),
     text,
   };

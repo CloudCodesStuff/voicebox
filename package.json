@@ -26,7 +26,8 @@
     "inspect": "tsx --tsconfig tsconfig.scripts.json scripts/inspect.ts",
     "refresh:widget": "tsx --tsconfig tsconfig.scripts.json scripts/refresh-widget-copy.ts",
     "smoke:api": "tsx --tsconfig tsconfig.scripts.json scripts/smoke-api.ts",
-    "smoke:agent": "tsx --tsconfig tsconfig.scripts.json scripts/smoke-agent.ts"
+    "smoke:agent": "tsx --tsconfig tsconfig.scripts.json scripts/smoke-agent.ts",
+    "email:preview": "tsx --tsconfig tsconfig.scripts.json scripts/preview-emails.ts"
   },
   "dependencies": {
     "@ai-sdk/deepseek": "^3.0.27",

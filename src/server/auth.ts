@@ -10,6 +10,7 @@ import { features } from "@/env";
 import { REF_COOKIE, normalizeRef } from "@/lib/attribution";
 import { db } from "@/server/db";
 import { sendSignInEmail } from "@/server/lib/emails/signin";
+import { captureError } from "@/server/lib/errors";
 
 /**
  * Auth.js v5.
@@ -58,12 +59,29 @@ if (features.email) {
           expiresInMinutes: SIGNIN_LINK_MINUTES,
         });
 
-        // The one place in the product where a failed send must throw. Every
-        // other message is a notification about something that already
-        // happened; this one *is* the sign-in. Swallowing it would leave the
-        // person on a "check your inbox" page waiting for mail that was never
-        // accepted, with no error anywhere.
         if (!result.ok) {
+          // Recorded here because it is the only way anyone finds out. Auth.js
+          // forwards just a fixed allowlist of error types to the browser
+          // (`clientErrors` in @auth/core/errors) and an email failure is not
+          // on it, so whatever we throw below reaches the user as the generic
+          // "Configuration" and the real reason exists only in a serverless
+          // log. Capturing it puts the provider's actual message in
+          // /admin/errors, grouped, which is the difference between "sign-in
+          // is broken" and "the sending domain is unverified".
+          //
+          // No recipient address in the context: `captureError` would redact
+          // it anyway, and an operator does not need it to fix a bad key.
+          await captureError({
+            source: "email",
+            error: new Error(`Sign-in link send failed: ${result.error}`),
+            context: { provider: "resend" },
+          });
+
+          // Then throw, because this is the one place in the product where a
+          // failed send must fail loudly. Every other message is a
+          // notification about something that already happened; this one *is*
+          // the sign-in. Swallowing it would send the person to a
+          // "check your inbox" page to wait for mail that was never accepted.
           throw new Error(`Sign-in email failed: ${result.error}`);
         }
       },
