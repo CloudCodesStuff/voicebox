@@ -109,22 +109,64 @@ export function activeModelId(): string {
   return p ? `${p.id}/${p.model}` : "none";
 }
 
+/* ---------------------------------------------------------------------------
+   Why the schemas below carry no length or range limits
+
+   Zod's `.max(60)` becomes JSON Schema `maxLength: 60`, and constrained
+   decoding does not honour it. Strict structured output guarantees the SHAPE
+   of the response — types, required keys, enum members — but the model writes
+   a title token by token with no awareness of a character budget. Write a
+   63-character title against `maxLength: 60` and the provider rejects the
+   whole response with `json_validate_failed`, so one long title threw away the
+   clustering of all 36 items.
+
+   That is exactly what happened in production on 3 Sep: two identical runs
+   minutes apart, one DONE at 3,721 tokens and one FAILED, because the failure
+   depends on whether the model happens to overrun a limit it cannot see.
+
+   So the limits moved to where each one can actually be enforced. The number
+   goes in `.describe()`, which the model does read and mostly respects, and
+   the hard bound is applied by `cap()` after generation. Every column these
+   land in is unbounded `text`, so the limits are for the UI's benefit, and
+   trimming a long title is strictly better than discarding the run.
+--------------------------------------------------------------------------- */
+
+/** Trims model-written text to a display budget, on a word boundary if it can. */
+function cap(value: string, max: number): string {
+  const text = value.trim();
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const space = cut.lastIndexOf(" ");
+  return (space > max * 0.6 ? cut.slice(0, space) : cut).trimEnd();
+}
+
 const TIMEOUT_MS = 20_000;
 
 /**
  * Clustering gets a much longer budget than per-item enrichment: it produces a
- * large structured object, and 60s was measurably too tight for a 30-item
- * project.
+ * large structured object one token at a time.
  *
- * But it has to stay UNDER the shortest function limit it can run inside, and
- * it did not. `runClustering` is called from a tRPC mutation as well as from
- * cron — the Regroup button in the app — and this was 150s against a route
- * with no `maxDuration` at all. When the platform kills a function, our catch
- * never runs, so the failure is not recorded anywhere: the exact invisible
- * failure the error capture exists to prevent. Both call sites now cap at 60s
- * and this sits below that, so our own abort fires first and leaves a row.
+ * It must stay UNDER the shortest function limit it can run inside, and it did
+ * not — `runClustering` is called from a tRPC mutation (the Regroup button) as
+ * well as from cron, and this was 150s against a route with no `maxDuration`
+ * at all. A function the platform kills never reaches our catch, so the
+ * failure is recorded nowhere. Both call sites now cap at 60s and this sits
+ * below that, so our own abort fires first and leaves a row behind.
+ *
+ * The number comes from measurement, not taste. Eight consecutive runs over
+ * 36 items: 5.8s, 6.6s, 6.6s, 20.0s, 39.3s, 25.4s, 28.8s, 12.4s. The spread is
+ * the point — the slowest was 6.7x the fastest on identical input, so a
+ * budget close to the observed maximum is a budget that fails intermittently.
+ * 50s leaves ~10s under the function limit to write the FAILED row.
+ *
+ * SCALING CAVEAT: those figures are for 36 items. `CLUSTER_BATCH` is 120, and
+ * latency here tracks output size, so a project with a full batch can be
+ * expected to exceed 60s and be killed by the platform regardless of this
+ * value. Before that matters, either raise `maxDuration` (the Vercel Pro
+ * ceiling is far higher than 60s) or lower `CLUSTER_BATCH`. Clustering from a
+ * synchronous button click is the design that runs out of room first.
  */
-const CLUSTER_TIMEOUT_MS = 45_000;
+const CLUSTER_TIMEOUT_MS = 50_000;
 
 function getModel() {
   const provider = activeProvider();
@@ -146,20 +188,18 @@ const enrichmentSchema = z.object({
     .describe("Overall emotional tone of the feedback."),
   sentimentScore: z
     .number()
-    .min(-1)
-    .max(1)
-    .describe("-1 is furious, 0 is neutral, 1 is delighted."),
+    .describe(
+      "Between -1 and 1, where -1 is furious, 0 is neutral, 1 is delighted.",
+    ),
   category: z
     .string()
-    .max(40)
     .describe(
-      "A short lowercase intent label, 1-3 words, e.g. 'billing confusion', 'export bug', 'feature request'.",
+      "A short lowercase intent label, 1-3 words and at most 40 characters, e.g. 'billing confusion', 'export bug', 'feature request'.",
     ),
   summary: z
     .string()
-    .max(160)
     .describe(
-      "One neutral sentence stating what this person wants or experienced. No preamble.",
+      "One neutral sentence, at most 160 characters, stating what this person wants or experienced. No preamble.",
     ),
 });
 
@@ -201,7 +241,16 @@ export async function enrichFeedback(
         .join("\n"),
     });
 
-    return { result: object, tokens: usage?.totalTokens ?? 0 };
+    // The limits the schema no longer states, applied where they can be.
+    return {
+      result: {
+        ...object,
+        sentimentScore: Math.max(-1, Math.min(1, object.sentimentScore)),
+        category: cap(object.category, 40),
+        summary: cap(object.summary, 160),
+      },
+      tokens: usage?.totalTokens ?? 0,
+    };
   } catch (error) {
     // Still swallowed: a failed analysis is a retry, not an incident, and
     // feedback has to remain usable without it. But it is recorded, because
@@ -241,14 +290,14 @@ const clusterSchema = z.object({
       z.object({
         title: z
           .string()
-          .max(60)
           .describe(
-            "Short, specific, action-oriented. 'Slow CSV export', not 'Performance'.",
+            "Short, specific, action-oriented, at most 60 characters. 'Slow CSV export', not 'Performance'.",
           ),
         description: z
           .string()
-          .max(240)
-          .describe("One or two sentences on what users are saying and why."),
+          .describe(
+            "One or two sentences, at most 240 characters, on what users are saying and why.",
+          ),
         itemIds: z
           .array(z.number().int())
           .describe(
@@ -329,8 +378,8 @@ export async function clusterFeedback(
 
     const themes: ClusterAssignment[] = object.themes
       .map((theme) => ({
-        title: theme.title,
-        description: theme.description,
+        title: cap(theme.title, 60),
+        description: cap(theme.description, 240),
         // Drop anything that isn't a line number we actually issued. Models
         // occasionally invent an index, and a silent bad mapping would put
         // someone else's feedback in the wrong theme.
