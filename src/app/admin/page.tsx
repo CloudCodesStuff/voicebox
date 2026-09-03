@@ -87,13 +87,21 @@ export default function AdminOverview() {
       <section>
         <h2 className="label">Business</h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat label="MRR" value={`$${d.mrr}`} hint="From plan records" />
+          <Stat
+            label="MRR"
+            value={`$${d.mrr}`}
+            hint={
+              d.compedPlans > 0
+                ? `Stripe-billed only · ${d.compedPlans} comped plan${d.compedPlans === 1 ? "" : "s"} excluded`
+                : "Stripe-billed subscriptions only"
+            }
+          />
           <Stat label="Workspaces" value={d.orgs} hint={`${d.users} users`} />
           <Stat
             label="Paying"
-            value={(d.planCounts.PRO ?? 0) + (d.planCounts.SCALE ?? 0)}
+            value={d.payingCustomers}
             hint={`${d.planCounts.FREE ?? 0} on free`}
-            accent={(d.planCounts.PRO ?? 0) + (d.planCounts.SCALE ?? 0) > 0}
+            accent={d.payingCustomers > 0}
           />
           <Stat
             label="Feedback, 30d"

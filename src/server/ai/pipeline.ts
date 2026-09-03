@@ -3,7 +3,7 @@ import "server-only";
 import type { PrismaClient, Sentiment } from "@prisma/client";
 
 import {
-  MODEL_ID,
+  activeModelId,
   clusterFeedback,
   dominantSentiment,
   enrichFeedback,
@@ -113,7 +113,7 @@ export async function analyzeOne(
       status: "DONE",
       itemsProcessed: 1,
       tokensUsed: outcome.tokens,
-      model: MODEL_ID,
+      model: activeModelId(),
       finishedAt: new Date(),
     },
   });
@@ -178,7 +178,7 @@ export async function runClustering(
   if (!project.org.analysisEnabled) return null;
 
   const run = await db.analysisRun.create({
-    data: { orgId: project.orgId, projectId, kind: "CLUSTER", model: MODEL_ID },
+    data: { orgId: project.orgId, projectId, kind: "CLUSTER", model: activeModelId() },
   });
 
   try {

@@ -110,7 +110,11 @@ const groups: Group[] = [
     required: false,
     consequence:
       "Feedback is still collected, but nothing is scored and no themes are found.",
-    checks: [check("DEEPSEEK_API_KEY")],
+    checks: [
+      check("GROQ_API_KEY"),
+      check("GOOGLE_GENERATIVE_AI_API_KEY"),
+      check("DEEPSEEK_API_KEY"),
+    ],
   },
   {
     title: "Email",
@@ -281,7 +285,12 @@ async function main() {
     );
   }
 
-  if (has("DEEPSEEK_API_KEY") && !has("CRON_SECRET")) {
+  if (
+    (has("GROQ_API_KEY") ||
+      has("GOOGLE_GENERATIVE_AI_API_KEY") ||
+      has("DEEPSEEK_API_KEY")) &&
+    !has("CRON_SECRET")
+  ) {
     console.log(
       `${YELLOW}AI is on but CRON_SECRET is not set.${RESET} Analysis that fails at\n` +
         `submission time will never be retried, and themes only regroup on demand.\n`,

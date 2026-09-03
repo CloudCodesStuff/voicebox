@@ -1,7 +1,9 @@
 import "server-only";
 
 import { createDeepSeek } from "@ai-sdk/deepseek";
-import { generateObject } from "ai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createGroq } from "@ai-sdk/groq";
+import { generateObject, type LanguageModel } from "ai";
 import { z } from "zod";
 
 import { captureError } from "@/server/lib/errors";
@@ -21,25 +23,117 @@ import { captureError } from "@/server/lib/errors";
    functions below is what makes it true.
 --------------------------------------------------------------------------- */
 
-export const MODEL_ID = "deepseek-v4-flash";
+/* ---------------------------------------------------------------------------
+   Provider selection
+
+   This used to be one hard-coded provider, and that turned out to be a single
+   point of failure for the only feature anyone pays for: the DeepSeek balance
+   ran out, every model call started returning "Insufficient Balance", and the
+   product quietly stopped producing themes while continuing to accept
+   feedback. Nothing in the app said so.
+
+   So the provider is now a list. Whichever key is present wins, in the order
+   below, and `ANALYSIS_PROVIDER` pins one explicitly when several are set.
+   Swapping provider is an environment variable, not a deploy.
+
+   The order is deliberate: Groq first because its free tier is genuinely free
+   and it supports strict JSON-schema decoding, which is what `generateObject`
+   needs to be reliable. Gemini Flash-Lite second as the cheap paid option
+   (~$9/month at 38 customers, measured against this app's own recorded token
+   spend). DeepSeek last, because it is the one that just failed.
+
+   DATA-HANDLING NOTE, which is a real constraint and not a formality: the text
+   sent here belongs to a customer's end users, and we hold it as a processor.
+   Any provider added to this list has to be named in the privacy policy and
+   the DPA subprocessor list before it sees customer feedback. Google's *free*
+   tier is specifically not eligible — its terms reserve the right to have
+   human reviewers read API inputs and outputs and say not to send confidential
+   data — so `GOOGLE_GENERATIVE_AI_API_KEY` here is expected to be a paid-tier
+   key. Groq treats API traffic as customer data under its own DPA, which is
+   why it can be the free default.
+--------------------------------------------------------------------------- */
+
+type ProviderId = "groq" | "google" | "deepseek";
+
+type ProviderSpec = {
+  id: ProviderId;
+  /** Environment variable holding the key. */
+  env: string;
+  /** Model to use for this provider. */
+  model: string;
+  build: (apiKey: string, model: string) => LanguageModel;
+};
+
+const PROVIDERS: ProviderSpec[] = [
+  {
+    id: "groq",
+    env: "GROQ_API_KEY",
+    // Strict structured-output support (constrained decoding), which the two
+    // Zod schemas below depend on. Both are fully-required objects with no
+    // optional fields, which is exactly what strict mode demands.
+    model: "openai/gpt-oss-120b",
+    build: (apiKey, model) => createGroq({ apiKey })(model),
+  },
+  {
+    id: "google",
+    env: "GOOGLE_GENERATIVE_AI_API_KEY",
+    model: "gemini-2.5-flash-lite",
+    build: (apiKey, model) => createGoogleGenerativeAI({ apiKey })(model),
+  },
+  {
+    id: "deepseek",
+    env: "DEEPSEEK_API_KEY",
+    model: "deepseek-v4-flash",
+    build: (apiKey, model) => createDeepSeek({ apiKey })(model),
+  },
+];
+
+function activeProvider(): ProviderSpec | null {
+  const pinned = process.env.ANALYSIS_PROVIDER?.trim().toLowerCase();
+  const candidates = pinned
+    ? PROVIDERS.filter((p) => p.id === pinned)
+    : PROVIDERS;
+  return candidates.find((p) => Boolean(process.env[p.env])) ?? null;
+}
+
+/**
+ * Which model is actually running, as `provider/model`.
+ *
+ * Recorded on every `AnalysisRun` and attached to captured errors, so a
+ * provider switch is visible in the history rather than being something you
+ * have to remember. Returns a placeholder rather than throwing when nothing is
+ * configured, because it is called from logging paths.
+ */
+export function activeModelId(): string {
+  const p = activeProvider();
+  return p ? `${p.id}/${p.model}` : "none";
+}
 
 const TIMEOUT_MS = 20_000;
 
 /**
- * Clustering gets a much longer budget than per-item enrichment. It runs in a
- * background job where nobody is waiting on it, and it produces a large
- * structured object; 60s was measurably too tight for a 30-item project.
+ * Clustering gets a much longer budget than per-item enrichment: it produces a
+ * large structured object, and 60s was measurably too tight for a 30-item
+ * project.
+ *
+ * But it has to stay UNDER the shortest function limit it can run inside, and
+ * it did not. `runClustering` is called from a tRPC mutation as well as from
+ * cron — the Regroup button in the app — and this was 150s against a route
+ * with no `maxDuration` at all. When the platform kills a function, our catch
+ * never runs, so the failure is not recorded anywhere: the exact invisible
+ * failure the error capture exists to prevent. Both call sites now cap at 60s
+ * and this sits below that, so our own abort fires first and leaves a row.
  */
-const CLUSTER_TIMEOUT_MS = 150_000;
+const CLUSTER_TIMEOUT_MS = 45_000;
 
 function getModel() {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  if (!apiKey) return null;
-  return createDeepSeek({ apiKey })(MODEL_ID);
+  const provider = activeProvider();
+  if (!provider) return null;
+  return provider.build(process.env[provider.env] as string, provider.model);
 }
 
 export function isAnalysisConfigured(): boolean {
-  return Boolean(process.env.DEEPSEEK_API_KEY);
+  return activeProvider() !== null;
 }
 
 /* --------------------------------------------------------------------------
@@ -116,11 +210,17 @@ export async function enrichFeedback(
     // the outside, which is to say invisible. Grouped by fingerprint, so a
     // provider having a bad hour is one row with a count, and `warn` because
     // one of these is noise; a thousand is an outage.
-    void captureError({
+    // Awaited, not fire-and-forget. `captureError` never throws, so there is
+    // nothing to gain from letting it float, and plenty to lose: a serverless
+    // function can be frozen the moment it returns its response, which kills
+    // an un-awaited write. That is how the failure this instrumentation exists
+    // to catch would go unrecorded — confirmed locally, where the row only
+    // appeared after waiting several seconds before disconnecting.
+    await captureError({
       source: "analysis",
       error,
       level: "warn",
-      context: { stage: "enrich", model: MODEL_ID },
+      context: { stage: "enrich", model: activeModelId() },
     });
     return null;
   }
@@ -248,10 +348,10 @@ export async function clusterFeedback(
   } catch (error) {
     // Clustering is the part customers pay for, so a failure here matters
     // more than a single enrichment: `error`, not `warn`.
-    void captureError({
+    await captureError({
       source: "analysis",
       error,
-      context: { stage: "cluster", items: items.length, model: MODEL_ID },
+      context: { stage: "cluster", items: items.length, model: activeModelId() },
     });
     return null;
   }

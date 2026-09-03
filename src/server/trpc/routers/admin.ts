@@ -100,14 +100,43 @@ export const adminRouter = createTRPCRouter({
     const planCounts: Record<string, number> = {};
     for (const row of subscriptions) planCounts[row.plan] = row._count;
 
-    // Monthly recurring revenue from the plan table rather than from Stripe:
-    // it is the number the product believes, and a mismatch with Stripe is
-    // itself worth seeing.
-    const mrr = subscriptions.reduce((sum, row) => {
-      const price =
-        row.plan === "PRO" ? 19 : row.plan === "SCALE" ? 49 : 0;
-      return sum + price * row._count;
-    }, 0);
+    /**
+     * MRR counts only subscriptions Stripe is actually billing.
+     *
+     * This used to sum the plan column, which sounds like the honest reading
+     * of "what the product believes" and is in fact the one number an
+     * operator dashboard must never get wrong. A plan can be set without a
+     * Stripe subscription behind it — `seed:owner` does exactly that, and
+     * granting yourself SCALE on your own workspace is a reasonable thing to
+     * do — so the old sum reported $98/mo of revenue that nobody was paying,
+     * on two workspaces belonging to the founder.
+     *
+     * Reporting phantom revenue to yourself is worse than reporting none: it
+     * inflates every milestone you check yourself against, and it does so from
+     * day one, silently, in the direction that feels good. So the meter is
+     * `stripeSubscriptionId != null` — the presence of something Stripe will
+     * invoice — and comped plans are counted separately below rather than
+     * hidden, because you still want to see them.
+     */
+    const [billed, comped] = await Promise.all([
+      ctx.db.subscription.groupBy({
+        by: ["plan"],
+        where: { stripeSubscriptionId: { not: null }, status: { in: ["ACTIVE", "TRIALING"] } },
+        _count: true,
+      }),
+      ctx.db.subscription.count({
+        where: { stripeSubscriptionId: null, plan: { in: ["STARTER", "PRO", "SCALE"] } },
+      }),
+    ]);
+
+    const priceOf = (plan: string) =>
+      plan === "PRO" ? 19 : plan === "SCALE" ? 49 : 0;
+
+    const mrr = billed.reduce(
+      (sum, row) => sum + priceOf(row.plan) * row._count,
+      0,
+    );
+    const payingCustomers = billed.reduce((sum, row) => sum + row._count, 0);
 
     return {
       users,
@@ -119,6 +148,10 @@ export const adminRouter = createTRPCRouter({
       unanalyzed,
       planCounts,
       mrr,
+      /** Subscriptions Stripe is billing. The real customer count. */
+      payingCustomers,
+      /** Paid plans granted without Stripe: seeds, comps, your own workspaces. */
+      compedPlans: comped,
       openErrors,
       /**
        * Activation, the number worth watching. Each step is a strictly

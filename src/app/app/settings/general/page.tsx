@@ -214,8 +214,8 @@ function GeneralForm({
           <div className="max-w-[52ch]">
             <h2 className="text-[1rem] font-semibold text-ink">AI analysis</h2>
             <p className="mt-1 text-[0.85rem] leading-relaxed text-steel">
-              Feedback text is sent to DeepSeek, in China, for sentiment and
-              theme analysis. Email addresses and identify traits are never
+              Feedback text is sent to Groq, in the United States, for sentiment
+              and theme analysis. Email addresses and identify traits are never
               included in a prompt.
             </p>
             <p className="mt-2 text-[0.85rem] leading-relaxed text-steel">

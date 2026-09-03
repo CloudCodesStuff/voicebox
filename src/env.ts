@@ -59,7 +59,27 @@ const serverSchema = z.object({
       "Comma-separated emails allowed into /admin. Unset means nobody, never everybody.",
     ),
 
-  // --- AI (DeepSeek via Vercel AI SDK) --------------------------------------
+  // --- AI (pluggable provider via Vercel AI SDK) ----------------------------
+  // Any one of these enables analysis; see PROVIDERS in server/ai/analyze.ts
+  // for the selection order. Hard-coding a single provider is what let a dead
+  // billing balance silently switch off the whole feature.
+  ANALYSIS_PROVIDER: z
+    .enum(["groq", "google", "deepseek"])
+    .optional()
+    .describe("Pins one provider when several keys are set. Optional."),
+
+  GROQ_API_KEY: z
+    .string()
+    .optional()
+    .describe("console.groq.com key. Free tier; strict JSON-schema decoding."),
+
+  GOOGLE_GENERATIVE_AI_API_KEY: z
+    .string()
+    .optional()
+    .describe(
+      "aistudio.google.com key. Must be a PAID-tier key: the free tier's terms allow human review of API inputs.",
+    ),
+
   DEEPSEEK_API_KEY: z
     .string()
     .optional()
@@ -221,7 +241,11 @@ export const features = {
     return Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
   },
   get ai(): boolean {
-    return Boolean(process.env.DEEPSEEK_API_KEY);
+    return Boolean(
+      process.env.GROQ_API_KEY ||
+        process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+        process.env.DEEPSEEK_API_KEY,
+    );
   },
   get billing(): boolean {
     return Boolean(

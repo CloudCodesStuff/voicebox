@@ -113,19 +113,19 @@ export default function DpaPage() {
 
       <Clause n="06" heading="International transfers">
         <p>
-          The AI analysis provider, DeepSeek, is in China, which has no UK or EU
-          adequacy decision. Where restricted transfer rules apply we rely on the
-          EU Standard Contractual Clauses and the UK International Data Transfer
-          Addendum, and we minimize what is transferred: feedback text, type, and
-          rating only, never email addresses, identify traits, IP addresses, or
-          page URLs.
+          Every subprocessor, including the AI analysis provider, is in the
+          United States. Where restricted transfer rules apply we rely on the EU
+          Standard Contractual Clauses and the UK International Data Transfer
+          Addendum, and we minimize what is transferred to the model: feedback
+          text, type, and rating only, never email addresses, identify traits,
+          IP addresses, or page URLs.
         </p>
         <p>
           If that transfer doesn&apos;t work for your risk assessment, switch AI
           analysis off in Settings. Nothing goes to the provider while it&apos;s
           off, and the rest of the product carries on working.
         </p>
-        <p>Our other subprocessors are in the United States.</p>
+        <p>There is no transfer to a country without a UK or EU adequacy decision.</p>
       </Clause>
 
       <Clause n="07" heading="Helping you with your obligations">

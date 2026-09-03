@@ -119,14 +119,13 @@ export default function PrivacyPage() {
           line numbers before anything leaves.
         </p>
         <p>
-          <strong>Our model provider is DeepSeek, a company based in Hangzhou,
-          China.</strong> Feedback text is therefore transferred outside the UK,
-          the EEA, and the United States, to a country without a UK or EU
-          adequacy decision. Where that transfer is restricted, we rely on the
-          UK International Data Transfer Addendum and the EU Standard
-          Contractual Clauses, and customers should assess that transfer as part
-          of their own compliance. We do not permit the provider to use content
-          for training, and we send no direct identifiers with it.
+          <strong>Our model provider is Groq, a company based in the United
+          States.</strong> Groq processes API content as customer data under its
+          own data processing terms rather than for its own purposes. We do not
+          permit the provider to use content for training, and we send no direct
+          identifiers with it. Where a transfer out of the UK or the EEA is
+          restricted, we rely on the UK International Data Transfer Addendum and
+          the EU Standard Contractual Clauses.
         </p>
         <p>
           <strong>Any customer can switch AI analysis off</strong>, under
@@ -194,7 +193,7 @@ export default function PrivacyPage() {
           <li><strong>Vercel</strong>, application hosting, United States.</li>
           <li><strong>Neon</strong>, PostgreSQL database hosting, United States.</li>
           <li><strong>Google</strong>, sign-in for customer accounts, United States.</li>
-          <li><strong>DeepSeek</strong>, the language model behind analysis, China.</li>
+          <li><strong>Groq</strong>, the language model behind analysis, United States.</li>
           <li><strong>Resend</strong>, transactional and digest email, United States.</li>
           <li><strong>Stripe</strong>, subscription billing, United States. Used only once paid plans are enabled on your account.</li>
         </ul>

@@ -5,6 +5,18 @@ import { captureError } from "@/server/lib/errors";
 import { createTRPCContext } from "@/server/trpc/init";
 import { appRouter } from "@/server/trpc/routers/_app";
 
+/**
+ * Most procedures here answer in milliseconds. One does not: `theme.regroup`
+ * calls `runClustering`, which makes a model call over up to 120 items.
+ *
+ * Without this the route took the platform default, which is short enough that
+ * a real clustering run was killed mid-flight — and a killed function never
+ * reaches our catch, so the failure was recorded nowhere. Stated explicitly so
+ * the relationship to `CLUSTER_TIMEOUT_MS` (45s, deliberately lower) is
+ * visible from both ends.
+ */
+export const maxDuration = 60;
+
 const handler = (req: NextRequest) =>
   fetchRequestHandler({
     endpoint: "/api/trpc",
