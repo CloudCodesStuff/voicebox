@@ -48,11 +48,21 @@ export const comparisons: Comparison[] = [
     what: "a public feedback board with voting, a roadmap and a changelog",
     title: "Voicebox vs Canny",
     description:
-      "Canny is a public voting board priced by tracked users. Voicebox is a widget plus an insight engine priced by feedback volume. Compared honestly, August 2026.",
-    verifiedOn: "August 2026",
+      "Canny is a public voting board priced by tracked users. Voicebox is a widget plus an insight engine priced by feedback volume. Compared honestly, September 2026.",
+    verifiedOn: "September 2026",
     pricingModel: "Per tracked user",
+    // Re-checked against canny.io/pricing on 2 Sep 2026. Two changes since the
+    // August reading, both worth knowing about:
+    //
+    //   • The Core tier at $19/mo is gone. The ladder is now Free, Pro,
+    //     Business, so the entry price for a paid plan went UP, not down.
+    //   • The "$275/mo at 1,000 tracked users" figure was sourced from a
+    //     third-party blog and priced a plan that no longer exists. Removed
+    //     rather than re-estimated: a number we cannot stand behind about
+    //     another company is a liability, and the tier ladder now makes the
+    //     same argument from Canny's own page.
     pricingDetail:
-      "Free for 25 tracked users, then Core from $19/mo and Pro from $79/mo billed annually ($99 monthly). A tracked user is anyone who submits, votes or comments. Reported costs climb steeply with engagement: around $275/mo on Core and $579/mo on Pro at 1,000 tracked users. Jira, Linear and ClickUp integrations start on Pro; SSO is on the custom-priced Business plan.",
+      "Free for 25 tracked users, then Pro from $79/mo billed yearly, then a custom-priced Business plan. A tracked user is anyone associated with feedback — anyone who posts, votes or comments. The tier ladder is the cost curve: 25 tracked users on Free, 100+ on Pro, 5,000+ on Business, so the bill is a function of how many of your customers participate rather than how much they say. Jira, Linear and ClickUp integrations start on Pro; SSO is listed with the Business plan.",
     theyreBetterAt: [
       "Public roadmaps and voting. If you want customers to see what is planned and vote on it, that is Canny's entire design and Voicebox does not do it at all.",
       "Duplicate merging on a public board, where the same request arrives from many people who can all see each other's posts.",
@@ -69,13 +79,10 @@ export const comparisons: Comparison[] = [
       "you want a public place where customers vote on what you build next, and you are comfortable with a bill that grows as more of them participate.",
     pickUsIf:
       "you want to hear what is wrong, privately, and be told what to fix first without running a community.",
-    sources: [
-      { label: "Canny pricing", url: "https://canny.io/pricing" },
-      {
-        label: "Canny pricing analysis, ProductLift",
-        url: "https://www.productlift.dev/blog/canny-pricing/",
-      },
-    ],
+    // Only the vendor's own page now. The third-party analysis that used to be
+    // cited here was where the dead-plan figures came from, so keeping it would
+    // point a reader at the stale numbers we just removed.
+    sources: [{ label: "Canny pricing", url: "https://canny.io/pricing" }],
   },
   {
     slug: "featurebase",
@@ -83,11 +90,16 @@ export const comparisons: Comparison[] = [
     what: "feedback boards, roadmaps, changelogs, surveys, a help centre and a support inbox in one product",
     title: "Voicebox vs Featurebase",
     description:
-      "Featurebase is an all-in-one support and feedback suite priced per seat. Voicebox does one thing: collect feedback and rank what to fix. Compared, August 2026.",
-    verifiedOn: "August 2026",
+      "Featurebase is an all-in-one support and feedback suite priced per seat. Voicebox does one thing: collect feedback and rank what to fix. Compared, September 2026.",
+    verifiedOn: "September 2026",
     pricingModel: "Per seat, plus usage for AI",
+    // Re-checked against featurebase.app/pricing on 2 Sep 2026. Seat prices
+    // and the startup programme are unchanged; the AI resolution charge had
+    // risen from $0.29 to $0.49, so we were understating their cost by 69%.
+    // Worth correcting in their favour as promptly as in ours — the whole
+    // value of these pages is that the figures are checkable.
     pricingDetail:
-      "A permanent Free plan with one seat and no AI, then Growth at $29, Professional at $59 and Enterprise at $99 per seat per month billed yearly, plus $0.29 per AI resolution on paid plans. There is an early-stage startup programme offering a large discount for companies under two years old with fewer than six employees.",
+      "A permanent Free plan with one seat and no AI, then Growth at $29, Professional at $59 and Enterprise at $99 per seat per month billed yearly, plus $0.49 per AI resolution on paid plans. There is an early-stage startup programme offering 86% off for companies founded less than two years ago with fewer than six employees.",
     theyreBetterAt: [
       "Breadth. Boards, roadmap, changelog, surveys, help centre and a live support inbox in one subscription is a lot of product.",
       "Being your support tool as well as your feedback tool, if you would rather not run both.",

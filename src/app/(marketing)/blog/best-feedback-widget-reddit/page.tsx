@@ -42,7 +42,7 @@ const faqs = [
   },
   {
     q: "Why do feedback tools get expensive so quickly?",
-    a: "Usually because of the meter. Tools priced per tracked user charge more as more of your customers participate, so cost rises with engagement rather than with value delivered. Reported figures put Canny around $275 a month on Core and $579 on Pro at 1,000 tracked users. Tools priced per seat charge you for teammates who only read.",
+    a: "Usually because of the meter. Tools priced per tracked user charge more as more of your customers participate, so cost rises with engagement rather than with value delivered — Canny's tiers step from 25 tracked users on Free to 100+ on Pro to 5,000+ on Business. Tools priced per seat charge you for teammates who only read.",
   },
   {
     q: "Do I need a feedback widget if I already use Hotjar?",
@@ -143,16 +143,15 @@ export default function Page() {
       <UL>
         <LI>
           <strong className="text-ink">Per tracked user</strong> means anyone
-          who submits, votes or comments counts. Your bill grows as engagement
-          grows. Canny is free to 25 tracked users, then Core from $19/mo and
-          Pro from $79/mo billed annually, and reported costs at 1,000 tracked
-          users are around $275 and $579 a month respectively.
+          associated with feedback counts. Your bill grows as engagement grows.
+          Canny is free to 25 tracked users, then Pro from $79/mo billed yearly
+          at 100+ tracked users, then a custom-priced Business plan at 5,000+.
         </LI>
         <LI>
           <strong className="text-ink">Per seat</strong> means you pay for
           colleagues who only ever read. Featurebase runs $29, $59 and $99 per
           seat per month on its paid tiers, with a permanent free plan at one
-          seat, plus $0.29 per AI resolution.
+          seat, plus $0.49 per AI resolution.
         </LI>
         <LI>
           <strong className="text-ink">Per session</strong> is how behavioural
@@ -268,10 +267,6 @@ export default function Page() {
       <Sources
         items={[
           { label: "Canny pricing", url: "https://canny.io/pricing" },
-          {
-            label: "Canny pricing analysis, ProductLift",
-            url: "https://www.productlift.dev/blog/canny-pricing/",
-          },
           {
             label: "Featurebase pricing",
             url: "https://www.featurebase.app/pricing",

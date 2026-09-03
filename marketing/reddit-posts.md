@@ -45,6 +45,17 @@ Founder here, obviously. Free plan is 25 replies/month, no card.
 
 ## 2. r/microsaas — story + numbers culture
 
+> ⛔ **BLOCKED until you have actually sold someone.** Verified 2 Sep 2026:
+> Stripe has 0 completed subscriptions, so every factual claim in this post is
+> currently false — the sale, the "[X weeks] ago", the pitch that closed it.
+> It is a good post the week after your first real close and an unrecoverable
+> one before it. r/microsaas and HN share readers, and a fabricated revenue
+> story is the one mistake on this list you cannot walk back.
+>
+> Precondition: one paying customer who is **not** another project of yours,
+> with a completed Stripe subscription you can point at. Then fill in the real
+> numbers and post it.
+
 **Title:** Sold my first customer before the product had a pricing page —
 what actually moved
 

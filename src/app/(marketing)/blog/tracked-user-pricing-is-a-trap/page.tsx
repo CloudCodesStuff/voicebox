@@ -82,16 +82,19 @@ export default function Page() {
 
       <P>
         Take Canny, the clearest example because its figures are public. Free
-        covers 25 tracked users. Core starts at $19 a month, Pro at $79 billed
-        annually. A tracked user is anyone who submits, votes or comments.
+        covers 25 tracked users, Pro starts at $79 a month billed yearly, and
+        above that the Business plan is custom-priced. A tracked user is anyone
+        associated with feedback — anyone who posts, votes or comments.
       </P>
 
       <P>
-        Now run a good quarter. You launch something, traffic doubles, and the
-        share of customers who bother to vote on a request goes from tiny to
-        merely small. Reported figures at 1,000 tracked users are around $275 a
-        month on Core and $579 on Pro. Nothing about your revenue necessarily
-        changed. What changed is that more people participated.
+        The tier ladder is the whole argument, because it is denominated in
+        people rather than in usage: 25 tracked users on Free, 100+ on Pro,
+        5,000+ on Business. Now run a good quarter. You launch something,
+        traffic doubles, and the share of customers who bother to vote on a
+        request goes from tiny to merely small. You cross a tier. Nothing about
+        your revenue necessarily changed — what changed is that more people
+        participated.
       </P>
 
       <P>
@@ -104,7 +107,7 @@ export default function Page() {
 
       <P>
         Featurebase charges $29, $59 and $99 per seat per month on its paid
-        tiers, plus $0.29 per AI resolution. That is predictable, which is a
+        tiers, plus $0.49 per AI resolution. That is predictable, which is a
         real advantage over engagement-based metering. Its failure mode is
         pointed at the other side of the table.
       </P>
@@ -172,10 +175,6 @@ export default function Page() {
       <Sources
         items={[
           { label: "Canny pricing", url: "https://canny.io/pricing" },
-          {
-            label: "Canny pricing analysis, ProductLift",
-            url: "https://www.productlift.dev/blog/canny-pricing/",
-          },
           {
             label: "Featurebase pricing",
             url: "https://www.featurebase.app/pricing",

@@ -70,8 +70,8 @@ claude mcp add --transport http voicebox https://www.usevoicebox.dev/api/mcp --h
 >
 > Free tier is 25 pieces of feedback a month with the full AI included; paid
 > plans only buy volume. It's live on its own landing page (the widget in the
-> corner is the product), and our first customer is a student-jobs platform
-> whose feedback inbox we now drink from daily.
+> corner is the product) and on another product of mine, whose feedback inbox
+> I now drink from daily. No outside customers yet, so you'd be early.
 >
 > Happy to answer anything about the clustering, the MCP surface, or the
 > widget isolation.
@@ -153,7 +153,8 @@ from real users. [terminal screenshot]
 emails structurally can't reach the model prompt, ranking is auditable
 arithmetic.
 6/ Free for 25 pieces/mo with the full AI. Paid plans only buy volume.
-First customer already live: @[lanci handle]. usevoicebox.dev
+Running live on another product of mine while I look for the first outside
+customer. usevoicebox.dev
 
 **Daily posts (one/day after the thread):**
 - D1: screenshot of a real Lanci theme forming from 5 differently-worded complaints
@@ -169,4 +170,8 @@ First customer already live: @[lanci handle]. usevoicebox.dev
 ## 6. Site follow-ups (mine, queued)
 - PH badge slot in the hero for launch day.
 - Swap RatingProof to the Lanci line: **done**.
-- When customer #2 agrees to be named, extend the claim line.
+- The landing page currently claims **no** customers, which is correct and
+  worth keeping until one exists. Verified 2 Sep 2026: nothing in `src/` names
+  Lanci or asserts a customer, so there is no claim to walk back. Add the
+  claim line only when a customer who is not your own project agrees to be
+  named.

@@ -34,7 +34,7 @@ export const metadata: Metadata = pageMetadata({
 const faqs = [
   {
     q: "Why do people look for Canny alternatives?",
-    a: "Most often the pricing model rather than the product. Canny meters on tracked users, meaning anyone who submits, votes or comments, so the bill grows with engagement. Reported costs at 1,000 tracked users are around $275 a month on Core and $579 on Pro. The second reason is that a public voting board is not what every team wants.",
+    a: "Most often the pricing model rather than the product. Canny meters on tracked users, meaning anyone associated with feedback, so the bill grows with engagement rather than with value. Its tiers are counted in people: 25 tracked users on Free, 100+ on Pro at $79 a month billed yearly, and 5,000+ on the custom-priced Business plan. The second reason is that a public voting board is not what every team wants.",
   },
   {
     q: "What is the cheapest Canny alternative?",
@@ -95,11 +95,12 @@ export default function Page() {
       <H2 id="why">Why the bill grew</H2>
 
       <P>
-        Canny meters on tracked users. A tracked user is anyone who submits,
-        votes or comments, which means the meter is engagement. Free covers 25
-        tracked users. Core starts at $19 a month and Pro at $79 billed annually
-        ($99 monthly). Reported figures put 1,000 tracked users at roughly $275
-        a month on Core and $579 on Pro.
+        Canny meters on tracked users. A tracked user is anyone associated with
+        feedback — anyone who posts, votes or comments — which means the meter
+        is engagement. Free covers 25 tracked users, Pro starts at $79 a month
+        billed yearly, and the Business plan above it is custom-priced. The
+        tiers themselves are counted in people: 25 on Free, 100+ on Pro, 5,000+
+        on Business.
       </P>
 
       <P>
@@ -115,7 +116,7 @@ export default function Page() {
       <UL>
         <LI>
           <strong className="text-ink">Featurebase</strong> — per seat. $29,
-          $59 and $99 per seat per month billed yearly, plus $0.29 per AI
+          $59 and $99 per seat per month billed yearly, plus $0.49 per AI
           resolution, with a permanent free plan at one seat. Boards, roadmap,
           changelog, surveys, help centre and a support inbox in one product. A
           real like-for-like swap if you want the board, and it has a large
@@ -197,10 +198,6 @@ export default function Page() {
       <Sources
         items={[
           { label: "Canny pricing", url: "https://canny.io/pricing" },
-          {
-            label: "Canny pricing analysis, ProductLift",
-            url: "https://www.productlift.dev/blog/canny-pricing/",
-          },
           {
             label: "Featurebase pricing",
             url: "https://www.featurebase.app/pricing",

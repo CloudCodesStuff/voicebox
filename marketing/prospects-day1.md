@@ -48,7 +48,12 @@ growth means a flood of user messages this exact month, and no system.
    subdomain, no widget script. If they have a stack, skip; we don't fight
    incumbents, we fill vacuums.
 
-Reference customer when asked who uses it: Voicebox runs live on Lanci.
+When asked who uses it, the honest answer — and the one to give on a call:
+"It runs live on another product of mine, and on our own site. You'd be the
+first outside customer." Do not present Lanci as a customer: it is your own
+project and it shares your Stripe account, so anyone who checks will find
+that out, and being early is a much easier thing to sell than a claim you
+have to walk back.
 
 Agencies (track 2) unchanged — see outreach.md; source from
 experts.webflow.com when ready.

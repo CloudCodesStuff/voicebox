@@ -1,4 +1,19 @@
-# Launch kit
+# Launch kit — SUPERSEDED, do not post from this file
+
+> **Use `marketing/launch-kit.md` instead.** This file is kept for the pieces
+> still worth reading (the Product Hunt image table, the "do not" list, the
+> r/SideProject and r/indiehackers drafts), but its **positioning is retired**
+> and posting from it would contradict the current thesis.
+>
+> What changed: commit `e3cef94` killed the board-customer thesis. This file
+> leads with the Canny/Featurebase pricing wedge and pitches people already
+> running a feedback board. The ICP is now a product with users and **no
+> system at all** — we fill vacuums rather than fight incumbents — and the
+> buyers are agencies and app-marketplace developers. See `marketing/avatars.md`
+> and `marketing/outreach.md`.
+>
+> Two kits with opposite theses is how the wrong one gets posted at 8am under
+> pressure. If you only read one, read `marketing/launch-kit.md`.
 
 Everything written and ready to paste. The posting is yours: these land better
 from a person than from an account that appeared this morning, and every one of
@@ -301,7 +316,7 @@ can interrogate gets ignored the first time it disagrees with someone senior.
 Tools that meter on tracked users charge you more the better your product does.
 A good launch should not raise your bill.
 
-$0 for 50/mo with the AI on. $19 for 3,000.
+$0 for 25/mo with the AI on. $19 for 3,000.
 
 5/ No customers yet. Free tier is real and the AI is on it.
 

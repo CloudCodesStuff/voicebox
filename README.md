@@ -5,7 +5,7 @@
 An embeddable feedback widget plus an AI backend that turns hundreds of
 scattered comments into a short, ranked list of exactly what to fix next.
 
-The widget is the wedge, one script tag, Shadow DOM isolated, under 30KB.
+The widget is the wedge, one script tag, Shadow DOM isolated, ~11KB gzipped.
 The theme clustering is the value: sentiment alone is a pie chart, but
 *"34 people are hitting the CSV export timeout, and they're angry"* is a roadmap.
 
