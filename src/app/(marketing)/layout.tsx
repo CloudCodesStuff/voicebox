@@ -1,3 +1,4 @@
+import { ConsoleBanner } from "@/components/marketing/console-banner";
 import { MarketingFooter } from "@/components/marketing/footer";
 import { MarketingNav } from "@/components/marketing/nav";
 import { site } from "@/lib/site";
@@ -50,6 +51,7 @@ export default function MarketingLayout({
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[780px] bg-[radial-gradient(ellipse_1100px_620px_at_50%_-14%,rgba(0,229,160,0.13),transparent_68%)]"
       />
 
+      <ConsoleBanner />
       <MarketingNav />
       <main className="flex-1">{children}</main>
       <MarketingFooter />
