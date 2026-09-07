@@ -74,14 +74,6 @@ export function ConsoleBanner() {
       `background:${SLAB};color:#e4eae8;line-height:1.6`,
     );
     console.log(
-      "%c ~11KB gzipped, rendered in a shadow root so it cannot fight your CSS. ",
-      `background:${SLAB};color:#9aa3a0;line-height:1.6`,
-    );
-    console.log(
-      "%c Your coding agent can query the ranked themes over MCP. ",
-      `background:${SLAB};color:#9aa3a0;line-height:1.6`,
-    );
-    console.log(
       "%c usevoicebox.dev ",
       `background:${SLAB};color:${RAMP[0]};line-height:1.6`,
     );

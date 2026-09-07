@@ -27,15 +27,21 @@ Rules that keep you alive:
 
 ## Schedule from today, Thu 3 Sep
 
-| When | Sub | Why this slot |
-|---|---|---|
-| Thu 3 Sep | r/SideProject | Safest, promo-native. Go today. |
-| Sat 5 Sep | r/webdev | Showoff Saturday is the only day promo is allowed |
-| Sun 6 Sep | r/alphaandbetausers | Straight ask. Promo is the point there. |
-| Tue 8 Sep | r/shopifyDev | Work this one hardest. It's the buyer. |
-| Wed 9 Sep | r/SaaS | Copy angle |
-| Thu 10 Sep | r/indiehackers | Lesson post. Weakest audience for buying. |
-| held | r/microsaas | See post 7 |
+| When | Sub | Link to paste | Why this slot |
+|---|---|---|---|
+| Thu 3 Sep | r/SideProject | `usevoicebox.dev/?ref=r-sideproject` | Safest, promo-native. Go today. |
+| Sat 5 Sep | r/webdev | in comments: `?ref=r-webdev` | Showoff Saturday is the only day promo is allowed |
+| Sun 6 Sep | r/alphaandbetausers | `usevoicebox.dev/?ref=r-alphabeta` | Straight ask. Promo is the point there. |
+| Tue 8 Sep | r/shopifyDev | in comments: `?ref=r-shopifydev` | Work this one hardest. It's the buyer. |
+| Wed 9 Sep | r/SaaS | `usevoicebox.dev/?ref=r-saas` | Copy angle |
+| Thu 10 Sep | r/indiehackers | `usevoicebox.dev/?ref=r-ih` | Lesson post. Weakest audience for buying. |
+| held | r/microsaas | `?ref=r-microsaas` | See post 7 |
+
+**Always post the tagged link, never a bare one.** Attribution is first-touch
+off `?ref=`, stored on the user at signup and shown as Acquisition in `/admin`.
+A bare link records nothing, so you finish the week unable to say which sub
+produced anything. The slugs above are the ones `src/lib/attribution.ts`
+recognises; an unknown slug is still recorded, but it won't get a label.
 
 ---
 
@@ -81,7 +87,7 @@ card.
 Founder here, obviously. Happy to go deep on the brand-matching internals or
 the MCP surface.
 
-usevoicebox.dev
+usevoicebox.dev/?ref=r-sideproject
 
 ---
 
@@ -159,7 +165,7 @@ What I want broken:
 
 I'll fix what you find and report back in this thread. Founder here.
 
-usevoicebox.dev
+usevoicebox.dev/?ref=r-alphabeta
 
 ---
 
@@ -221,7 +227,7 @@ stopped asking "so what does the AI do" and started asking about the grouping.
 Has anyone here A/B'd de-AI-ing their copy? Does "AI" still lift signups in
 2026 or is it wallpaper now?
 
-Founder of usevoicebox.dev, the site in question, so you can check the copy.
+Founder of usevoicebox.dev/?ref=r-saas, the site in question, so you can check the copy.
 
 ---
 
@@ -243,7 +249,7 @@ anything. If your feedback system is DMs plus support email plus memory, you're
 sampling the loudest few percent and calling it a roadmap.
 
 What I'd do at that stage, and what I eventually built because I wanted it
-(disclosure: founder of usevoicebox.dev): collect where users already are,
+(disclosure: founder of usevoicebox.dev/?ref=r-ih): collect where users already are,
 because in-product beats "go visit our feedback board" by a mile. Then rank by
 volume × negative share × recency instead of by recall. A spreadsheet version
 of that beats vibes.

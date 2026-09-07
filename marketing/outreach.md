@@ -32,22 +32,25 @@ People click your name before they reply. The profile is the landing page.
 
 **Headline**
 
-> Building Voicebox — a feedback widget that installs in 4 minutes, matches
-> your brand on its own, and turns replies into a ranked fix list.
+> Building Voicebox: your users' feedback, grouped and ranked, and queryable
+> by your coding agent. One script tag to collect it.
 
 **About**
 
-> Feedback boards make users leave your product to complain, so they don't.
-> Voicebox is a widget that installs with one script tag, matches your brand
-> automatically, and groups every reply into a ranked list of what to fix
-> next. AI on every plan, including free. I'm the founder; DM me and you'll
-> get me, not a sequence.
+> Every feedback tool ends at a dashboard you stop opening within a week.
+> Voicebox is a widget that installs with one script tag and matches your brand
+> on its own, and it groups every reply into a ranked list of what to fix. Then
+> it hands that list to your coding agent over MCP, so the thing deciding what
+> to build has already read your users. Free tier includes the analysis. I'm
+> the founder, so DM me and you get me, not a sequence.
 
 **Featured section** (in this order)
 
-1. Link: usevoicebox.dev
+1. Link: usevoicebox.dev/?ref=dm-t1
 2. A 30-second screen recording: paste tag → widget appears matched → themes
-   dashboard. (Record once with QuickTime, reuse everywhere.)
+   dashboard → ask Claude Code what to fix and let it answer from the themes.
+   That last beat is the whole pitch. Record once with QuickTime, reuse
+   everywhere.
 3. Link: usevoicebox.dev/pricing
 
 ---
