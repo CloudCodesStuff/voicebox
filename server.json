@@ -1,9 +1,24 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.CloudCodesStuff/voicebox",
-  "description": "Ranked user-feedback themes for your coding agent: ask what to fix next, get the answer with real quotes.",
+  "title": "Voicebox",
+  "description": "Your users' feedback, grouped into ranked themes, queryable by your coding agent.",
   "version": "0.3.0",
   "websiteUrl": "https://www.usevoicebox.dev",
+  "repository": {
+    "url": "https://github.com/CloudCodesStuff/voicebox",
+    "source": "github",
+    "id": "1331738828"
+  },
+  "icons": [
+    {
+      "src": "https://www.usevoicebox.dev/icon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": [
+        "any"
+      ]
+    }
+  ],
   "remotes": [
     {
       "type": "streamable-http",
@@ -12,6 +27,7 @@
         {
           "name": "Authorization",
           "description": "Bearer token: an API key from Settings → Developers (sk_…)",
+          "placeholder": "Bearer sk_...",
           "isRequired": true,
           "isSecret": true
         }

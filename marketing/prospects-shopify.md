@@ -1,5 +1,11 @@
 # Shopify app developers — the enumerable list
 
+> **PARKED, 7 Sep 2026.** Cold outbound to marketplace developers is out of
+> scope: it's sales rather than marketing, and it was cut on request. The list
+> and the method below are still sound if that changes, but nothing in
+> `index.html` references this file any more, and an agent working the runbook
+> should not pick it up.
+
 Built 3 Sep 2026 from Shopify App Store category pages. Every name below has a
 **public review count between roughly 50 and 900**, which is the only
 qualification that matters: a review count is a customer count, visible from

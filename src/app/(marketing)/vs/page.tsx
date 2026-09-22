@@ -8,7 +8,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: `Compare ${site.name}`,
-  description: `How ${site.name} compares with Canny, Featurebase, Hotjar and Usersnap, including what each of them is better at. Pricing verified August 2026.`,
+  description: `How ${site.name} compares with Canny, Featurebase, Hotjar and Usersnap, including what each of them is better at. Pricing verified September 2026.`,
   path: "/vs",
 });
 

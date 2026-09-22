@@ -6,7 +6,7 @@ import {
   createTRPCRouter,
   orgProcedure,
 } from "@/server/trpc/init";
-import { recomputeThemeStats, runClustering } from "@/server/ai/pipeline";
+import { analyzePending, recomputeThemeStats, runClustering } from "@/server/ai/pipeline";
 import { isAnalysisConfigured } from "@/server/ai/analyze";
 import { assertRate } from "@/server/lib/rate-limit";
 
@@ -156,6 +156,17 @@ export const themeRouter = createTRPCRouter({
         });
       }
 
+      // Score whatever is still waiting before grouping. Clustering only
+      // considers analyzed items, and until 21 Sep 2026 production ingest was
+      // losing its analysis call to the function ending (see the ingest
+      // route), so a project could hold twenty submissions and Regroup would
+      // report "grouped 0 items into 0 themes" as a success. Whatever the
+      // ingest path does in future, the button that promises themes should
+      // never depend on it having worked: scoring here makes the button
+      // self-sufficient, and a batch of 25 is a few seconds on the current
+      // provider.
+      const scored = await analyzePending(project.id, 25, ctx.db);
+
       const result = await runClustering(project.id, ctx.db);
       if (!result) {
         throw new TRPCError({
@@ -163,7 +174,23 @@ export const themeRouter = createTRPCRouter({
           message: "Clustering didn't return anything usable. Try again.",
         });
       }
-      return result;
+
+      // Still nothing to group after scoring: say so, rather than toasting
+      // a success with two zeros in it.
+      if (result.items === 0) {
+        const unscored = await ctx.db.feedback.count({
+          where: { projectId: project.id, analyzedAt: null },
+        });
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message:
+            unscored > 0
+              ? `${unscored} submissions could not be scored, so there is nothing to group yet. Try again in a moment.`
+              : "No analyzed feedback to group yet.",
+        });
+      }
+
+      return { ...result, scored };
     }),
 
   /** Cheap arithmetic refresh with no model call. */

@@ -129,27 +129,33 @@ export const comparisons: Comparison[] = [
     what: "behavioural analytics: heatmaps, session recordings and funnels, with survey and feedback widgets alongside",
     title: "Voicebox vs Hotjar",
     description:
-      "Hotjar shows you what people did. Voicebox tells you what they meant. Where the two overlap, where they do not, and why plenty of teams run both. August 2026.",
-    verifiedOn: "August 2026",
-    pricingModel: "Per session volume",
+      "Hotjar shows you what people did. Voicebox tells you what they meant. Where the two overlap, where they do not, and why plenty of teams run both. Compared, September 2026.",
+    verifiedOn: "September 2026",
+    // Re-checked 21 Sep 2026: hotjar.com/pricing now redirects to
+    // contentsquare.com. The old Plus/Business/Scale ladder ($32/$80/$171)
+    // is gone; Hotjar's tools are sold as Contentsquare products, and the
+    // feedback side (surveys, widgets) is a separate product from analytics.
+    pricingModel: "Per product, metered on sessions or responses",
     pricingDetail:
-      "A free tier, then paid plans reported from around $32/mo (Plus), $80/mo (Business) and $171+/mo (Scale), metered on sessions rather than on feedback.",
+      "Hotjar is now sold as Contentsquare. Experience Analytics (heatmaps, replays) has a free tier and a Growth plan from $49/mo ($39 billed yearly) for 7,000 sessions. The feedback side, Voice of Customer, is a separate product: 100 responses free, then Growth from $99/mo ($79 billed yearly) for 500 responses. Pro and Enterprise are quote-only.",
     theyreBetterAt: [
       "Showing you behaviour. Heatmaps and session recordings answer 'where did they get stuck' in a way no amount of written feedback will.",
       "Funnels and drop-off analysis, which is a different question from the one Voicebox answers.",
       "Volume of signal without asking anyone anything, since recordings need no participation.",
+      "Breadth: since the Contentsquare merger the same account covers analytics, surveys and product analytics, with an MCP server on the paid plans.",
     ],
     weDoDifferently: [
       "The written word is the product, not a side feature. Every submission is scored, summarised and grouped with everything describing the same problem.",
       "Output is a ranked list of things to fix, rather than a set of recordings to watch.",
-      "Priced on feedback collected rather than sessions, so traffic spikes do not move the bill.",
+      "Priced on feedback collected rather than sessions, so traffic spikes do not move the bill. Written feedback is the whole product here, not a $79/mo add-on to analytics.",
+      "The MCP server is on every plan, including free, and is read-only by design.",
     ],
     pickThemIf:
       "your question is where people struggle in a flow, and you have the time to watch recordings.",
     pickUsIf:
       "your question is what people want changed and in what order, in their words.",
     sources: [
-      { label: "Hotjar pricing", url: "https://www.hotjar.com/pricing/" },
+      { label: "Hotjar pricing (now Contentsquare)", url: "https://www.hotjar.com/pricing/" },
     ],
   },
   {
@@ -158,20 +164,24 @@ export const comparisons: Comparison[] = [
     what: "visual bug reporting with screenshots and annotation, aimed at QA and UX teams",
     title: "Voicebox vs Usersnap",
     description:
-      "Usersnap is built for reporting visual bugs with annotated screenshots. Voicebox is built for understanding written feedback at volume. Compared, August 2026.",
-    verifiedOn: "August 2026",
-    pricingModel: "Per user and feature tier",
+      "Usersnap is built for reporting visual bugs with annotated screenshots. Voicebox is built for understanding written feedback at volume. Compared, September 2026.",
+    verifiedOn: "September 2026",
+    // Re-checked against usersnap.com/pricing on 21 Sep 2026. There is no
+    // free plan, only a trial; the ladder is seats and active projects.
+    pricingModel: "Per seat and project tier",
     pricingDetail:
-      "A limited free plan, with paid tiers by number of users and features; higher tiers are reported to reach several hundred euros a month.",
+      "No free plan, a free trial. Starter $49/mo (5 projects, 5 seats), Growth $109/mo (15 projects, 10 seats), Professional $189/mo (20 projects, 20 seats), Premium from $369/mo (50 projects, 50 seats), all billed monthly; yearly billing saves up to three months. Feedback volume is unlimited on every tier; what you pay for is people and projects.",
     theyreBetterAt: [
       "Bug reports. Screen capture with annotation on top, plus browser and console metadata attached automatically, is exactly what a QA cycle needs and Voicebox has none of it.",
       "Handing a developer something reproducible without a back-and-forth.",
       "Structured QA workflows during a release, which is a different job from listening to customers.",
+      "Video feedback, a form builder with thirty-odd templates, and an MCP connector on top of it all.",
     ],
     weDoDifferently: [
       "No screenshots. Voicebox deliberately collects only what someone typed, which keeps it light and keeps other people's data out of your inbox.",
       "Analysis over capture: the value is in grouping hundreds of messages, not in the fidelity of any one report.",
       "A widget your end users are meant to use, rather than a tool aimed at your own testers.",
+      "A free plan that is a plan, not a trial, and a starting price of $19 rather than $49.",
     ],
     pickThemIf:
       "you are collecting bug reports from testers or clients and need annotated screenshots and environment detail.",

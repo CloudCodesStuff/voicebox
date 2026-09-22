@@ -110,7 +110,7 @@ async function sweep(): Promise<NextResponse> {
   const errorsPurged = await purgeOldErrors().catch(() => 0);
 
   if (!isAnalysisConfigured()) {
-    return NextResponse.json({ ok: true, ipsPurged, errorsPurged, skipped: "no DEEPSEEK_API_KEY" });
+    return NextResponse.json({ ok: true, ipsPurged, errorsPurged, skipped: "no analysis provider configured" });
   }
 
   const projects = await db.project.findMany({

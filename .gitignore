@@ -50,3 +50,6 @@ next-env.d.ts
 # rendered email previews (npm run email:preview)
 .email-preview/
 /plan.html
+
+# Saved Claude Code chat transcripts
+/*-local-command-caveat*.txt

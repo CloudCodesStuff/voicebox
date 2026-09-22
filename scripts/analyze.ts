@@ -3,7 +3,7 @@
  *
  *   npm run analyze
  *
- * Useful for backfilling after a seed, or after adding DEEPSEEK_API_KEY to an
+ * Useful for backfilling after a seed, or after adding a provider key to an
  * instance that had been collecting feedback without it.
  */
 
@@ -20,8 +20,12 @@ if (!connectionString) {
   process.exit(1);
 }
 
-if (!process.env.DEEPSEEK_API_KEY) {
-  console.error("\nDEEPSEEK_API_KEY is not set, nothing to run.\n");
+if (
+  !process.env.GROQ_API_KEY &&
+  !process.env.GOOGLE_GENERATIVE_AI_API_KEY &&
+  !process.env.DEEPSEEK_API_KEY
+) {
+  console.error("\nNo analysis provider key is set, nothing to run.\n");
   process.exit(1);
 }
 

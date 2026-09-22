@@ -123,10 +123,12 @@ export default function Page() {
       <H2 id="sessions">Per-session bills you for traffic</H2>
 
       <P>
-        Behavioural tools like Hotjar meter on sessions, from around $32 a month
-        on paid plans. If your question is behavioural that is
-        reasonable, since sessions are the raw material. It does mean a piece of
-        content going unexpectedly viral shows up as a bill.
+        Behavioural tools like Hotjar, now sold as Contentsquare, meter on
+        sessions: the Growth plan starts at $49 a month for 7,000 of them, and
+        the survey side is a separate product from $99 a month for 500
+        responses. If your question is behavioural that is reasonable, since
+        sessions are the raw material. It does mean a piece of content going
+        unexpectedly viral shows up as a bill.
       </P>
 
       <H2 id="alternative">What to look for instead</H2>

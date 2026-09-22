@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, after, type NextRequest } from "next/server";
 import { z } from "zod";
 
 import { analyzeOne } from "@/server/ai/pipeline";
@@ -9,6 +9,11 @@ import { dispatchWebhookInBackground } from "@/server/lib/webhooks";
 import { captureError } from "@/server/lib/errors";
 
 export const dynamic = "force-dynamic";
+// The analysis call below runs after the response is sent (see `after`), so
+// the function has to be allowed to live long enough for a 20s model call
+// plus the writes that record it. Without this the platform default applies,
+// which on Vercel Hobby is 10s.
+export const maxDuration = 60;
 
 /* ---------------------------------------------------------------------------
    Widget ingest
@@ -267,20 +272,36 @@ export async function POST(req: NextRequest) {
     serializeFeedback(feedback),
   );
 
-  // Enrich without making the submitter wait. The cron sweep catches anything
-  // that fails or gets cut short by the function ending.
+  // Enrich without making the submitter wait, but AFTER the response, not
+  // detached from it.
   //
-  // The catch used to be empty, which meant a systematically broken analysis
-  // path (a revoked provider key, a changed response shape) looked exactly
-  // like a slow one: feedback kept arriving, nothing was ever scored, and the
-  // only symptom was a backlog nobody was watching.
+  // This used to be `void analyzeOne(...)`, fire-and-forget. Locally that
+  // works, because `next dev` is a long-lived process. In production it did
+  // not: a serverless function is frozen the instant it returns its response,
+  // so the model call was killed mid-flight, the attempt counter was never
+  // incremented, and no error was recorded, since the catch never ran either.
+  // Every submission from the live widget arrived unscored with
+  // `analysisAttempts: 0`, Regroup found nothing analyzed to group, and the
+  // only thing that ever scored anything was the 04:00 cron. Confirmed 21 Sep
+  // 2026 by posting to /api/ingest on localhost (scored in 1.4s) and on
+  // production (still unscored 35s later, zero attempts, zero errors).
+  //
+  // `after()` is the platform-aware version of the same intent: the response
+  // goes out immediately and the callback keeps the function alive until it
+  // finishes, bounded by `maxDuration` above.
   if (decision.analyze) {
-    void analyzeOne(feedback.id).catch((cause: unknown) => {
-      void captureError({
-        source: "analysis",
-        error: cause,
-        context: { orgId: project.orgId, projectId: project.id },
-      });
+    after(async () => {
+      try {
+        await analyzeOne(feedback.id);
+      } catch (cause) {
+        // A systematically broken analysis path (a revoked provider key, a
+        // changed response shape) must not look like a slow one.
+        await captureError({
+          source: "analysis",
+          error: cause,
+          context: { orgId: project.orgId, projectId: project.id },
+        });
+      }
     });
   }
 

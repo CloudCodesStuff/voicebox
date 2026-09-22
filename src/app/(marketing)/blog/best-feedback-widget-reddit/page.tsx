@@ -155,8 +155,9 @@ export default function Page() {
         </LI>
         <LI>
           <strong className="text-ink">Per session</strong> is how behavioural
-          tools meter. Hotjar&apos;s paid plans are reported from about $32/mo,
-          rising with traffic rather than with feedback.
+          tools meter. Hotjar, now Contentsquare, starts at $49/mo for 7,000
+          sessions, with feedback widgets sold separately from $99/mo, and the
+          bill rises with traffic rather than with feedback.
         </LI>
         <LI>
           <strong className="text-ink">Per piece of feedback</strong> is what

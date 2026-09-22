@@ -50,7 +50,9 @@ export function JobsProvider({ children }: { children: React.ReactNode }) {
         .mutate({ projectId })
         .then((result) => {
           toast.success(
-            `Grouped ${result.items} items into ${result.themes} themes.`,
+            result.scored > 0
+              ? `Scored ${result.scored} new submissions and grouped ${result.items} items into ${result.themes} themes.`
+              : `Grouped ${result.items} items into ${result.themes} themes.`,
           );
           void utils.analytics.invalidate();
           void utils.theme.invalidate();
