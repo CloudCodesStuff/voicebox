@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { buttonVariants } from "@/components/site/button";
 import { cn } from "@/lib/utils";
 
 /* Shared marketing layout primitives. Every page composes from these so the
@@ -98,20 +99,17 @@ export function CtaButton({
   variant?: "primary" | "ghost" | "accent";
   className?: string;
 }) {
+  // One button for the whole site: see components/site/button.tsx. `accent`
+  // is the single mint action on a screen, `primary` the white key, `ghost`
+  // the glass one.
   return (
     <Link
       href={href}
       className={cn(
-        "inline-flex cursor-pointer items-center justify-center gap-2 rounded-md px-6 py-3 text-[0.95rem] font-medium transition-all duration-200 active:scale-[0.98]",
-        // The primary action. A vertical gradient and an inset highlight give
-        // it a physical edge; mint is too light for white text, so the label
-        // is near-black and the whole thing still reads as one bright control.
-        variant === "accent" &&
-          "bg-gradient-to-b from-[#2AEFB4] to-[#00BE89] text-mint-ink shadow-[0_1px_2px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.45)] hover:shadow-[0_1px_2px_rgba(0,0,0,0.3),0_4px_16px_rgba(0,229,160,0.35),inset_0_1px_0_rgba(255,255,255,0.5)]",
-        variant === "primary" &&
-          "bg-ink text-paper hover:opacity-90",
-        variant === "ghost" &&
-          "bg-paper-2 text-ink shadow-[0_1px_2px_rgba(0,0,0,0.25)] ring-1 ring-line-strong hover:bg-sunken",
+        buttonVariants({
+          variant: variant === "accent" ? "signal" : variant,
+          size: "lg",
+        }),
         className,
       )}
     >

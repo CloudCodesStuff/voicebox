@@ -1,6 +1,10 @@
+import { Geist, Geist_Mono } from "next/font/google";
+
 import { ConsoleBanner } from "@/components/marketing/console-banner";
-import { MarketingFooter } from "@/components/marketing/footer";
-import { MarketingNav } from "@/components/marketing/nav";
+import { SiteFooter } from "@/components/site/footer";
+import { MotionRoot } from "@/components/site/motion";
+import { SiteNav } from "@/components/site/nav";
+import { SmoothScroll } from "@/components/site/smooth-scroll";
 import { site } from "@/lib/site";
 
 /**
@@ -30,14 +34,25 @@ const organizationLd = {
   sameAs: [`https://x.com/${site.twitter.replace(/^@/, "")}`],
 };
 
+// The marketing site's own typeface. The app keeps Inter; everything under
+// this layout runs on Geist, and `.site` in globals.css points the shared
+// font utilities at it.
+const geist = Geist({
+  variable: "--font-geist",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+});
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+});
+
 /**
- * The top bloom lives here, not in the page.
- *
- * It used to sit inside the hero section, which begins below the nav in the
- * document, so the tinted area started at y=64 and left a hard horizontal
- * seam right under the header. Hoisting it to the layout and giving it a
- * negative z-index puts it behind the nav as well, so the header has nothing
- * of its own to paint and the gradient runs unbroken from the very top edge.
+ * The marketing shell: pure black, a floating glass nav, a framed column
+ * whose hairlines run the height of every page, and a footer built from the
+ * same frame. The skin lives in `.site` (globals.css), so every page under
+ * here (docs, blog, pricing, legal) picks it up without changing.
  */
 export default function MarketingLayout({
   children,
@@ -45,16 +60,17 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative flex min-h-dvh flex-col bg-paper">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[780px] bg-[radial-gradient(ellipse_1100px_620px_at_50%_-14%,rgba(0,229,160,0.13),transparent_68%)]"
-      />
-
+    <div
+      id="top"
+      className={`site ${geist.variable} ${geistMono.variable} relative flex min-h-dvh flex-col overflow-x-clip bg-paper text-ink`}
+    >
+      <SmoothScroll />
       <ConsoleBanner />
-      <MarketingNav />
-      <main className="flex-1">{children}</main>
-      <MarketingFooter />
+      <MotionRoot>
+        <SiteNav />
+        <main className="flex-1 pt-16">{children}</main>
+        <SiteFooter />
+      </MotionRoot>
 
       <script
         type="application/ld+json"

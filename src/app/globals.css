@@ -276,3 +276,94 @@
     transform: translateX(100%);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   The marketing site.
+
+   Pure black, hairlines instead of cards, Geist, and one accent used like a
+   light rather than a paint. Scoped to `.site` (the marketing layout) so the
+   app, the widget and the emails keep the system above. Inside the scope the
+   incumbent tokens are remapped, so every shared marketing component (docs,
+   blog, pricing, legal) reads in the new skin without knowing it moved.
+--------------------------------------------------------------------------- */
+.site {
+  --bg: #000000;
+  --bg-subtle: #0c0c0e;
+  --bg-sunken: #141416;
+
+  --fg: #f3f1fa;
+  --fg-muted: #a3a3a9;
+  --fg-subtle: #75757d;
+
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.16);
+
+  --slab: #09090b;
+  --slab-fg: #e8e6f0;
+
+  --card: var(--bg-subtle);
+  --popover: var(--bg-subtle);
+  --muted: var(--bg-sunken);
+  --accent: var(--bg-sunken);
+
+  /* One typeface, cut by weight and tracking. The shared utilities read the
+     Inter and JetBrains variables, so those are pointed at Geist here. */
+  --font-inter: var(--font-geist);
+  --font-jetbrains-mono: var(--font-geist-mono);
+
+  color-scheme: dark;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: normal;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+html:has(.site) {
+  background: #000;
+  scroll-behavior: smooth;
+}
+.site ::selection {
+  background: rgba(0, 229, 160, 0.25);
+  color: var(--fg);
+}
+
+.site .display {
+  font-weight: 600;
+  letter-spacing: -0.045em;
+}
+
+/* Continuous (Apple-style) corners wherever the browser supports them.
+   Capsules stay capsules. */
+@supports (corner-shape: squircle) {
+  .site [class*="rounded"]:not([class*="rounded-full"]) {
+    corner-shape: superellipse(1.6);
+  }
+}
+
+/* Links: the underline draws in from the left on hover and leaves to the right. */
+.site .link-line {
+  position: relative;
+}
+.site .link-line::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -3px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.7;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.site .link-line:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(.site) {
+    scroll-behavior: auto;
+  }
+}

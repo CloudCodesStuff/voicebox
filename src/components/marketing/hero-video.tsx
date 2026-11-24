@@ -28,9 +28,12 @@ function formatTime(seconds: number): string {
 
 export function HeroVideo({
   src,
+  poster,
   className,
 }: {
   src: string;
+  /** Shown until the first frame decodes, and for reduced-motion visitors. */
+  poster?: string;
   className?: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -122,6 +125,7 @@ export function HeroVideo({
       <video
         ref={videoRef}
         src={src}
+        poster={poster}
         muted
         loop
         playsInline
